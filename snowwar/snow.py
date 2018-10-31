@@ -10,7 +10,7 @@ class Snow:
         self.image = load_image('snow.png')
         self.destroy_image = load_image('snow_destroy.png')
         self.x, self.y = x, y
-        self.prev_x, self.prev_y = x + main_state.base_x, y
+        self.prev_x, self.prev_y = x, y
         self.vx, self.vy = vx, vy
         self.cur_state = FLY
         self.frame = 0
@@ -48,11 +48,17 @@ class Snow:
             self.delete()
 
     def collision_object(self, left, top, right, bottom):
-        if self.prev_y < top and self.prev_x < left < self.x:
-            self.x = left
-            self.cur_state = HIT
-            self.frame = 0
-            return True
+        if self.cur_state == FLY:
+            if self.y < top and self.prev_x < left < self.x and self.vx > 0:
+                self.x = left
+                self.cur_state = HIT
+                self.frame = 0
+                return True
+            elif self.y < top and self.x < right < self.prev_x and self.vx < 0:
+                self.x = right
+                self.cur_state = HIT
+                self.frame = 0
+                return True
 
     def delete(self):
         game_world.remove_object(self, game_world.snow_layer)
