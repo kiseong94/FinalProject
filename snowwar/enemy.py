@@ -193,7 +193,7 @@ class Enemy:
         t = distance/vx
         #vy = (28*math.sqrt(t**2 + 100) + 40*t)/50
         vy = t/5-(40/t)
-        game_world.add_object(snow.Snow(self.x, self.y + 10, -vx, vy), game_world.snow_layer)
+        game_world.add_object(snow.SmallSnow(self.x, self.y + 10, -vx, vy, 0), game_world.snow_layer)
 
 
 

@@ -182,10 +182,18 @@ class ThrowState:
 
     @staticmethod
     def exit(character):
+        if character.snow_stack < 3:
+            game_world.add_object(snow.SmallSnow(200 + main_state.base_x, character.y + 15,
+                                            (character.aim_base_x - character.aim_draw_x) / 15 + 5,
+                                            (character.aim_base_y - character.aim_draw_y) / 15, character.snow_stack-1),
+                                game_world.snow_layer)
+        else:
+            game_world.add_object(snow.BigSnow(200 + main_state.base_x, character.y + 15,
+                                                 (character.aim_base_x - character.aim_draw_x) / 15 + 5,
+                                                 (character.aim_base_y - character.aim_draw_y) / 15,
+                                                 character.snow_stack - 1),
+                                  game_world.snow_layer)
         character.snow_stack = 0
-        game_world.add_object(snow.Snow(200 + main_state.base_x, character.y + 15,
-                                        (character.aim_base_x - character.aim_draw_x) / 15 + 5,
-                                        (character.aim_base_y - character.aim_draw_y) / 15), game_world.snow_layer)
 
     @staticmethod
     def do(character):

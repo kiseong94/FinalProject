@@ -1,5 +1,5 @@
 
-back_ground_layer, snow_layer, character_layer, snow_wall_layer = 0, 1, 2, 3
+back_ground_layer, character_layer, snow_layer, snow_wall_layer = 0, 1, 2, 3
 
 objects = [[], [], [], []]
 
