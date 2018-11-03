@@ -7,7 +7,7 @@ LEVEL1, LEVEL2, LEVEL3 = range(3)
 
 class SnowWall:
     def __init__(self, x):
-        self.image = load_image('snow_wall.png')
+        self.image = load_image('image\\snows\\snow_wall.png')
         self.x, self.y = x, 260 + 25
         self.cur_state = LEVEL1
         self.hp = 1
@@ -29,9 +29,9 @@ class SnowWall:
     def strengthen_wall(self):
         self.hp += 1
 
-        if self.cur_state == LEVEL1 and self.hp >= 3:
+        if 3 <= self.hp <= 5:
             self.cur_state = LEVEL2
-        elif self.cur_state == LEVEL2 and self.hp >= 5:
+        elif self.hp > 5:
             self.cur_state = LEVEL3
 
     def check_existence(self, x1, x2):
@@ -43,7 +43,16 @@ class SnowWall:
     def collision_snow(self):
         for snow in game_world.layer_objects(game_world.snow_layer):
             if snow.collision_object(*self.get_hit_box()):
-                pass
+               self. hp -= 1;
+               if self.hp < 1:
+                   game_world.remove_object(self, game_world.snow_wall_layer)
+               elif 1 <= self.hp < 3:
+                   self.cur_state = LEVEL1
+               elif 3 <= self.hp < 6:
+                   self.cur_state = LEVEL2
+               elif self.hp >= 6:
+                   self.cur_state = LEVEL3
+
 
     def get_hit_box(self):
         if self.cur_state == LEVEL1:

@@ -9,12 +9,14 @@ import game_world
 import main_character
 import back_ground
 import enemy
+import interface
 
 name = "MainState"
 
 player = None
 background = None
 font = None
+ui = None
 base_x = 0
 cnt = 100
 
@@ -22,8 +24,10 @@ cnt = 100
 def enter():
     global player
     global background
+    global ui
     player = main_character.Character()
     background = back_ground.Back_Ground()
+    ui = interface.UI()
     game_world.add_object(player, game_world.character_layer)
     game_world.add_object(background, game_world.back_ground_layer)
 
@@ -53,6 +57,7 @@ def handle_events():
 
 def update():
     global cnt
+
     if cnt == 0:
         game_world.add_object(enemy.Enemy_Basic(), game_world.character_layer)
         cnt = 100
@@ -64,9 +69,12 @@ def update():
 
 
 def draw():
+    global ui
     clear_canvas()
     for game_object in game_world.all_objects():
         game_object.draw()
+
+    ui.draw()
     update_canvas()
 
 

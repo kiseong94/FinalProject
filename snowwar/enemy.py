@@ -4,7 +4,7 @@ import random
 import snow
 import game_world
 
-IDLE, MOVE, AIM, THROW, HIT, DEAD, SIT, MAKE_WALL, RELOAD = range(9)
+IDLE, MOVE, AIM, THROW, HIT, DEAD1, DEAD2, DEAD3, SIT, MAKE_WALL, RELOAD = range(11)
 
 
 # initialization code
@@ -144,23 +144,53 @@ class Enemy:
         pass
 
 
-    def enter_DEAD(self):
+    def enter_DEAD1(self):
         self.frame = 0
 
-    def exit_DEAD(self):
+    def exit_DEAD1(self):
         pass
 
-    def do_DEAD(self):
+    def do_DEAD1(self):
         if self.frame < 15:
             self.frame += 1
 
-    def draw_DEAD(self):
+    def draw_DEAD1(self):
         self.image.clip_draw(60 * (self.frame//2), 60 * 1, 60, 60, self.x - main_state.base_x, self.y, 60, 60)
 
-    enter_state = {IDLE: enter_IDLE, MOVE: enter_MOVE, DEAD: enter_DEAD, RELOAD: enter_RELOAD, AIM: enter_AIM, THROW: enter_THROW}
-    exit_state = {IDLE: exit_IDLE, MOVE: exit_MOVE, DEAD: exit_DEAD, RELOAD: exit_RELOAD, AIM: exit_AIM, THROW: exit_THROW}
-    do_state = {IDLE: do_IDLE, MOVE: do_MOVE, DEAD: do_DEAD, RELOAD: do_RELOAD, AIM: do_AIM, THROW: do_THROW}
-    draw_state = {IDLE: draw_IDLE, MOVE: draw_MOVE, DEAD: draw_DEAD, RELOAD: draw_RELOAD, AIM: draw_AIM, THROW: draw_THROW}
+    def enter_DEAD2(self):
+        self.frame = 0
+
+    def exit_DEAD2(self):
+        pass
+
+    def do_DEAD2(self):
+        if self.frame < 15:
+            self.frame += 1
+            self.x += 3
+
+    def draw_DEAD2(self):
+        self.image.clip_draw(60 * (self.frame//2), 60 * 5, 60, 60, self.x - main_state.base_x, self.y, 60, 60)
+
+
+    def enter_DEAD3(self):
+        self.frame = 0
+
+    def exit_DEAD3(self):
+        pass
+
+    def do_DEAD3(self):
+        if self.frame < 15:
+            self.frame += 1
+
+    def draw_DEAD3(self):
+        self.image.clip_draw(60 * (self.frame//2), 60 * 6, 60, 60, self.x - main_state.base_x, self.y, 60, 60)
+
+
+
+    enter_state = {IDLE: enter_IDLE, MOVE: enter_MOVE, DEAD1: enter_DEAD1,DEAD2: enter_DEAD2,DEAD3: enter_DEAD3,  RELOAD: enter_RELOAD, AIM: enter_AIM, THROW: enter_THROW}
+    exit_state = {IDLE: exit_IDLE, MOVE: exit_MOVE, DEAD1: exit_DEAD1, DEAD2: exit_DEAD2, DEAD3: exit_DEAD3,RELOAD: exit_RELOAD, AIM: exit_AIM, THROW: exit_THROW}
+    do_state = {IDLE: do_IDLE, MOVE: do_MOVE, DEAD1: do_DEAD1, DEAD2: do_DEAD2, DEAD3: do_DEAD3, RELOAD: do_RELOAD, AIM: do_AIM, THROW: do_THROW}
+    draw_state = {IDLE: draw_IDLE, MOVE: draw_MOVE, DEAD1: draw_DEAD1, DEAD2: draw_DEAD2, DEAD3: draw_DEAD3, RELOAD: draw_RELOAD, AIM: draw_AIM, THROW: draw_THROW}
 
 
     def add_event(self, event):
@@ -175,13 +205,19 @@ class Enemy:
 
     def update(self):
         self.do_state[self.cur_state](self)
-        if self.cur_state == IDLE or self.cur_state != DEAD:
+        if self.cur_state == IDLE or (self.cur_state != DEAD1 and self.cur_state != DEAD2 and self.cur_state != DEAD3):
             self.select_state()
 
-        if self.cur_state != DEAD:
+        if self.cur_state != DEAD1 and self.cur_state != DEAD2 and self.cur_state != DEAD3:
             for s in game_world.layer_objects(game_world.snow_layer):
-                if s.collision_object(self.x - 10, self.y + 25, self.x + 10, self.y - 25):
-                    self.change_state(DEAD)
+                if s.vx >= 0:
+                    if s.collision_object(self.x - 10, self.y + 25, self.x + 10, self.y - 25):
+                        if s.type == 0:
+                            self.change_state(DEAD1)
+                        elif s.type == 1:
+                            self.change_state(DEAD2)
+                        elif s.type == 2:
+                            self.change_state(DEAD3)
 
     def draw(self):
         self.draw_state[self.cur_state](self)
@@ -203,7 +239,7 @@ class Enemy:
 
 class Enemy_Basic(Enemy):
     def __init__(self):
-        self.image = load_image('enemy_image.png')
+        self.image = load_image('image\\enemy\\basic\\enemy_image.png')
         self.velocity = -2
         self.cur_state = MOVE
         self.event_que = []

@@ -5,7 +5,7 @@ import snow_wall
 import math
 import game_world
 
-A_DOWN, A_UP, S_DOWN, S_UP, W_DOWN, W_UP, D_DOWN, D_UP, R_DOWN, LEFT_BUTTON_DOWN, LEFT_BUTTON_UP, TIME_UP = range(12)
+A_DOWN, A_UP, S_DOWN, S_UP, W_DOWN, W_UP, D_DOWN, D_UP, R_DOWN, LEFT_BUTTON_DOWN, LEFT_BUTTON_UP, TIME_UP, SNOW, STONE_SNOW, ICICLE = range(15)
 
 
 key_event_table = {
@@ -18,6 +18,11 @@ key_event_table = {
 mouse_event_table = {
     (SDL_MOUSEBUTTONDOWN, SDL_BUTTON_LEFT): LEFT_BUTTON_DOWN,
     (SDL_MOUSEBUTTONUP, SDL_BUTTON_LEFT): LEFT_BUTTON_UP,
+}
+weapon_key_table = {
+    (SDL_KEYDOWN, SDLK_1): SNOW,
+    (SDL_KEYDOWN, SDLK_2): STONE_SNOW,
+    (SDL_KEYDOWN, SDLK_3): ICICLE
 }
 
 
@@ -52,7 +57,7 @@ class MoveState:
 
     @staticmethod
     def do(character):
-        character.frame = (character.frame + 1) % 8
+        character.frame = (character.frame + 1) % 16
         main_state.base_x += character.velocity
         main_state.background.move_ground(character.velocity)
         main_state.background.move_forest(character.velocity)
@@ -61,9 +66,9 @@ class MoveState:
     @staticmethod
     def draw(character):
         if character.velocity > 0:
-            character.image.clip_draw(60 * character.frame, 60 * 1, 60, 60, 200, character.y, 60, 60)
+            character.image.clip_draw(60 * (character.frame//2), 60 * 1, 60, 60, 200, character.y, 60, 60)
         else:
-            character.image.clip_draw(60 * character.frame, 60 * 2, 60, 60, 200, character.y, 60, 60)
+            character.image.clip_draw(60 * (character.frame//2), 60 * 2, 60, 60, 200, character.y, 60, 60)
 
 
 class ReloadState:
@@ -182,18 +187,8 @@ class ThrowState:
 
     @staticmethod
     def exit(character):
-        if character.snow_stack < 3:
-            game_world.add_object(snow.SmallSnow(200 + main_state.base_x, character.y + 15,
-                                            (character.aim_base_x - character.aim_draw_x) / 15 + 5,
-                                            (character.aim_base_y - character.aim_draw_y) / 15, character.snow_stack-1),
-                                game_world.snow_layer)
-        else:
-            game_world.add_object(snow.BigSnow(200 + main_state.base_x, character.y + 15,
-                                                 (character.aim_base_x - character.aim_draw_x) / 15 + 5,
-                                                 (character.aim_base_y - character.aim_draw_y) / 15,
-                                                 character.snow_stack - 1),
-                                  game_world.snow_layer)
-        character.snow_stack = 0
+        character.throw()
+
 
     @staticmethod
     def do(character):
@@ -250,9 +245,9 @@ class Character:
 
     def __init__(self):
         self.event_que = []
-        self.image = load_image('main.png')
-        self.arrow_image = load_image('arrow.png')
-        self.throw_image = load_image('throw_parts.png')
+        self.image = load_image('image\\main_character\\main.png')
+        self.arrow_image = load_image('image\\main_character\\arrow.png')
+        self.throw_image = load_image('image\\main_character\\throw_parts.png')
         self.x, self.y = 200, 30 + 260
         self.cur_state = IdleState
         self.frame = 0
@@ -264,6 +259,7 @@ class Character:
         self.timer = 0
         self.throw_degree = 0
         self.snow_stack = 0
+        self.weapon_type = SNOW
 
 
     def add_event(self, event):
@@ -285,6 +281,34 @@ class Character:
     def draw(self):
         self.cur_state.draw(self)
 
+    def throw(self):
+        if self.weapon_type == SNOW:
+            if self.snow_stack < 3:
+                game_world.add_object(snow.SmallSnow(200 + main_state.base_x, self.y + 15,
+                                            (self.aim_base_x - self.aim_draw_x) / 15 + 5,
+                                            (self.aim_base_y - self.aim_draw_y) / 15, self.snow_stack-1),
+                                game_world.snow_layer)
+            else:
+                game_world.add_object(snow.BigSnow(200 + main_state.base_x, self.y + 15,
+                                                 (self.aim_base_x - self.aim_draw_x) / 15 + 5,
+                                                 (self.aim_base_y - self.aim_draw_y) / 15,
+                                                 self.snow_stack - 1),
+                                  game_world.snow_layer)
+        elif self.weapon_type == STONE_SNOW:
+            game_world.add_object(snow.StoneSnow(200 + main_state.base_x, self.y + 15,
+                                                 (self.aim_base_x - self.aim_draw_x) / 15 + 5,
+                                                 (self.aim_base_y - self.aim_draw_y) / 15),
+                                  game_world.snow_layer)
+        elif self.weapon_type == ICICLE:
+            game_world.add_object(snow.Icicle(200 + main_state.base_x, self.y + 15,
+                                                 (self.aim_base_x - self.aim_draw_x) / 15 + 5,
+                                                 (self.aim_base_y - self.aim_draw_y) / 15),
+                                  game_world.snow_layer)
+
+
+        self.snow_stack = 0
+    
+
     def handle_event(self, event):
         if (event.type, event.key) in key_event_table:
             key_event = key_event_table[(event.type, event.key)]
@@ -297,6 +321,14 @@ class Character:
             elif key_event == A_UP:
                 self.velocity += 2
             self.add_event(key_event)
+        elif (event.type, event.key) in weapon_key_table:
+            key_event = weapon_key_table[(event.type, event.key)]
+            if key_event == SNOW:
+                self.weapon_type = SNOW
+            elif key_event == STONE_SNOW:
+                self.weapon_type = STONE_SNOW
+            elif key_event == ICICLE:
+                self.weapon_type = ICICLE
         elif (event.type, event.button) in mouse_event_table:
             key_event = mouse_event_table[(event.type, event.button)]
             if key_event == LEFT_BUTTON_DOWN:

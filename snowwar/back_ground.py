@@ -4,10 +4,10 @@ from pico2d import *
 
 class Back_Ground:
     def __init__(self):
-        self.ground_image = load_image('ground.png')
-        self.mountain_image = load_image('mountain.png')
-        self.forest_image = load_image('forest.png')
-        self.tree_image = load_image('trees.png')
+        self.ground_image = load_image('image\\background\\ground.png')
+        self.mountain_image = load_image('image\\background\\mountain.png')
+        self.forest_image = load_image('image\\background\\forest.png')
+        self.tree_image = load_image('image\\background\\trees.png')
         self.mountain_x = 0
         self.forest_x = 0
         self.ground_x = 0
