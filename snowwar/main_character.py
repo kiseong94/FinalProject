@@ -260,6 +260,7 @@ class Character:
         self.throw_degree = 0
         self.snow_stack = 0
         self.weapon_type = SNOW
+        self.ammo = [0, 0, 0]
 
 
     def add_event(self, event):

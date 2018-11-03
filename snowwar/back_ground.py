@@ -8,12 +8,14 @@ class Back_Ground:
         self.mountain_image = load_image('image\\background\\mountain.png')
         self.forest_image = load_image('image\\background\\forest.png')
         self.tree_image = load_image('image\\background\\trees.png')
+        self.sky_image = load_image('image\\background\\sky.png')
         self.mountain_x = 0
         self.forest_x = 0
         self.ground_x = 0
 
 
     def draw(self):
+        self.sky_image.draw(800, 550, 1600, 700)
         self.mountain_image.draw(800 - self.mountain_x, 200 + self.mountain_image.h, 1600, 400)
         self.mountain_image.draw(1600 + 800 - self.mountain_x, 200 + self.mountain_image.h, 1600, 400)
         self.forest_image.draw(800 - self.forest_x, 340, 1600, 160)
@@ -22,6 +24,7 @@ class Back_Ground:
         self.tree_image.draw(1600 + 800 - self.ground_x, 340 + self.tree_image.h // 2, 1600, 320)
         self.ground_image.draw(800 - self.ground_x,230)
         self.ground_image.draw(1600 + 800 - self.ground_x, 230)
+
 
     def move_ground(self, distance):
         self.ground_x = (self.ground_x + distance) % 1600
