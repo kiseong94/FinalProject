@@ -18,6 +18,10 @@ class UI:
     def draw(self):
         self.image.draw(self.x, self.y)
 
+        self.weapon_image.clip_draw(0 * 120, 0, 120, 180, 300, 95)
+        self.weapon_image.clip_draw(1 * 120, 0, 120, 180, 300 + 150, 95)
+        self.weapon_image.clip_draw(2 * 120, 0, 120, 180, 300 + 300, 95)
+
        
 
 
