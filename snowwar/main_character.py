@@ -5,7 +5,7 @@ import snow_wall
 import math
 import game_world
 
-A_DOWN, A_UP, S_DOWN, S_UP, W_DOWN, W_UP, D_DOWN, D_UP, R_DOWN, LEFT_BUTTON_DOWN, LEFT_BUTTON_UP, TIME_UP, SNOW, STONE_SNOW, ICICLE = range(15)
+SNOW, STONE_SNOW, ICICLE, A_DOWN, A_UP, S_DOWN, S_UP, W_DOWN, W_UP, D_DOWN, D_UP, R_DOWN, LEFT_BUTTON_DOWN, LEFT_BUTTON_UP, TIME_UP = range(15)
 
 
 key_event_table = {
@@ -77,6 +77,8 @@ class ReloadState:
     def enter(character):
         character.frame = 0
         character.timer = 0
+        if (character.weapon_type == SNOW and character.snow_stack == 4) or (character.weapon_type == STONE_SNOW and character.ammo[1] == 1) or character.weapon_type == ICICLE :
+            character.add_event(TIME_UP)
 
     @staticmethod
     def exit(character):
@@ -86,7 +88,14 @@ class ReloadState:
     def do(character):
         character.frame = (character.frame + 1) % 16
         if character.timer == character.reload_time:
-            character.snow_stack += 1
+            if character.weapon_type == SNOW:
+                if character.ammo[0] == 0:
+                    character.ammo[0] += 1
+                character.snow_stack += 1
+            elif character.weapon_type == STONE_SNOW:
+                character.ammo[1] += 1
+
+
             character.add_event(TIME_UP)
         else:
             character.timer += 1
@@ -155,6 +164,7 @@ class AimState:
         character.aim_draw_x, character.aim_draw_y = character.aim_base_x, character.aim_base_y
         character.frame = 0
         character.throw_power = 0
+
 
     @staticmethod
     def exit(character):
@@ -260,7 +270,7 @@ class Character:
         self.throw_degree = 0
         self.snow_stack = 0
         self.weapon_type = SNOW
-        self.ammo = [0, 0, 0]
+        self.ammo = [0, 0, 30]
 
 
     def add_event(self, event):
@@ -306,8 +316,10 @@ class Character:
                                                  (self.aim_base_y - self.aim_draw_y) / 15),
                                   game_world.snow_layer)
 
+        self.ammo[self.weapon_type] -= 1
 
-        self.snow_stack = 0
+        if self.weapon_type == SNOW:
+            self.snow_stack = 0
     
 
     def handle_event(self, event):
@@ -322,18 +334,19 @@ class Character:
             elif key_event == A_UP:
                 self.velocity += 2
             self.add_event(key_event)
+
         elif (event.type, event.key) in weapon_key_table:
             key_event = weapon_key_table[(event.type, event.key)]
-            if key_event == SNOW:
-                self.weapon_type = SNOW
-            elif key_event == STONE_SNOW:
-                self.weapon_type = STONE_SNOW
-            elif key_event == ICICLE:
-                self.weapon_type = ICICLE
+            if key_event != self.weapon_type and self.cur_state == ReloadState:
+                self.add_event(TIME_UP)
+                self.weapon_type = key_event
+            else:
+                self.weapon_type = key_event
+
         elif (event.type, event.button) in mouse_event_table:
             key_event = mouse_event_table[(event.type, event.button)]
             if key_event == LEFT_BUTTON_DOWN:
-                if self.snow_stack == 0:
+                if self.ammo[self.weapon_type] == 0:
                     key_event = R_DOWN
                 else:
                     self.aim_base_x, self.aim_base_y = event.x, 900 - event.y - 1

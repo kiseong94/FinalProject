@@ -31,6 +31,7 @@ def enter():
     game_world.add_object(player, game_world.character_layer)
     game_world.add_object(background, game_world.back_ground_layer)
 
+
 def exit():
     game_world.clear()
 
