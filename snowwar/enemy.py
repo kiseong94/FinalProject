@@ -131,6 +131,8 @@ class Enemy:
         self.image.clip_draw(60 * (self.frame // 2), 60 * 4, 60, 60, self.x - main_state.base_x, self.y, 60, 60)
 
 
+
+
     def enter_HIT(self):
         pass
 
@@ -212,12 +214,14 @@ class Enemy:
             for s in game_world.layer_objects(game_world.snow_layer):
                 if s.vx >= 0:
                     if s.collision_object(self.x - 10, self.y + 25, self.x + 10, self.y - 25):
-                        if s.type == 0:
+                        if s.type == 0 or s.type == 3:
                             self.change_state(DEAD1)
                         elif s.type == 1:
                             self.change_state(DEAD2)
                         elif s.type == 2:
                             self.change_state(DEAD3)
+        if (self.cur_state == DEAD1 or self.cur_state == DEAD2 or self.cur_state == DEAD3) and self.out_of_sight():
+            self.delete()
 
     def draw(self):
         self.draw_state[self.cur_state](self)
@@ -231,8 +235,12 @@ class Enemy:
         vy = t/5-(40/t)
         game_world.add_object(snow.SmallSnow(self.x, self.y + 10, -vx, vy, 0), game_world.snow_layer)
 
+    def out_of_sight(self):
+        if main_state.base_x > self.x or self.x > main_state.base_x + 1600:
+            return True
 
-
+    def delete(self):
+        game_world.remove_object(self, game_world.character_layer)
 
 
 

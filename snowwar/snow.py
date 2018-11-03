@@ -198,3 +198,37 @@ class Icicle(Snow):
             elif self.y < top and self.x < right < self.prev_x and self.vx < 0:
                 self.delete()
                 return True
+
+
+class SpreadSnow(Snow):
+    def __init__(self, x, y):
+        self.destroy_image = load_image('image\\snows\\spread_snow.png')
+        self.x, self.y = x, y
+        self.vx = 1
+        self.cur_state = HIT
+        self.frame = 0
+        self.type = 3
+
+    def draw(self):
+        self.destroy_image.clip_draw((self.frame//3)*120, 0, 120, 60, self.x-main_state.base_x, self.y)
+
+    def collision_object(self, left, top, right, bottom):
+        snow_left, snow_top, snow_right, snow_bottom = self.get_hit_box()
+        if snow_left <= right and snow_right >= left and snow_bottom <= top and snow_top >= bottom:
+            return True
+
+    def update(self):
+        if self.frame == 30:
+            self.delete()
+        else:
+            self.frame = self.frame + 1
+
+        draw_rectangle(*self.get_hit_box())
+
+    def get_hit_box(self):
+        if 0 <= self.frame < 10:
+            return self.x - 60, self.y + 30, self.x - 20, self.y - 30
+        elif 10 <= self.frame < 20:
+            return self.x - 20, self.y + 30, self.x + 20, self.y - 30
+        elif 20 <= self.frame <= 30:
+            return self.x + 20, self.y + 30, self.x + 60, self.y - 30
