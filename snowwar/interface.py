@@ -22,7 +22,12 @@ class UI:
         self.weapon_image.clip_draw(1 * 120, 0, 120, 180, 300 + 150, 95)
         self.weapon_image.clip_draw(2 * 120, 0, 120, 180, 300 + 300, 95)
 
-       
+        if main_state.player.weapon_type == main_character.SNOW:
+            self.select_image.draw(300, 95)
+        elif main_state.player.weapon_type == main_character.STONE_SNOW:
+            self.select_image.draw(300 + 150, 95)
+        elif main_state.player.weapon_type == main_character.ICICLE:
+            self.select_image.draw(300 + 300, 95)
 
 
     def update(self):
