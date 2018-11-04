@@ -12,19 +12,22 @@ def remove_object(o, layer):
         del o
 
 def clear():
-    for o in all_objects():
-        if o in objects[back_ground_layer]:
-            objects[back_ground_layer].remove(o)
-            del o
-        elif o in objects[character_layer]:
-            objects[character_layer].remove(o)
-            del o
-        elif o in objects[snow_layer]:
-            objects[snow_layer].remove(o)
-            del o
-        elif o in objects[snow_wall_layer]:
-            objects[snow_wall_layer].remove(o)
-            del o
+    for o in objects[back_ground_layer]:
+        objects[back_ground_layer].remove(o)
+        del o
+    for o in objects[character_layer]:
+        objects[character_layer].remove(o)
+        del o
+    for o in objects[snow_layer]:
+        objects[snow_layer].remove(o)
+        del o
+    for o in objects[snow_wall_layer]:
+        objects[snow_wall_layer].remove(o)
+        del o
+
+
+
+
 
 
 def all_objects():

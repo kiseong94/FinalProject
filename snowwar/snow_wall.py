@@ -6,8 +6,10 @@ import snow
 LEVEL1, LEVEL2, LEVEL3 = range(3)
 
 class SnowWall:
+    image = None
     def __init__(self, x):
-        self.image = load_image('image\\snows\\snow_wall.png')
+        if SnowWall.image == None:
+            SnowWall.image = load_image('image\\snows\\snow_wall.png')
         self.x, self.y = x, 260 + 25
         self.cur_state = LEVEL1
         self.hp = 1

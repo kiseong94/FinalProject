@@ -246,8 +246,10 @@ class Enemy:
 
 
 class Enemy_Basic(Enemy):
+    image = None
     def __init__(self):
-        self.image = load_image('image\\enemy\\basic\\enemy_image.png')
+        if Enemy_Basic.image == None:
+            Enemy_Basic.image = load_image('image\\enemy\\basic\\enemy_image.png')
         self.velocity = -2
         self.cur_state = MOVE
         self.event_que = []

@@ -19,16 +19,19 @@ background = None
 font = None
 ui = None
 base_x = 0
-cnt = 100
+cnt = 10
 
 
 def enter():
     global player
     global background
     global ui
+    global base_x
+    base_x = 0
     player = main_character.Character()
     background = back_ground.Back_Ground()
     ui = interface.UI()
+    game_world.objects = [[], [], [], []]
     game_world.add_object(player, game_world.character_layer)
     game_world.add_object(background, game_world.back_ground_layer)
 
@@ -64,7 +67,7 @@ def update():
 
     if cnt == 0:
         game_world.add_object(enemy.Enemy_Basic(), game_world.character_layer)
-        cnt = 100
+        cnt = 50
     else:
         cnt -= 1
 

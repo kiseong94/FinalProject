@@ -7,7 +7,6 @@ FLY, HIT, DESTROY = range(3)
 pi = 3.14
 
 class Snow:
-
     def draw(self):
         pass
 
@@ -52,9 +51,13 @@ class Snow:
         game_world.remove_object(self, game_world.snow_layer)
 
 class SmallSnow(Snow):
+    image = None
+    destroy_image = None
     def __init__(self, x, y, vx, vy, size):
-        self.image = load_image('image\\snows\\snow.png')
-        self.destroy_image = load_image('image\\snows\\snow_destroy.png')
+        if SmallSnow.image == None:
+            SmallSnow.image = load_image('image\\snows\\snow.png')
+        if SmallSnow.destroy_image == None:
+            SmallSnow.destroy_image = load_image('image\\snows\\snow_destroy.png')
         self.x, self.y = x, y
         self.prev_x, self.prev_y = x, y
         self.vx, self.vy = vx, vy
@@ -72,9 +75,13 @@ class SmallSnow(Snow):
 
 
 class BigSnow(Snow):
+    image = None
+    destroy_image = None
     def __init__(self, x, y, vx, vy, size):
-        self.image = load_image('image\\snows\\big_snow.png')
-        self.destroy_image = load_image('image\\snows\\big_snow_destroy.png')
+        if BigSnow.image == None:
+            BigSnow.image = load_image('image\\snows\\big_snow.png')
+        if BigSnow.destroy_image == None:
+            BigSnow.destroy_image = load_image('image\\snows\\big_snow_destroy.png')
         self.x, self.y = x, y
         self.prev_x, self.prev_y = x, y
         self.vx, self.vy = vx, vy
@@ -124,9 +131,13 @@ class BigSnow(Snow):
         return self.x - 20, self.y + 10, self.x + 40, self.y - 40
 
 class StoneSnow(Snow):
+    image = None
+    destroy_image = None
     def __init__(self, x, y, vx, vy):
-        self.image = load_image('image\\snows\\stone_snow.png')
-        self.destroy_image = load_image('image\\snows\\snow_destroy.png')
+        if StoneSnow.image == None:
+            StoneSnow.image = load_image('image\\snows\\stone_snow.png')
+        if StoneSnow.destroy_image == None:
+            StoneSnow.destroy_image = load_image('image\\snows\\snow_destroy.png')
         self.x, self.y = x, y
         self.prev_x, self.prev_y = x, y
         self.vx, self.vy = vx, vy
@@ -160,9 +171,13 @@ class StoneSnow(Snow):
                 return True
 
 class Icicle(Snow):
+    image = None
+    destroy_image = None
     def __init__(self, x, y, vx, vy):
-        self.image = load_image('image\\snows\\icicle.png')
-        self.destroy_image = load_image('image\\snows\\snow_destroy.png')
+        if Icicle.image == None:
+            Icicle.image = load_image('image\\snows\\icicle.png')
+        if Icicle.destroy_image == None:
+            Icicle.destroy_image = load_image('image\\snows\\snow_destroy.png')
         self.x, self.y = x, y
         self.prev_x, self.prev_y = x, y
         self.vx, self.vy = vx, vy
@@ -200,8 +215,10 @@ class Icicle(Snow):
 
 
 class SpreadSnow(Snow):
+    destroy_image = None
     def __init__(self, x, y):
-        self.destroy_image = load_image('image\\snows\\spread_snow.png')
+        if SpreadSnow.destroy_image == None:
+            SpreadSnow.destroy_image = load_image('image\\snows\\spread_snow.png')
         self.x, self.y = x, y
         self.vx = 1
         self.cur_state = HIT
