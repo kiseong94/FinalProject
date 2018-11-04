@@ -31,12 +31,12 @@ class Enemy:
         pass
 
     def do_MOVE(self):
-        self.frame = (self.frame + 1) % 8
+        self.frame = (self.frame + 1) % 16
         self.x += self.velocity
 
 
     def draw_MOVE(self):
-        self.image.clip_draw(60 * self.frame, 60 * 0, 60, 60, self.x - main_state.base_x, self.y, 60, 60)
+        self.image.clip_draw(60 * (self.frame // 2), 60 * 0, 60, 60, self.x - main_state.base_x, self.y, 60, 60)
 
 
 

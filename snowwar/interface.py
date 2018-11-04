@@ -36,6 +36,9 @@ class UI:
         self.weapon_image.clip_draw(2 * 120, 0, 120, 180, 300 + 300, 95)
         self.font.draw(300 + 300 - 10, 30, '%d' % main_state.player.ammo[2], (0, 0, 0))
 
+        self.weapon_image.clip_draw(3 * 120, 0, 120, 180, 300 + 450, 95)
+        self.font.draw(300 + 450 - 35, 30, '%d / 1' % main_state.player.ammo[3], (0, 0, 0))
+
 
         if main_state.player.weapon_type == main_character.SNOW:
             self.select_image.draw(300, 95)
@@ -43,6 +46,8 @@ class UI:
             self.select_image.draw(300 + 150, 95)
         elif main_state.player.weapon_type == main_character.ICICLE:
             self.select_image.draw(300 + 300, 95)
+        elif main_state.player.weapon_type == main_character.BUCKET:
+            self.select_image.draw(300 + 450, 95)
 
 
     def update(self):

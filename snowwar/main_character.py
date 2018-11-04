@@ -192,7 +192,7 @@ class AimState:
             character.aim_draw_y = character.aim_base_y - 1
         if character.aim_base_x <= character.aim_draw_x:
             character.aim_draw_x = character.aim_base_x - 1
-        character.throw_power = math.sqrt((character.aim_draw_x - character.aim_base_x)**2+(character.aim_base_y - character.aim_draw_y)**2)
+        character.throw_power = clamp(0, math.sqrt((character.aim_draw_x - character.aim_base_x)**2+(character.aim_base_y - character.aim_draw_y)**2), character.max_throw_power)
         character.throw_degree = math.atan((character.aim_draw_x - character.aim_base_x)/(character.aim_base_y - character.aim_draw_y))
 
     @staticmethod
@@ -290,6 +290,7 @@ class Character:
         self.velocity = 0
         self.reload_time = 60
         self.throw_power = 0
+        self.max_throw_power = 280
         self.aim_base_x, self.aim_base_y = 0, 0
         self.aim_draw_x, self.aim_draw_y = 0, 0
         self.timer = 0
@@ -319,27 +320,29 @@ class Character:
         self.cur_state.draw(self)
 
     def throw(self):
+        bias_x = (self.aim_base_x - self.aim_draw_x) / (self.aim_base_x - self.aim_draw_x + self.aim_base_y - self.aim_draw_y)
+        bias_y = (self.aim_base_y - self.aim_draw_y) / (self.aim_base_x - self.aim_draw_x + self.aim_base_y - self.aim_draw_y)
         if self.weapon_type == SNOW:
             if self.snow_stack < 3:
                 game_world.add_object(snow.SmallSnow(200 + main_state.base_x, self.y + 15,
-                                            (self.aim_base_x - self.aim_draw_x) / 15 + 5,
-                                            (self.aim_base_y - self.aim_draw_y) / 15, self.snow_stack-1),
+                                            self.throw_power * bias_x / 10 + 6 - self.snow_stack * 2,
+                                            self.throw_power * bias_y / 10 - self.snow_stack * 2, self.snow_stack-1),
                                 game_world.snow_layer)
             else:
                 game_world.add_object(snow.BigSnow(200 + main_state.base_x, self.y + 15,
-                                                 (self.aim_base_x - self.aim_draw_x) / 15 + 5,
-                                                 (self.aim_base_y - self.aim_draw_y) / 15,
+                                                 self.throw_power * bias_x / 10 + 6 - self.snow_stack * 2,
+                                                 self.throw_power * bias_y / 10 - self.snow_stack * 2,
                                                  self.snow_stack - 1),
                                   game_world.snow_layer)
         elif self.weapon_type == STONE_SNOW:
             game_world.add_object(snow.StoneSnow(200 + main_state.base_x, self.y + 15,
-                                                 (self.aim_base_x - self.aim_draw_x) / 15 + 5,
-                                                 (self.aim_base_y - self.aim_draw_y) / 15),
+                                                 self.throw_power * bias_x / 10 + 6,
+                                                 self.throw_power * bias_y / 10),
                                   game_world.snow_layer)
         elif self.weapon_type == ICICLE:
             game_world.add_object(snow.Icicle(200 + main_state.base_x, self.y + 15,
-                                                 (self.aim_base_x - self.aim_draw_x) / 15 + 5,
-                                                 (self.aim_base_y - self.aim_draw_y) / 15),
+                                                 self.throw_power * bias_x / 10 / 2 + 6,
+                                                 self.throw_power * bias_y / 10 / 2),
                                   game_world.snow_layer)
         elif self.weapon_type == BUCKET:
             game_world.add_object(snow.SpreadSnow(200 + 80 + main_state.base_x, self.y), game_world.snow_layer)

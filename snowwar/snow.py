@@ -111,7 +111,7 @@ class BigSnow(Snow):
             self.prev_x, self.prev_y = self.x, self.y
             self.x += self.vx
             self.y += self.vy
-            self.vy = self.vy - 0.4 - 0.1 * self.size
+            self.vy = self.vy - 0.4
             self.collision_ground()
             self.out_of_sight()
         elif self.cur_state == HIT:
@@ -168,7 +168,6 @@ class Icicle(Snow):
         self.vx, self.vy = vx, vy
         self.cur_state = FLY
         self.frame = 0
-        self.size = 8
         self.degree = 0
         self.type = 2
 
@@ -183,7 +182,7 @@ class Icicle(Snow):
             self.prev_x, self.prev_y = self.x, self.y
             self.x += self.vx
             self.y += self.vy
-            self.vy = self.vy - 0.4 - 0.1 * self.size
+            self.vy = self.vy - 0.4
             self.degree += (2 * pi) / 10
             self.collision_ground()
             self.out_of_sight()
