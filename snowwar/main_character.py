@@ -205,6 +205,31 @@ class AimState:
             character.throw_image.clip_composite_draw(40 * 0, 0, 40, 45, clamp(-2, character.throw_degree, -0.2), 'n', 200 - 5, character.y + 10, 40, 45)
             character.throw_image.clip_composite_draw(40 * 2, 0, 40, 45, clamp(-2, character.throw_degree, -0.6) - 30, 'n', 200 - 1, character.y + 15, 40, 45)
             character.arrow_image.rotate_draw(character.throw_degree, 200, 350, 10 + character.throw_power / 12, 30 + character.throw_power / 2)
+            if character.weapon_type == SNOW:
+                if character.snow_stack == 1:
+                    character.throw_objects.clip_composite_draw(40 * 0, 0, 40, 45,
+                                                              clamp(-2, character.throw_degree, -0.2), 'n', 200 - 5,
+                                                              character.y + 10, 40, 45)
+                elif character.snow_stack == 2:
+                    character.throw_objects.clip_composite_draw(40 * 1, 0, 40, 45,
+                                                                clamp(-2, character.throw_degree, -0.2), 'n', 200 - 5,
+                                                                character.y + 10, 40, 45)
+                elif character.snow_stack == 3:
+                    character.throw_objects.clip_composite_draw(40 * 2, 0, 40, 45,
+                                                                clamp(-2, character.throw_degree, -0.2), 'n', 200 - 5,
+                                                                character.y + 10, 40, 45)
+                elif character.snow_stack == 4:
+                    character.throw_objects.clip_composite_draw(40 * 3, 0, 40, 45,
+                                                                clamp(-2, character.throw_degree, -0.2), 'n', 200 - 5,
+                                                                character.y + 10, 40, 45)
+            elif character.weapon_type == STONE_SNOW:
+                character.throw_objects.clip_composite_draw(40 * 4, 0, 40, 45,
+                                                            clamp(-2, character.throw_degree, -0.2), 'n', 200 - 5,
+                                                            character.y + 10, 40, 45)
+            elif character.weapon_type == ICICLE:
+                character.throw_objects.clip_composite_draw(40 * 5, 0, 40, 45,
+                                                            clamp(-2, character.throw_degree, -0.2), 'n', 200 - 5,
+                                                            character.y + 10, 40, 45)
 
 
 class ThrowState:
@@ -284,11 +309,12 @@ class Character:
         self.image = load_image('image\\main_character\\main.png')
         self.arrow_image = load_image('image\\main_character\\arrow.png')
         self.throw_image = load_image('image\\main_character\\throw_parts.png')
+        self.throw_objects = load_image('image\\main_character\\throw_objects.png')
         self.x, self.y = 200, 30 + 260
         self.cur_state = IdleState
         self.frame = 0
         self.velocity = 0
-        self.reload_time = 60
+        self.reload_time = 30
         self.throw_power = 0
         self.max_throw_power = 280
         self.aim_base_x, self.aim_base_y = 0, 0

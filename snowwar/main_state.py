@@ -10,6 +10,7 @@ import main_character
 import back_ground
 import enemy
 import interface
+import start_state
 
 name = "MainState"
 
@@ -33,7 +34,9 @@ def enter():
 
 
 def exit():
+    global player, background, ui
     game_world.clear()
+
 
 
 def pause():
@@ -50,7 +53,7 @@ def handle_events():
         if event.type == SDL_QUIT:
             game_framework.quit()
         elif event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
-                game_framework.quit()
+                game_framework.change_state(start_state)
         else:
             player.handle_event(event)
 

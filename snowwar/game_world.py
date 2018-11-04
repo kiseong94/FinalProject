@@ -1,5 +1,5 @@
 
-back_ground_layer, character_layer, snow_layer, snow_wall_layer = 0, 1, 2, 3
+back_ground_layer, character_layer, snow_layer, snow_wall_layer = range(4)
 
 objects = [[], [], [], []]
 
@@ -13,8 +13,19 @@ def remove_object(o, layer):
 
 def clear():
     for o in all_objects():
-        del o
-    objects.clear()
+        if o in objects[back_ground_layer]:
+            objects[back_ground_layer].remove(o)
+            del o
+        elif o in objects[character_layer]:
+            objects[character_layer].remove(o)
+            del o
+        elif o in objects[snow_layer]:
+            objects[snow_layer].remove(o)
+            del o
+        elif o in objects[snow_wall_layer]:
+            objects[snow_wall_layer].remove(o)
+            del o
+
 
 def all_objects():
     for i in range(len(objects)):
