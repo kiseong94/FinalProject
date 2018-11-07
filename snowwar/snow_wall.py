@@ -45,15 +45,7 @@ class SnowWall:
     def collision_snow(self):
         for snow in game_world.layer_objects(game_world.snow_layer):
             if snow.collision_object(*self.get_hit_box()):
-               self. hp -= 1;
-               if self.hp < 1:
-                   game_world.remove_object(self, game_world.snow_wall_layer)
-               elif 1 <= self.hp < 3:
-                   self.cur_state = LEVEL1
-               elif 3 <= self.hp < 6:
-                   self.cur_state = LEVEL2
-               elif self.hp >= 6:
-                   self.cur_state = LEVEL3
+               self.hit()
 
 
     def get_hit_box(self):
@@ -64,3 +56,13 @@ class SnowWall:
         elif self.cur_state == LEVEL3:
             return self.x - 15, self.y + 25, self.x + 15, self.y - 25
 
+    def hit(self):
+        self.hp -= 1;
+        if self.hp < 1:
+            game_world.remove_object(self, game_world.snow_wall_layer)
+        elif 1 <= self.hp < 3:
+            self.cur_state = LEVEL1
+        elif 3 <= self.hp < 6:
+            self.cur_state = LEVEL2
+        elif self.hp >= 6:
+            self.cur_state = LEVEL3

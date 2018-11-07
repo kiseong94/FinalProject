@@ -376,7 +376,9 @@ class Character:
         self.ammo[self.weapon_type] -= 1
         if self.weapon_type == SNOW:
             self.snow_stack = 0
-    
+
+    def hit(self):
+        pass
 
     def handle_event(self, event):
         if (event.type, event.key) in key_event_table:

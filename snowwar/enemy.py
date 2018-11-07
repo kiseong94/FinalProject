@@ -4,7 +4,7 @@ import random
 import snow
 import game_world
 
-IDLE, MOVE, AIM, THROW, HIT, DEAD1, DEAD2, DEAD3, SIT, MAKE_WALL, RELOAD = range(11)
+IDLE, MOVE, AIM, THROW, HIT, DEAD1, DEAD2, DEAD3, SIT, MAKE_WALL, RELOAD, ATTACK = range(12)
 
 
 # initialization code
@@ -187,12 +187,35 @@ class Enemy:
     def draw_DEAD3(self):
         self.image.clip_draw(60 * (self.frame//2), 60 * 6, 60, 60, self.x - main_state.base_x, self.y, 60, 60)
 
+    ###################### type1 상태 ####################
+
+    def enter_ATTACK(self):
+        self.frame = 0
+
+    def exit_ATTACK(self):
+        pass
+
+    def do_ATTACK(self):
+        if self.frame < 15:
+            if self.frame == 9:
+                self.attack_target.hit()
+                self.attack_target = None
+            self.frame += 1
+        else:
+            self.change_state(IDLE)
+
+    def draw_ATTACK(self):
+        self.image.clip_draw(60 * (self.frame//2), 60 * 0, 60, 60, self.x - main_state.base_x, self.y, 60, 60)
 
 
-    enter_state = {IDLE: enter_IDLE, MOVE: enter_MOVE, DEAD1: enter_DEAD1,DEAD2: enter_DEAD2,DEAD3: enter_DEAD3,  RELOAD: enter_RELOAD, AIM: enter_AIM, THROW: enter_THROW}
-    exit_state = {IDLE: exit_IDLE, MOVE: exit_MOVE, DEAD1: exit_DEAD1, DEAD2: exit_DEAD2, DEAD3: exit_DEAD3,RELOAD: exit_RELOAD, AIM: exit_AIM, THROW: exit_THROW}
-    do_state = {IDLE: do_IDLE, MOVE: do_MOVE, DEAD1: do_DEAD1, DEAD2: do_DEAD2, DEAD3: do_DEAD3, RELOAD: do_RELOAD, AIM: do_AIM, THROW: do_THROW}
-    draw_state = {IDLE: draw_IDLE, MOVE: draw_MOVE, DEAD1: draw_DEAD1, DEAD2: draw_DEAD2, DEAD3: draw_DEAD3, RELOAD: draw_RELOAD, AIM: draw_AIM, THROW: draw_THROW}
+    enter_state = {IDLE: enter_IDLE, MOVE: enter_MOVE, DEAD1: enter_DEAD1, DEAD2: enter_DEAD2, DEAD3: enter_DEAD3,
+                   RELOAD: enter_RELOAD, AIM: enter_AIM, THROW: enter_THROW, ATTACK: enter_ATTACK}
+    exit_state = {IDLE: exit_IDLE, MOVE: exit_MOVE, DEAD1: exit_DEAD1, DEAD2: exit_DEAD2, DEAD3: exit_DEAD3,
+                  RELOAD: exit_RELOAD, AIM: exit_AIM, THROW: exit_THROW, ATTACK: exit_ATTACK}
+    do_state = {IDLE: do_IDLE, MOVE: do_MOVE, DEAD1: do_DEAD1, DEAD2: do_DEAD2, DEAD3: do_DEAD3, RELOAD: do_RELOAD,
+                AIM: do_AIM, THROW: do_THROW, ATTACK: do_ATTACK}
+    draw_state = {IDLE: draw_IDLE, MOVE: draw_MOVE, DEAD1: draw_DEAD1, DEAD2: draw_DEAD2, DEAD3: draw_DEAD3,
+                  RELOAD: draw_RELOAD, AIM: draw_AIM, THROW: draw_THROW, ATTACK: draw_ATTACK}
 
 
     def add_event(self, event):
@@ -281,21 +304,26 @@ class EnemyType1(Enemy):
             EnemyType1.image = load_image('image\\enemy\\type1\\enemy2_image.png')
         self.velocity = -2
         self.cur_state = MOVE
-        self.event_que = []
         self.x, self.y = 1800 + main_state.base_x, 30 + 260
+        self.attack_target = None
         self.frame = 0
-        self.reload_time = 80
-        self.throw_power = 0
         self.timer = 0
-        self.throw_degree = 0
-        self.snow_stack = 0
+
 
     def select_state(self):
-        # 일정 거리에 도달하면 공격상태에 들어감
+        # 아군 혹은 눈벽을 만나면 공격하도록 함
 
-        if self.x - main_state.base_x <= 30:
-            # 눈덩이가 없다면 눈을 뭉침
-            if self.snow_stack == 0:
-                self.change_state(RELOAD)
+        if self.find_target():
+            self.change_state(ATTACK)
         else:
             self.change_state(MOVE)
+
+    def find_target(self):
+        for o in game_world.layer_objects(game_world.player_layer):
+            if o.x + 20 >= self.x - 20:
+                self.attack_target = o
+                return True
+        for o in game_world.layer_objects(game_world.snow_wall_layer):
+            if o.x + 20 >= self.x - 20:
+                self.attack_target = o
+                return True
