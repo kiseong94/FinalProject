@@ -240,16 +240,15 @@ class Enemy:
             return True
 
     def delete(self):
-        game_world.remove_object(self, game_world.character_layer)
+        game_world.remove_object(self, game_world.enemy_layer)
 
 
-
-
-class Enemy_Basic(Enemy):
+class EnemyBasic(Enemy):
     image = None
+
     def __init__(self):
-        if Enemy_Basic.image == None:
-            Enemy_Basic.image = load_image('image\\enemy\\basic\\enemy_image.png')
+        if EnemyBasic.image == None:
+            EnemyBasic.image = load_image('image\\enemy\\basic\\enemy_image.png')
         self.velocity = -2
         self.cur_state = MOVE
         self.event_que = []
@@ -273,3 +272,30 @@ class Enemy_Basic(Enemy):
         else:
             self.change_state(MOVE)
 
+
+class EnemyType1(Enemy):
+    image = None
+
+    def __init__(self):
+        if EnemyType1.image == None:
+            EnemyType1.image = load_image('image\\enemy\\type1\\enemy2_image.png')
+        self.velocity = -2
+        self.cur_state = MOVE
+        self.event_que = []
+        self.x, self.y = 1800 + main_state.base_x, 30 + 260
+        self.frame = 0
+        self.reload_time = 80
+        self.throw_power = 0
+        self.timer = 0
+        self.throw_degree = 0
+        self.snow_stack = 0
+
+    def select_state(self):
+        # 일정 거리에 도달하면 공격상태에 들어감
+
+        if self.x - main_state.base_x <= 30:
+            # 눈덩이가 없다면 눈을 뭉침
+            if self.snow_stack == 0:
+                self.change_state(RELOAD)
+        else:
+            self.change_state(MOVE)

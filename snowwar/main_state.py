@@ -31,8 +31,8 @@ def enter():
     player = main_character.Character()
     background = back_ground.Back_Ground()
     ui = interface.UI()
-    game_world.objects = [[], [], [], []]
-    game_world.add_object(player, game_world.character_layer)
+    game_world.objects = [[], [], [], [], []]
+    game_world.add_object(player, game_world.player_layer)
     game_world.add_object(background, game_world.back_ground_layer)
 
 
@@ -66,7 +66,10 @@ def update():
     global cnt
 
     if cnt == 0:
-        game_world.add_object(enemy.Enemy_Basic(), game_world.character_layer)
+        if random.randint(0, 1) == 1:
+            game_world.add_object(enemy.EnemyBasic(), game_world.enemy_layer)
+        else:
+            game_world.add_object(enemy.EnemyType1(), game_world.enemy_layer)
         cnt = 50
     else:
         cnt -= 1

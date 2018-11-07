@@ -1,7 +1,7 @@
 
-back_ground_layer, character_layer, snow_layer, snow_wall_layer = range(4)
+back_ground_layer, player_layer, enemy_layer, snow_layer, snow_wall_layer = range(5)
 
-objects = [[], [], [], []]
+objects = [[], [], [], [], []]
 
 def add_object(o, layer):
     objects[layer].append(o)
@@ -15,8 +15,11 @@ def clear():
     for o in objects[back_ground_layer]:
         objects[back_ground_layer].remove(o)
         del o
-    for o in objects[character_layer]:
-        objects[character_layer].remove(o)
+    for o in objects[player_layer]:
+        objects[player_layer].remove(o)
+        del o
+    for o in objects[enemy_layer]:
+        objects[enemy_layer].remove(o)
         del o
     for o in objects[snow_layer]:
         objects[snow_layer].remove(o)
