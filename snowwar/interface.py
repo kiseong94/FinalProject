@@ -21,10 +21,11 @@ class UI:
     def draw(self):
         self.image.draw(self.x, self.y)
 
-        self.player_inform.draw(30, 150, '체력 LV.1', (0, 0, 0))
-        self.player_inform.draw(30, 120, '장전속도 LV.1', (0, 0, 0))
-        self.player_inform.draw(30, 90, '던지는힘 LV.1', (0, 0, 0))
-        self.player_inform.draw(30, 60, '눈벽보수 LV.1', (0, 0, 0))
+        self.player_inform.draw(30, 160, '체 력 LV.%d' % main_state.main_inform[0], (0, 0, 0))
+        self.player_inform.draw(30, 130, '장전 속도 LV.%d'% main_state.main_inform[1], (0, 0, 0))
+        self.player_inform.draw(30, 100, '던지는 힘 LV.%d'% main_state.main_inform[2], (0, 0, 0))
+        self.player_inform.draw(30, 70, '눈벽 보수 LV.%d'% main_state.main_inform[3], (0, 0, 0))
+        self.player_inform.draw(30, 40, '눈벽 레벨 LV.%d' % main_state.main_inform[4], (0, 0, 0))
 
         for i in range(4):
             if main_state.available_weapon[i]:
