@@ -9,7 +9,8 @@ from pico2d import *
 
 name = "MainState"
 
-main_inform = {'hp': 5, 'throw_power': 1, 'shovel_power': 0, 'reload_speed': 1}
+main_inform = [1, 1, 1, 1, 1]
+#main_inform = {'hp': 5, 'throw_power': 1, 'shovel_power': 0, 'reload_speed': 1}
 available_weapon = [True, False, False, False]
 
 Shop = None
@@ -32,6 +33,7 @@ def resume():
 
 def handle_events():
     global IsShopOpened
+    global Shop
     events = get_events()
     for event in events:
         if event.type == SDL_QUIT:
@@ -45,6 +47,8 @@ def handle_events():
                 IsShopOpened = False
             else:
                 IsShopOpened = True
+        else:
+            Shop.handle_event(event)
 
 
 
