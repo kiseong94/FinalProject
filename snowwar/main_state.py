@@ -1,46 +1,26 @@
-import random
-import json
-import os
+import stage_state
+import start_state
+import game_framework
+import shop
 
 from pico2d import *
 
-import game_framework
-import game_world
-import main_character
-import back_ground
-import enemy
-import interface
-import start_state
+
 
 name = "MainState"
 
-player = None
-background = None
-font = None
-ui = None
-base_x = 0
-cnt = 10
+main_inform = {'hp': 5, 'throw_power': 1, 'shovel_power': 0, 'reload_speed': 1}
+available_weapon = [True, False, False, False]
 
+Shop = None
+IsShopOpened = False
 
 def enter():
-    global player
-    global background
-    global ui
-    global base_x
-    base_x = 0
-    player = main_character.Character()
-    background = back_ground.Back_Ground()
-    ui = interface.UI()
-    game_world.objects = [[], [], [], [], []]
-    game_world.add_object(player, game_world.player_layer)
-    game_world.add_object(background, game_world.back_ground_layer)
-
+    global Shop
+    Shop = shop.Shop()
 
 def exit():
-    global player, background, ui
-    game_world.clear()
-
-
+    pass
 
 def pause():
     pass
@@ -51,40 +31,32 @@ def resume():
 
 
 def handle_events():
+    global IsShopOpened
     events = get_events()
     for event in events:
         if event.type == SDL_QUIT:
             game_framework.quit()
         elif event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
-                game_framework.change_state(start_state)
-        else:
-            player.handle_event(event)
+            game_framework.change_state(start_state)
+        elif event.type == SDL_KEYDOWN and event.key == SDLK_SPACE:
+            game_framework.push_state(stage_state)
+        elif event.type == SDL_KEYDOWN and event.key == SDLK_s:
+            if IsShopOpened:
+                IsShopOpened = False
+            else:
+                IsShopOpened = True
 
 
 
 def update():
-    global cnt
-
-    if cnt == 0:
-        if random.randint(0, 1) == 1:
-            game_world.add_object(enemy.EnemyBasic(), game_world.enemy_layer)
-        else:
-            game_world.add_object(enemy.EnemyType1(), game_world.enemy_layer)
-        cnt = 50
-    else:
-        cnt -= 1
-
-    for game_object in game_world.all_objects():
-        game_object.update()
+    pass
 
 
 def draw():
-    global ui
+    global Shop
     clear_canvas()
-    for game_object in game_world.all_objects():
-        game_object.draw()
-
-    ui.draw()
+    if IsShopOpened:
+        Shop.draw()
     update_canvas()
 
 

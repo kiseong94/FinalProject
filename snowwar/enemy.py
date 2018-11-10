@@ -1,5 +1,6 @@
 from pico2d import *
 import main_state
+import stage_state
 import random
 import snow
 import game_world
@@ -36,7 +37,7 @@ class Enemy:
 
 
     def draw_MOVE(self):
-        self.image.clip_draw(60 * (self.frame // 2), 60 * 0, 60, 60, self.x - main_state.base_x, self.y, 60, 60)
+        self.image.clip_draw(60 * (self.frame // 2), 60 * 0, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
 
 
 
@@ -60,7 +61,7 @@ class Enemy:
 
 
     def draw_RELOAD(self):
-        self.image.clip_draw(60 * (self.frame//2), 60 * 2, 60, 60, self.x - main_state.base_x, self.y, 60, 60)
+        self.image.clip_draw(60 * (self.frame//2), 60 * 2, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
 
 
 
@@ -108,7 +109,7 @@ class Enemy:
             self.timer += 1
 
     def draw_AIM(self):
-        self.image.clip_draw(60 * (self.frame // 2), 60 * 3, 60, 60, self.x - main_state.base_x, self.y, 60, 60)
+        self.image.clip_draw(60 * (self.frame // 2), 60 * 3, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
 
 
     def enter_THROW(self):
@@ -128,7 +129,7 @@ class Enemy:
             self.frame += 1
 
     def draw_THROW(self):
-        self.image.clip_draw(60 * (self.frame // 2), 60 * 4, 60, 60, self.x - main_state.base_x, self.y, 60, 60)
+        self.image.clip_draw(60 * (self.frame // 2), 60 * 4, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
 
 
 
@@ -157,7 +158,7 @@ class Enemy:
             self.frame += 1
 
     def draw_DEAD1(self):
-        self.image.clip_draw(60 * (self.frame//2), 60 * 1, 60, 60, self.x - main_state.base_x, self.y, 60, 60)
+        self.image.clip_draw(60 * (self.frame//2), 60 * 1, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
 
     def enter_DEAD2(self):
         self.frame = 0
@@ -171,7 +172,7 @@ class Enemy:
             self.x += 3
 
     def draw_DEAD2(self):
-        self.image.clip_draw(60 * (self.frame//2), 60 * 5, 60, 60, self.x - main_state.base_x, self.y, 60, 60)
+        self.image.clip_draw(60 * (self.frame//2), 60 * 5, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
 
 
     def enter_DEAD3(self):
@@ -185,7 +186,7 @@ class Enemy:
             self.frame += 1
 
     def draw_DEAD3(self):
-        self.image.clip_draw(60 * (self.frame//2), 60 * 6, 60, 60, self.x - main_state.base_x, self.y, 60, 60)
+        self.image.clip_draw(60 * (self.frame//2), 60 * 6, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
 
     ###################### type1 상태 ####################
 
@@ -205,7 +206,7 @@ class Enemy:
             self.change_state(IDLE)
 
     def draw_ATTACK(self):
-        self.image.clip_draw(60 * (self.frame//2), 60 * 0, 60, 60, self.x - main_state.base_x, self.y, 60, 60)
+        self.image.clip_draw(60 * (self.frame//2), 60 * 2, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
 
 
     enter_state = {IDLE: enter_IDLE, MOVE: enter_MOVE, DEAD1: enter_DEAD1, DEAD2: enter_DEAD2, DEAD3: enter_DEAD3,
@@ -248,10 +249,10 @@ class Enemy:
 
     def draw(self):
         self.draw_state[self.cur_state](self)
-        #draw_rectangle(self.x - 10 - main_state.base_x, self.y + 25, self.x + 10 - main_state.base_x, self.y - 25)
+        #draw_rectangle(self.x - 10 - stage_state.base_x, self.y + 25, self.x + 10 - stage_state.base_x, self.y - 25)
 
     def throw_snow(self):
-        distance = self.x - main_state.base_x - 200 + random.randint(-150, 100)
+        distance = self.x - stage_state.base_x - 200 + random.randint(-150, 100)
         vx = random.randint(20, 25)
         t = distance/vx
         #vy = (28*math.sqrt(t**2 + 100) + 40*t)/50
@@ -259,7 +260,7 @@ class Enemy:
         game_world.add_object(snow.SmallSnow(self.x, self.y + 10, -vx, vy, 0), game_world.snow_layer)
 
     def out_of_sight(self):
-        if main_state.base_x > self.x or self.x > main_state.base_x + 1600:
+        if stage_state.base_x > self.x or self.x > stage_state.base_x + 1600:
             return True
 
     def delete(self):
@@ -275,7 +276,7 @@ class EnemyBasic(Enemy):
         self.velocity = -2
         self.cur_state = MOVE
         self.event_que = []
-        self.x, self.y = 1800 + main_state.base_x, 30 + 260
+        self.x, self.y = 1800 + stage_state.base_x, 30 + 260
         self.frame = 0
         self.reload_time = 80
         self.throw_power = 0
@@ -288,7 +289,7 @@ class EnemyBasic(Enemy):
     def select_state(self):
          # 일정 거리에 도달하면 공격상태에 들어감
 
-        if self.x - main_state.base_x <= self.target_distance:
+        if self.x - stage_state.base_x <= self.target_distance:
             # 눈덩이가 없다면 눈을 뭉침
             if self.snow_stack == 0:
                 self.change_state(RELOAD)
@@ -304,7 +305,7 @@ class EnemyType1(Enemy):
             EnemyType1.image = load_image('image\\enemy\\type1\\enemy2_image.png')
         self.velocity = -2
         self.cur_state = MOVE
-        self.x, self.y = 1800 + main_state.base_x, 30 + 260
+        self.x, self.y = 1800 + stage_state.base_x, 30 + 260
         self.attack_target = None
         self.frame = 0
         self.timer = 0

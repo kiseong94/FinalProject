@@ -1,4 +1,5 @@
 from pico2d import *
+import stage_state
 import main_state
 import snow
 import snow_wall
@@ -59,11 +60,11 @@ class MoveState:
     @staticmethod
     def do(character):
         character.frame = (character.frame + 1) % 16
-        main_state.base_x += character.velocity
+        stage_state.base_x += character.velocity
         character.x += character.velocity
-        main_state.background.move_ground(character.velocity)
-        main_state.background.move_forest(character.velocity)
-        main_state.background.move_mountain(character.velocity)
+        stage_state.background.move_ground(character.velocity)
+        stage_state.background.move_forest(character.velocity)
+        stage_state.background.move_mountain(character.velocity)
 
     @staticmethod
     def draw(character):
@@ -350,28 +351,28 @@ class Character:
         bias_y = (self.aim_base_y - self.aim_draw_y) / (self.aim_base_x - self.aim_draw_x + self.aim_base_y - self.aim_draw_y)
         if self.weapon_type == SNOW:
             if self.snow_stack < 3:
-                game_world.add_object(snow.SmallSnow(200 + main_state.base_x, self.y + 15,
+                game_world.add_object(snow.SmallSnow(200 + stage_state.base_x, self.y + 15,
                                             self.throw_power * bias_x / 10 + 6 - self.snow_stack * 2,
                                             self.throw_power * bias_y / 10 - self.snow_stack * 2, self.snow_stack-1),
                                 game_world.snow_layer)
             else:
-                game_world.add_object(snow.BigSnow(200 + main_state.base_x, self.y + 15,
+                game_world.add_object(snow.BigSnow(200 + stage_state.base_x, self.y + 15,
                                                  self.throw_power * bias_x / 10 + 6 - self.snow_stack * 2,
                                                  self.throw_power * bias_y / 10 - self.snow_stack * 2,
                                                  self.snow_stack - 1),
                                   game_world.snow_layer)
         elif self.weapon_type == STONE_SNOW:
-            game_world.add_object(snow.StoneSnow(200 + main_state.base_x, self.y + 15,
+            game_world.add_object(snow.StoneSnow(200 + stage_state.base_x, self.y + 15,
                                                  self.throw_power * bias_x / 10 + 6,
                                                  self.throw_power * bias_y / 10),
                                   game_world.snow_layer)
         elif self.weapon_type == ICICLE:
-            game_world.add_object(snow.Icicle(200 + main_state.base_x, self.y + 15,
+            game_world.add_object(snow.Icicle(200 + stage_state.base_x, self.y + 15,
                                                  self.throw_power * bias_x / 10 / 2 + 6,
                                                  self.throw_power * bias_y / 10 / 2),
                                   game_world.snow_layer)
         elif self.weapon_type == BUCKET:
-            game_world.add_object(snow.SpreadSnow(200 + 80 + main_state.base_x, self.y), game_world.snow_layer)
+            game_world.add_object(snow.SpreadSnow(200 + 80 + stage_state.base_x, self.y), game_world.snow_layer)
 
         self.ammo[self.weapon_type] -= 1
         if self.weapon_type == SNOW:
@@ -395,11 +396,12 @@ class Character:
 
         elif (event.type, event.key) in weapon_key_table:
             key_event = weapon_key_table[(event.type, event.key)]
-            if key_event != self.weapon_type and self.cur_state == ReloadState:
-                self.add_event(TIME_UP)
-                self.weapon_type = key_event
-            else:
-                self.weapon_type = key_event
+            if main_state.available_weapon[key_event]:
+                if key_event != self.weapon_type and (self.cur_state == ReloadState or self.cur_state == AimState):
+                    self.add_event(TIME_UP)
+                    self.weapon_type = key_event
+                else:
+                    self.weapon_type = key_event
 
         elif (event.type, event.button) in mouse_event_table:
             key_event = mouse_event_table[(event.type, event.button)]

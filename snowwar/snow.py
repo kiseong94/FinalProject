@@ -1,5 +1,5 @@
 from pico2d import *
-import main_state
+import stage_state
 import game_world
 
 FLY, HIT, DESTROY = range(3)
@@ -31,7 +31,7 @@ class Snow:
             self.frame = 0
 
     def out_of_sight(self):
-        if main_state.base_x > self.x or self.x > main_state.base_x + 1600:
+        if stage_state.base_x > self.x or self.x > stage_state.base_x + 1600:
             self.delete()
 
     def collision_object(self, left, top, right, bottom):
@@ -68,9 +68,9 @@ class SmallSnow(Snow):
 
     def draw(self):
         if self.cur_state == FLY:
-            self.image.draw(self.x - main_state.base_x, self.y, 10+(self.size + 1)*2,10+(self.size + 1)*2)
+            self.image.draw(self.x - stage_state.base_x, self.y, 10+(self.size + 1)*2,10+(self.size + 1)*2)
         elif self.cur_state == HIT:
-            self.destroy_image.clip_draw((self.frame//2)*30, 0, 30, 30, self.x-main_state.base_x, self.y, 30 + (self.size + 1)*6, 30 + (self.size + 1)*6)
+            self.destroy_image.clip_draw((self.frame//2)*30, 0, 30, 30, self.x-stage_state.base_x, self.y, 30 + (self.size + 1)*6, 30 + (self.size + 1)*6)
 
 
 
@@ -92,9 +92,9 @@ class BigSnow(Snow):
 
     def draw(self):
         if self.cur_state == FLY:
-            self.image.draw(self.x - main_state.base_x, self.y)
+            self.image.draw(self.x - stage_state.base_x, self.y)
         elif self.cur_state == HIT:
-            self.destroy_image.clip_draw((self.frame//3)*80, 0, 80, 80, self.x-main_state.base_x, self.y, 80, 80)
+            self.destroy_image.clip_draw((self.frame//3)*80, 0, 80, 80, self.x-stage_state.base_x, self.y, 80, 80)
 
     def collision_object(self, left, top, right, bottom):
         if self.cur_state == FLY:
@@ -149,9 +149,9 @@ class StoneSnow(Snow):
 
     def draw(self):
         if self.cur_state == FLY:
-            self.image.draw(self.x - main_state.base_x, self.y)
+            self.image.draw(self.x - stage_state.base_x, self.y)
         elif self.cur_state == HIT:
-            self.destroy_image.clip_draw((self.frame//3)*30, 0, 30, 30, self.x-main_state.base_x, self.y)
+            self.destroy_image.clip_draw((self.frame//3)*30, 0, 30, 30, self.x-stage_state.base_x, self.y)
 
     def collision_object(self, left, top, right, bottom):
         if self.cur_state == FLY:
@@ -188,9 +188,9 @@ class Icicle(Snow):
 
     def draw(self):
         if self.cur_state == FLY:
-            self.image.rotate_draw(self.degree, self.x - main_state.base_x, self.y)
+            self.image.rotate_draw(self.degree, self.x - stage_state.base_x, self.y)
         elif self.cur_state == HIT:
-            self.destroy_image.clip_draw((self.frame//3)*30, 0, 30, 30, self.x-main_state.base_x, self.y)
+            self.destroy_image.clip_draw((self.frame//3)*30, 0, 30, 30, self.x-stage_state.base_x, self.y)
 
     def update(self):
         if self.cur_state == FLY:
@@ -226,7 +226,7 @@ class SpreadSnow(Snow):
         self.type = 3
 
     def draw(self):
-        self.destroy_image.clip_draw((self.frame//3)*120, 0, 120, 60, self.x-main_state.base_x, self.y)
+        self.destroy_image.clip_draw((self.frame//3)*120, 0, 120, 60, self.x-stage_state.base_x, self.y)
 
     def collision_object(self, left, top, right, bottom):
         snow_left, snow_top, snow_right, snow_bottom = self.get_hit_box()

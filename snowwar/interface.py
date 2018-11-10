@@ -1,6 +1,7 @@
 from pico2d import *
-import main_state
+import stage_state
 import main_character
+import main_state
 import game_world
 import snow
 
@@ -25,28 +26,25 @@ class UI:
         self.player_inform.draw(30, 90, '던지는힘 LV.1', (0, 0, 0))
         self.player_inform.draw(30, 60, '눈벽보수 LV.1', (0, 0, 0))
 
-
-        self.weapon_image.clip_draw(0 * 120, 0, 120, 180, 300, 95)
-        self.font.draw(300 + 20, 80, '+%d' % main_state.player.snow_stack, (255, 255, 0))
-        self.font.draw(300 - 35, 30, '%d / 1' % main_state.player.ammo[0], (0, 0, 0))
-
-        self.weapon_image.clip_draw(1 * 120, 0, 120, 180, 300 + 150, 95)
-        self.font.draw(300 + 150 - 35, 30, '%d / 1' % main_state.player.ammo[1], (0, 0, 0))
-
-        self.weapon_image.clip_draw(2 * 120, 0, 120, 180, 300 + 300, 95)
-        self.font.draw(300 + 300 - 10, 30, '%d' % main_state.player.ammo[2], (0, 0, 0))
-
-        self.weapon_image.clip_draw(3 * 120, 0, 120, 180, 300 + 450, 95)
-        self.font.draw(300 + 450 - 35, 30, '%d / 1' % main_state.player.ammo[3], (0, 0, 0))
+        for i in range(4):
+            if main_state.available_weapon[i]:
+                if i == 2:
+                    self.weapon_image.clip_draw(i * 120, 0, 120, 180, 300 + 300, 95)
+                    self.font.draw(300 + 150*i - 10, 30, '%d' % stage_state.player.ammo[i], (0, 0, 0))
+                else:
+                    self.weapon_image.clip_draw(i * 120, 0, 120, 180, 300 + 150*i, 95)
+                    self.font.draw(300 - 35 + i*150, 30, '%d / 1' % stage_state.player.ammo[i], (0, 0, 0))
 
 
-        if main_state.player.weapon_type == main_character.SNOW:
+        self.font.draw(300 + 20, 80, '+%d' % stage_state.player.snow_stack, (255, 255, 0))
+
+        if stage_state.player.weapon_type == main_character.SNOW:
             self.select_image.draw(300, 95)
-        elif main_state.player.weapon_type == main_character.STONE_SNOW:
+        elif stage_state.player.weapon_type == main_character.STONE_SNOW:
             self.select_image.draw(300 + 150, 95)
-        elif main_state.player.weapon_type == main_character.ICICLE:
+        elif stage_state.player.weapon_type == main_character.ICICLE:
             self.select_image.draw(300 + 300, 95)
-        elif main_state.player.weapon_type == main_character.BUCKET:
+        elif stage_state.player.weapon_type == main_character.BUCKET:
             self.select_image.draw(300 + 450, 95)
 
 

@@ -1,5 +1,5 @@
 from pico2d import *
-import main_state
+import stage_state
 import game_world
 import snow
 
@@ -17,11 +17,11 @@ class SnowWall:
 
     def draw(self):
         if self.cur_state == LEVEL1:
-            self.image.clip_draw(0 * 40, 0, 40, 50, self.x - main_state.base_x, self.y)
+            self.image.clip_draw(0 * 40, 0, 40, 50, self.x - stage_state.base_x, self.y)
         elif self.cur_state == LEVEL2:
-            self.image.clip_draw(1 * 40, 0, 40, 50, self.x - main_state.base_x, self.y)
+            self.image.clip_draw(1 * 40, 0, 40, 50, self.x - stage_state.base_x, self.y)
         elif self.cur_state == LEVEL3:
-            self.image.clip_draw(2 * 40, 0, 40, 50, self.x - main_state.base_x, self.y)
+            self.image.clip_draw(2 * 40, 0, 40, 50, self.x - stage_state.base_x, self.y)
 
         #draw_rectangle(*self.get_hit_box())
 
