@@ -47,12 +47,12 @@ class Shop:
                 x, y, option_name = self.sheet1_image_pos[i]
                 #option_name = option_name + ' %d'
                 self.sheet1_select_image.clip_draw(120*i,0,120,120,x,y)
-                self.font.draw(x + 75, y, option_name + ' LV.%d' % main_state.main_inform[i], (0, 0, 0))
+                self.font.draw(x + 75, y, option_name + ' LV.%d' % main_state.Data.main_inform[i], (0, 0, 0))
 
         elif self.sheet_state == Weapon:
             for i in range(2):
                 x, y = self.sheet2_button_pos[i]
-                if main_state.available_weapon[self.page_number * 2 + i]:
+                if main_state.Data.available_weapon[self.page_number * 2 + i]:
                     if i == self.mouse_on_button:
                         self.upgrade_button_image.clip_draw(150, 0, 150, 50, x, y)
                     else:
@@ -99,16 +99,16 @@ class Shop:
                 for i in range(5):
                     x, y = self.sheet1_button_pos[i]
                     if x - 75 <= mouse_x <= x + 75 and y - 25 <= mouse_y <= y + 25:
-                        main_state.main_inform[i] += 1
+                        main_state.Data.main_inform[i] += 1
                         break
             elif self.sheet_state == Weapon:
                 for i in range(2):
                     x, y = self.sheet2_button_pos[i]
                     if x - 75 <= mouse_x <= x + 75 and y - 25 <= mouse_y <= y + 25:
-                        if main_state.available_weapon[self.page_number * 2 + i]:
+                        if main_state.Data.available_weapon[self.page_number * 2 + i]:
                             pass
                         else:
-                            main_state.available_weapon[self.page_number * 2 + i] = True
+                            main_state.Data.available_weapon[self.page_number * 2 + i] = True
                         break
                     if self.page_number == 0:
                         x, y = self.page_right_button

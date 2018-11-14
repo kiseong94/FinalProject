@@ -1,6 +1,7 @@
 import stage_state
 import start_state
 import game_framework
+import game_data
 import shop
 
 from pico2d import *
@@ -8,16 +9,14 @@ from pico2d import *
 
 
 name = "MainState"
-
-main_inform = [1, 1, 1, 1, 1]
-#main_inform = {'hp': 5, 'throw_power': 1, 'shovel_power': 0, 'reload_speed': 1}
-available_weapon = [True, False, False, False]
-
+Data = None
 Shop = None
 IsShopOpened = False
 
 def enter():
     global Shop
+    global Data
+    Data = game_data.Data()
     Shop = shop.Shop()
 
 def exit():
@@ -47,7 +46,7 @@ def handle_events():
                 IsShopOpened = False
             else:
                 IsShopOpened = True
-        else:
+        elif IsShopOpened:
             Shop.handle_event(event)
 
 

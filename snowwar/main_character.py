@@ -315,9 +315,9 @@ class Character:
         self.cur_state = IdleState
         self.frame = 0
         self.velocity = 0
-        self.reload_time = 30
+        self.reload_time = main_state.Data.get_player_inform('reload_speed')
         self.throw_power = 0
-        self.max_throw_power = 280
+        self.max_throw_power = 280 + main_state.Data.get_player_inform('throw_power')
         self.aim_base_x, self.aim_base_y = 0, 0
         self.aim_draw_x, self.aim_draw_y = 0, 0
         self.timer = 0
@@ -396,7 +396,7 @@ class Character:
 
         elif (event.type, event.key) in weapon_key_table:
             key_event = weapon_key_table[(event.type, event.key)]
-            if main_state.available_weapon[key_event]:
+            if main_state.Data.available_weapon[key_event]:
                 if key_event != self.weapon_type and (self.cur_state == ReloadState or self.cur_state == AimState):
                     self.add_event(TIME_UP)
                     self.weapon_type = key_event
