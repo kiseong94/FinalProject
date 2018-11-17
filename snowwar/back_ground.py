@@ -32,7 +32,7 @@ next_state_table = {
     IdleState: {A_DOWN: MoveState, D_DOWN: MoveState, A_UP: IdleState, D_UP: IdleState, S_DOWN: IdleState, S_UP: IdleState, W_DOWN: IdleState,
                 W_UP: IdleState, R_DOWN: IdleState, LEFT_BUTTON_DOWN: IdleState, LEFT_BUTTON_UP: IdleState},
     MoveState: {A_DOWN: MoveState, D_DOWN: MoveState, A_UP: IdleState, D_UP: IdleState, S_DOWN: IdleState, S_UP: MoveState, W_DOWN: IdleState,
-           W_UP: MoveState, R_DOWN: IdleState, LEFT_BUTTON_DOWN: IdleState, LEFT_BUTTON_UP: IdleState}
+           W_UP: MoveState, R_DOWN: IdleState, LEFT_BUTTON_DOWN: IdleState, LEFT_BUTTON_UP: MoveState}
 }
 
 class Back_Ground:

@@ -1,6 +1,7 @@
 from pico2d import *
 import stage_state
 import main_state
+import game_data
 import snow
 import snow_wall
 import math
@@ -44,7 +45,7 @@ class IdleState:
 
     @staticmethod
     def draw(character):
-        character.image.clip_draw(60 * (character.frame // 2), 60 * 0, 60, 60, 200, character.y, 60, 60)
+        character.image.clip_draw(60 * (character.frame // 2), 60 * 0, 60, 60, 300, character.y, 60, 60)
 
 
 class MoveState:
@@ -67,9 +68,9 @@ class MoveState:
     @staticmethod
     def draw(character):
         if character.velocity > 0:
-            character.image.clip_draw(60 * (character.frame//2), 60 * 1, 60, 60, 200, character.y, 60, 60)
+            character.image.clip_draw(60 * (character.frame//2), 60 * 1, 60, 60, 300, character.y, 60, 60)
         else:
-            character.image.clip_draw(60 * (character.frame//2), 60 * 2, 60, 60, 200, character.y, 60, 60)
+            character.image.clip_draw(60 * (character.frame//2), 60 * 2, 60, 60, 300, character.y, 60, 60)
 
 
 class ReloadState:
@@ -112,9 +113,9 @@ class ReloadState:
     @staticmethod
     def draw(character):
         if character.weapon_type == BUCKET:
-            character.image.clip_draw(60 * (character.frame // 2), 60 * 8, 60, 60, 200, character.y, 60, 60)
+            character.image.clip_draw(60 * (character.frame // 2), 60 * 8, 60, 60, 300, character.y, 60, 60)
         else:
-            character.image.clip_draw(60 * (character.frame // 2), 60 * 3, 60, 60, 200, character.y, 60, 60)
+            character.image.clip_draw(60 * (character.frame // 2), 60 * 3, 60, 60, 300, character.y, 60, 60)
         character.draw_reloading_gauge()
 
 
@@ -134,7 +135,7 @@ class SitState:
 
     @staticmethod
     def draw(character):
-        character.image.clip_draw(60 * (character.frame // 2), 60 * 4, 60, 60, 200, character.y, 60, 60)
+        character.image.clip_draw(60 * (character.frame // 2), 60 * 4, 60, 60, 300, character.y, 60, 60)
 
 
 class MakeWallState:
@@ -155,11 +156,11 @@ class MakeWallState:
 
             for sw in game_world.layer_objects(game_world.snow_wall_layer):
                 if sw.check_existence(character.x, character.x + 60):
-                    sw.strengthen_wall()
+                    sw.strengthen_wall(character.shovel_power)
                     find_wall = True
 
             if find_wall == False:
-                game_world.add_object(snow_wall.SnowWall(character.x + 20), game_world.snow_wall_layer)
+                game_world.add_object(snow_wall.SnowWall(character.x + 20, 0, character.snow_wall_level, character.shovel_power), game_world.snow_wall_layer)
 
             character.frame = 0
         else:
@@ -167,7 +168,7 @@ class MakeWallState:
 
     @staticmethod
     def draw(character):
-        character.image.clip_draw(60 * (character.frame // 2), 60 * 5, 60, 60, 200, character.y, 60, 60)
+        character.image.clip_draw(60 * (character.frame // 2), 60 * 5, 60, 60, 300, character.y, 60, 60)
 
 
 class AimState:
@@ -198,20 +199,20 @@ class AimState:
     @staticmethod
     def draw(character):
         if character.weapon_type == BUCKET:
-            character.image.clip_draw(60 * (character.frame // 2), 60 * 9, 60, 60, 200, character.y, 60, 60)
+            character.image.clip_draw(60 * (character.frame // 2), 60 * 9, 60, 60, 300, character.y, 60, 60)
         else:
-            character.throw_image.clip_composite_draw(40 * 1, 0, 40, 45, clamp(-1.2, character.throw_degree, 0), 'n', 200, character.y + 10, 40, 45)
-            character.image.clip_draw(60 * 0, 60 * 6, 60, 60, 200, character.y, 60, 60)
-            character.throw_image.clip_composite_draw(40 * 0, 0, 40, 45, clamp(-2, character.throw_degree, -0.2), 'n', 200 - 5, character.y + 10, 40, 45)
-            character.throw_image.clip_composite_draw(40 * 2, 0, 40, 45, clamp(-2, character.throw_degree, -0.6) - 30, 'n', 200 - 1, character.y + 15, 40, 45)
-            character.arrow_image.rotate_draw(character.throw_degree, 200, 350, 10 + character.throw_power / 12, 30 + character.throw_power / 2)
+            character.throw_image.clip_composite_draw(40 * 1, 0, 40, 45, clamp(-1.2, character.throw_degree, 0), 'n', 300, character.y + 10, 40, 45)
+            character.image.clip_draw(60 * 0, 60 * 6, 60, 60, 300, character.y, 60, 60)
+            character.throw_image.clip_composite_draw(40 * 0, 0, 40, 45, clamp(-2, character.throw_degree, -0.2), 'n', 300 - 5, character.y + 10, 40, 45)
+            character.throw_image.clip_composite_draw(40 * 2, 0, 40, 45, clamp(-2, character.throw_degree, -0.6) - 30, 'n', 300 - 1, character.y + 15, 40, 45)
+            character.arrow_image.rotate_draw(character.throw_degree, 300, 350, 10 + character.throw_power / 12, 30 + character.throw_power / 2)
             if character.weapon_type == SNOW:
                 character.throw_objects.clip_composite_draw(40 * (character.snow_stack -1), 0, 40, 45,
-                                                            clamp(-2, character.throw_degree, -0.2), 'n', 200 - 5,
+                                                            clamp(-2, character.throw_degree, -0.2), 'n', 300 - 5,
                                                             character.y + 10, 40, 45)
             else:
                 character.throw_objects.clip_composite_draw(40 * (character.weapon_type+3), 0, 40, 45,
-                                                            clamp(-2, character.throw_degree, -0.2), 'n', 200 - 5,
+                                                            clamp(-2, character.throw_degree, -0.2), 'n', 300 - 5,
                                                             character.y + 10, 40, 45)
 
 
@@ -240,9 +241,9 @@ class ThrowState:
     @staticmethod
     def draw(character):
         if character.weapon_type == BUCKET:
-            character.image.clip_draw(60 * (character.frame // 2), 60 * 9, 60, 60, 200, character.y, 60, 60)
+            character.image.clip_draw(60 * (character.frame // 2), 60 * 9, 60, 60, 300, character.y, 60, 60)
         else:
-            character.image.clip_draw(60 * (character.frame // 2), 60 * 7, 60, 60, 200, character.y, 60, 60)
+            character.image.clip_draw(60 * (character.frame // 2), 60 * 7, 60, 60, 300, character.y, 60, 60)
 
 
 
@@ -296,13 +297,16 @@ class Character:
         self.reloading_bar = load_image('image\\main_character\\reloading_bar.png')
         self.reloading_gauge = load_image('image\\main_character\\reloading_gauge.png')
         self.font = load_font('font\\neodgm.ttf')
-        self.x, self.y = 200, 30 + 260
+        self.x, self.y = 300, 30 + 260
         self.cur_state = IdleState
         self.frame = 0
         self.velocity = 0
-        self.reload_time = main_state.Data.get_player_inform('reload_speed')
+        self.hp = main_state.Data.get_player_inform(game_data.HP)
+        self.reload_time = main_state.Data.get_player_inform(game_data.RELOAD_SPEED)
+        self.max_throw_power = main_state.Data.get_player_inform(game_data.THROW_POWER)
+        self.snow_wall_level = main_state.Data.get_player_inform(game_data.WALL_LEVEL)
+        self.shovel_power = main_state.Data.get_player_inform(game_data.SHOVEL_POWER)
         self.throw_power = 0
-        self.max_throw_power = 280 + main_state.Data.get_player_inform('throw_power')
         self.aim_base_x, self.aim_base_y = 0, 0
         self.aim_draw_x, self.aim_draw_y = 0, 0
         self.timer = 0
@@ -336,28 +340,28 @@ class Character:
         bias_y = (self.aim_base_y - self.aim_draw_y) / (self.aim_base_x - self.aim_draw_x + self.aim_base_y - self.aim_draw_y)
         if self.weapon_type == SNOW:
             if self.snow_stack < 3:
-                game_world.add_object(snow.SmallSnow(200 + stage_state.base_x, self.y + 15,
+                game_world.add_object(snow.SmallSnow(self.x, self.y + 15,
                                             self.throw_power * bias_x / 10 + 6 - self.snow_stack * 2,
                                             self.throw_power * bias_y / 10 - self.snow_stack * 2, self.snow_stack-1),
                                 game_world.snow_layer)
             else:
-                game_world.add_object(snow.BigSnow(200 + stage_state.base_x, self.y + 15,
+                game_world.add_object(snow.BigSnow(self.x, self.y + 15,
                                                  self.throw_power * bias_x / 10 + 6 - self.snow_stack * 2,
                                                  self.throw_power * bias_y / 10 - self.snow_stack * 2,
                                                  self.snow_stack - 1),
                                   game_world.snow_layer)
         elif self.weapon_type == STONE_SNOW:
-            game_world.add_object(snow.StoneSnow(200 + stage_state.base_x, self.y + 15,
+            game_world.add_object(snow.StoneSnow(self.x, self.y + 15,
                                                  self.throw_power * bias_x / 10 + 6,
                                                  self.throw_power * bias_y / 10),
                                   game_world.snow_layer)
         elif self.weapon_type == ICICLE:
-            game_world.add_object(snow.Icicle(200 + stage_state.base_x, self.y + 15,
+            game_world.add_object(snow.Icicle(self.x, self.y + 15,
                                                  self.throw_power * bias_x / 10 / 2 + 6,
                                                  self.throw_power * bias_y / 10 / 2),
                                   game_world.snow_layer)
         elif self.weapon_type == BUCKET:
-            game_world.add_object(snow.SpreadSnow(200 + 80 + stage_state.base_x, self.y), game_world.snow_layer)
+            game_world.add_object(snow.SpreadSnow(self.x + 80, self.y), game_world.snow_layer)
 
         self.ammo[self.weapon_type] -= 1
         if self.weapon_type == SNOW:

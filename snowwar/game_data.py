@@ -1,4 +1,5 @@
 
+HP, THROW_POWER, RELOAD_SPEED, SHOVEL_POWER, WALL_LEVEL = range(5)
 
 class Data:
     def __init__(self):
@@ -9,13 +10,13 @@ class Data:
 
 
     def get_player_inform(self,option):
-        if option == 'hp':
+        if option == HP:
             return self.main_inform[0]
-        elif option == 'throw_power':
-            return self.main_inform[1] * 10
-        elif option == 'reload_speed':
+        elif option == THROW_POWER:
+            return 280 + self.main_inform[1] * 10
+        elif option == RELOAD_SPEED:
             return 50 - self.main_inform[2] * 5
-        elif option == 'shovel_power':
+        elif option == SHOVEL_POWER:
             return self.main_inform[3]
-        elif option == 'wall_level':
+        elif option == WALL_LEVEL:
             return self.main_inform[4]

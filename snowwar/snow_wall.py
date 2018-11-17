@@ -7,12 +7,15 @@ LEVEL1, LEVEL2, LEVEL3 = range(3)
 
 class SnowWall:
     image = None
-    def __init__(self, x):
+    def __init__(self, x, dir, max_hp, shovel_power):
         if SnowWall.image == None:
             SnowWall.image = load_image('image\\snows\\snow_wall.png')
         self.x, self.y = x, 260 + 25
         self.cur_state = LEVEL1
-        self.hp = 1
+        self.hp = shovel_power
+        self.max_hp = 5 + max_hp*10
+        self.shovel_tick = shovel_power
+        self.dir = dir
 
 
     def draw(self):
@@ -28,8 +31,10 @@ class SnowWall:
     def update(self):
         self.collision_snow()
 
-    def strengthen_wall(self):
-        self.hp += 1
+    def strengthen_wall(self, shovel_power):
+        self.hp += shovel_power
+        if self.max_hp < self.hp:
+            self.hp = self.max_hp
 
         if 3 <= self.hp <= 5:
             self.cur_state = LEVEL2
@@ -57,7 +62,7 @@ class SnowWall:
             return self.x - 15, self.y + 25, self.x + 15, self.y - 25
 
     def hit(self):
-        self.hp -= 1;
+        self.hp -= 1
         if self.hp < 1:
             game_world.remove_object(self, game_world.snow_wall_layer)
         elif 1 <= self.hp < 3:
