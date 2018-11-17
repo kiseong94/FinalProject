@@ -115,6 +115,7 @@ class ReloadState:
             character.image.clip_draw(60 * (character.frame // 2), 60 * 8, 60, 60, 200, character.y, 60, 60)
         else:
             character.image.clip_draw(60 * (character.frame // 2), 60 * 3, 60, 60, 200, character.y, 60, 60)
+        character.draw_reloading_gauge()
 
 
 class SitState:
@@ -292,6 +293,9 @@ class Character:
         self.arrow_image = load_image('image\\main_character\\arrow.png')
         self.throw_image = load_image('image\\main_character\\throw_parts.png')
         self.throw_objects = load_image('image\\main_character\\throw_objects.png')
+        self.reloading_bar = load_image('image\\main_character\\reloading_bar.png')
+        self.reloading_gauge = load_image('image\\main_character\\reloading_gauge.png')
+        self.font = load_font('font\\neodgm.ttf')
         self.x, self.y = 200, 30 + 260
         self.cur_state = IdleState
         self.frame = 0
@@ -362,6 +366,15 @@ class Character:
     def hit(self):
         pass
 
+    def draw_reloading_gauge(self):
+        t = 50 * self.timer // self.reload_time//2
+
+        self.reloading_bar.draw(self.x - stage_state.base_x, self.y + 20)
+        self.reloading_gauge.clip_draw(0, 0, 4, 10, self.x - stage_state.base_x - 27, self.y + 20)
+        if self.timer > 0:
+            self.reloading_gauge.clip_draw(4, 0, 4, 10, self.x - stage_state.base_x - 25 + t, self.y + 20, t*2, 10)
+        self.reloading_gauge.clip_draw(54, 0, 4, 10, self.x - stage_state.base_x - 23 + t*2, self.y + 20)
+
     def handle_event(self, event):
         if (event.type, event.key) in key_event_table:
             key_event = key_event_table[(event.type, event.key)]
@@ -374,7 +387,6 @@ class Character:
             elif key_event == A_UP:
                 self.velocity += 2
             self.add_event(key_event)
-
         elif (event.type, event.key) in weapon_key_table:
             key_event = weapon_key_table[(event.type, event.key)]
             if main_state.Data.available_weapon[key_event]:
@@ -396,6 +408,6 @@ class Character:
         elif event.type == SDL_MOUSEMOTION and self.cur_state == AimState:
             self.aim_draw_x, self.aim_draw_y = event.x, 900 - event.y - 1
 
-
+        return self.velocity
 
 

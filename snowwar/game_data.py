@@ -14,7 +14,7 @@ class Data:
         elif option == 'throw_power':
             return self.main_inform[1] * 10
         elif option == 'reload_speed':
-            return 45 - self.main_inform[2] * 2
+            return 50 - self.main_inform[2] * 5
         elif option == 'shovel_power':
             return self.main_inform[3]
         elif option == 'wall_level':
