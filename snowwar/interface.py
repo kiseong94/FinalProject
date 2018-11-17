@@ -31,10 +31,10 @@ class UI:
             if main_state.Data.available_weapon[i]:
                 if i == 2:
                     self.weapon_image.clip_draw(i * 120, 0, 120, 180, 300 + 300, 95)
-                    self.font.draw(300 + 150*i - 10, 30, '%d' % stage_state.player.ammo[i], (0, 0, 0))
+                    self.font.draw(300 + 150*i - 10, 30, '%d' % stage_state.player.num_ammo[i], (0, 0, 0))
                 else:
                     self.weapon_image.clip_draw(i * 120, 0, 120, 180, 300 + 150*i, 95)
-                    self.font.draw(300 - 35 + i*150, 30, '%d / 1' % stage_state.player.ammo[i], (0, 0, 0))
+                    self.font.draw(300 - 35 + i*150, 30, '%d / 1' % stage_state.player.num_ammo[i], (0, 0, 0))
 
 
         self.font.draw(300 + 20, 80, '+%d' % stage_state.player.snow_stack, (255, 255, 0))

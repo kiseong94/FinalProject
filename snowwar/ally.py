@@ -10,17 +10,18 @@ IDLE, MOVE, AIM, THROW, HIT, DEAD1, DEAD2, DEAD3, SIT, MAKE_WALL, RELOAD, ATTACK
 
 
 # initialization code
-class Ally:
+class ReloadMan:
     image = None
+    giving_snow_queue = []
     def __init__(self):
-        if Ally.image == None:
-            Ally.image = load_image('image\\ally\\reload_man\\temp.png')
+        if ReloadMan.image == None:
+            ReloadMan.image = load_image('image\\ally\\reload_man\\temp.png')
         self.velocity = 2
         self.cur_state = IDLE
         self.event_que = []
         self.x, self.y = 0, 30 + 260
         self.frame = 0
-        self.reload_time = 120
+        self.reload_time = 140
         self.timer = 0
         self.move_target_point = 0
         self.Is_move_point_set = False
@@ -52,6 +53,9 @@ class Ally:
             if self.cur_state == RELOAD:
                 if self.timer >= self.reload_time:
                     self.snow_stack += 1
+                    ReloadMan.giving_snow_queue.insert(0, self)
+                    self.timer = 0
+                    self.cur_state = IDLE
                 else:
                     self.timer += 1
             else:

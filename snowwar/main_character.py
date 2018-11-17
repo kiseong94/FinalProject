@@ -6,6 +6,7 @@ import snow
 import snow_wall
 import math
 import game_world
+import ally
 
 SNOW, STONE_SNOW, ICICLE, BUCKET, A_DOWN, A_UP, S_DOWN, S_UP, W_DOWN, W_UP, D_DOWN, D_UP, R_DOWN, LEFT_BUTTON_DOWN, LEFT_BUTTON_UP, TIME_UP = range(16)
 
@@ -91,15 +92,15 @@ class ReloadState:
         character.frame = (character.frame + 1) % 16
         if character.weapon_type == BUCKET:
             if character.timer == character.reload_time*2:
-                character.ammo[character.weapon_type] += 1
+                character.num_ammo[character.weapon_type] += 1
                 character.add_event(TIME_UP)
             else:
                 character.timer += 1
         else:
             if character.timer == character.reload_time:
                 if character.weapon_type == SNOW:
-                    if character.ammo[0] == 0:
-                        character.ammo[0] += 1
+                    if character.num_ammo[0] == 0:
+                        character.num_ammo[0] += 1
                     character.snow_stack += 1
                 else:
                     character.ammo[character.weapon_type] += 1
@@ -229,6 +230,7 @@ class ThrowState:
         character.throw()
 
 
+
     @staticmethod
     def do(character):
         character.timer -= 1
@@ -311,7 +313,7 @@ class Character:
         self.throw_degree = 0
         self.snow_stack = 0
         self.weapon_type = SNOW
-        self.ammo = [0, 0, 30, 1]
+        self.num_ammo = [0, 0, 30, 1]
 
 
     def add_event(self, event):
@@ -326,6 +328,7 @@ class Character:
 
     def update(self):
         self.cur_state.do(self)
+        self.get_snow()
         if len(self.event_que) > 0:
             event = self.event_que.pop()
             self.change_state(next_state_table[self.cur_state][event])
@@ -361,12 +364,20 @@ class Character:
         elif self.weapon_type == BUCKET:
             game_world.add_object(snow.SpreadSnow(self.x + 80, self.y), game_world.snow_layer)
 
-        self.ammo[self.weapon_type] -= 1
+        self.num_ammo[self.weapon_type] -= 1
         if self.weapon_type == SNOW:
             self.snow_stack = 0
 
     def hit(self):
         pass
+
+    def get_snow(self):
+        if self.snow_stack == 0 and self.num_ammo[SNOW] == 0:
+            if len(ally.ReloadMan.giving_snow_queue) > 0:
+                self.snow_stack += 1
+                self.num_ammo[SNOW] += 1
+                giver = ally.ReloadMan.giving_snow_queue.pop()
+                giver.snow_stack = 0
 
     def draw_reloading_gauge(self):
         t = 50 * self.timer // self.reload_time//2
@@ -401,7 +412,7 @@ class Character:
         elif (event.type, event.button) in mouse_event_table:
             key_event = mouse_event_table[(event.type, event.button)]
             if key_event == LEFT_BUTTON_DOWN:
-                if self.ammo[self.weapon_type] == 0:
+                if self.num_ammo[self.weapon_type] == 0:
                     key_event = R_DOWN
                 else:
                     self.aim_base_x, self.aim_base_y = event.x, 900 - event.y - 1
