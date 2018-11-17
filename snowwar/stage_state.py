@@ -10,7 +10,7 @@ import main_character
 import back_ground
 import enemy
 import interface
-import start_state
+import ally
 
 name = "StageState"
 
@@ -34,7 +34,7 @@ def enter():
     game_world.objects = [[], [], [], [], []]
     game_world.add_object(player, game_world.player_layer)
     game_world.add_object(background, game_world.back_ground_layer)
-
+    game_world.add_object(ally.Ally(), game_world.player_layer)
 
 def exit():
     global player, background, ui

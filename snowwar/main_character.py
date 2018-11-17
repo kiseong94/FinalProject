@@ -108,8 +108,6 @@ class ReloadState:
                 character.timer += 1
 
 
-
-
     @staticmethod
     def draw(character):
         if character.weapon_type == BUCKET:
