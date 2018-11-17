@@ -51,6 +51,8 @@ def resume():
 
 
 def handle_events():
+    global player
+    global background
     events = get_events()
     for event in events:
         if event.type == SDL_QUIT:
@@ -59,6 +61,7 @@ def handle_events():
                 game_framework.pop_state()
         else:
             player.handle_event(event)
+            background.handle_event(event)
 
 
 

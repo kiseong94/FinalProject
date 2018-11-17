@@ -62,9 +62,7 @@ class MoveState:
         character.frame = (character.frame + 1) % 16
         stage_state.base_x += character.velocity
         character.x += character.velocity
-        stage_state.background.move_ground(character.velocity)
-        stage_state.background.move_forest(character.velocity)
-        stage_state.background.move_mountain(character.velocity)
+
 
     @staticmethod
     def draw(character):
