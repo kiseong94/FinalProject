@@ -16,6 +16,7 @@ class SnowWall:
         self.max_hp = 5 + max_hp*10
         self.shovel_tick = shovel_power
         self.dir = dir
+        self.occupied = False
 
 
     def draw(self):
