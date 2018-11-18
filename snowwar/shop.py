@@ -31,6 +31,7 @@ class Shop:
                                 [(400, 475, '고드름'), (400, 250, '눈 양동이')]]
 
 
+
     def draw(self):
         self.sheet_image.clip_draw(1200*self.sheet_state, 0, 1200, 700, 800, 450)
 
@@ -46,7 +47,7 @@ class Shop:
             for i in range(5):
                 x, y, option_name = self.sheet1_image_pos[i]
                 #option_name = option_name + ' %d'
-                self.sheet1_select_image.clip_draw(120*i,0,120,120,x,y)
+                self.sheet1_select_image.clip_draw(120 * i, 0, 120, 120, x, y)
                 self.font.draw(x + 75, y, option_name + ' LV.%d' % main_state.Data.main_inform[i], (0, 0, 0))
 
         elif self.sheet_state == Weapon:

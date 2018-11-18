@@ -15,7 +15,7 @@ class ReloadMan:
     giving_snow_queue = []
     def __init__(self):
         if ReloadMan.image == None:
-            ReloadMan.image = load_image('image\\ally\\reload_man\\temp.png')
+            ReloadMan.image = load_image('image\\ally\\reload_man\\reloadman.png')
         self.velocity = 2
         self.cur_state = IDLE
         self.event_que = []
@@ -96,11 +96,17 @@ class ReloadMan:
 
     def draw(self):
         if self.cur_state == IDLE:
-            self.image.clip_draw(60 * (self.frame // 2), 60 * 0, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
+            if self.snow_stack == 0:
+                self.image.clip_draw(60 * (self.frame // 2), 60 * 0, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
+            else:
+                self.image.clip_draw(60 * (self.frame // 2), 60 * 1, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
         elif self.cur_state == MOVE:
-            self.image.clip_draw(60 * (self.frame//2), 60 * 1, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
+            if self.snow_stack == 0:
+                self.image.clip_draw(60 * (self.frame // 2), 60 * 2, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
+            else:
+                self.image.clip_draw(60 * (self.frame // 2), 60 * 3, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
         elif self.cur_state == RELOAD:
-            self.image.clip_draw(60 * (self.frame // 2), 60 * 3, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
+            self.image.clip_draw(60 * (self.frame // 2), 60 * 4, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
 
 
 class ThrowMan:
