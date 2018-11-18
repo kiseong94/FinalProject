@@ -113,7 +113,7 @@ class ThrowMan:
     image = None
     def __init__(self):
         if ThrowMan.image == None:
-            ThrowMan.image = load_image('image\\ally\\reload_man\\temp.png')
+            ThrowMan.image = load_image('image\\ally\\throw_man\\throwman.png')
         self.velocity = 2
         self.cur_state = IDLE
         self.event_que = []
@@ -186,11 +186,13 @@ class ThrowMan:
     def throw(self):
         if self.is_aim_done:
             if self.cur_state == THROW:
-                if self.timer > 20:
-                    self.throw_snow()
+                if self.timer > 16:
                     self.is_target_set = False
                     self.is_aim_done = False
                     self.timer = 0
+                elif self.timer == 12:
+                    self.throw_snow()
+                    self.timer += 1
                 else:
                     self.timer += 1
             else:
@@ -245,11 +247,11 @@ class ThrowMan:
         elif self.cur_state == MOVE:
             self.image.clip_draw(60 * (self.frame//2), 60 * 1, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
         elif self.cur_state == RELOAD:
-            self.image.clip_draw(60 * (self.frame // 2), 60 * 3, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
+            self.image.clip_draw(60 * (self.frame // 2), 60 * 2, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
         elif self.cur_state == AIM:
-            self.image.clip_draw(60 * (self.frame // 2), 60 * 6, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
+            self.image.clip_draw(60 * (self.frame // 2), 60 * 3, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
         elif self.cur_state == THROW:
-            self.image.clip_draw(60 * (self.frame // 2), 60 * 7, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
+            self.image.clip_draw(60 * (self.frame // 2), 60 * 4, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
 
 
     def throw_snow(self):
