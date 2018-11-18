@@ -8,6 +8,7 @@ import game_world
 
 IDLE, MOVE, AIM, THROW, HIT, DEAD1, DEAD2, DEAD3, SIT, MAKE_WALL, RELOAD, ATTACK = range(12)
 
+LEFT, RIGHT = range(2)
 
 # initialization code
 class ReloadMan:
@@ -205,7 +206,8 @@ class ThrowMan:
 
     def set_target(self):
         for enemy in game_world.layer_objects(game_world.enemy_layer):
-            if enemy.cur_state != DEAD1 and enemy.cur_state != DEAD2 and enemy.cur_state != DEAD3:
+            if enemy.cur_state != DEAD1 and enemy.cur_state != DEAD2 and enemy.cur_state != DEAD3 and\
+                    stage_state.base_x + 600 < enemy.x < stage_state.base_x + 1200:
                 self.target_x = enemy.x
                 self.is_target_set = True
                 return BehaviorTree.SUCCESS
@@ -255,7 +257,7 @@ class ThrowMan:
 
 
     def throw_snow(self):
-        distance = self.target_x - self.x  #random.randint(-150, 100)
+        distance = self.target_x - self.x + random.randint(-150, 100)
         vx = random.randint(20, 25)
         t = distance / vx
         vy = t / 5 - (40 / t)
@@ -268,7 +270,7 @@ class ShovelMan:
     image = None
     def __init__(self):
         if ShovelMan.image == None:
-            ShovelMan.image = load_image('image\\ally\\reload_man\\temp.png')
+            ShovelMan.image = load_image('image\\ally\\shovel_man\\shovelman.png')
         self.velocity = 3
         self.cur_state = IDLE
         self.event_que = []
@@ -282,6 +284,7 @@ class ShovelMan:
         self.target_wall = None
         self.build_behavior_tree()
         self.shoveling_time = 50
+        self.dir = RIGHT
 
     def check_player_distance(self):
         if stage_state.player.x - self.x > 280 or self.is_move_point_set:
@@ -331,8 +334,10 @@ class ShovelMan:
             self.cur_state = MOVE
             if self.x <= self.target_wall.x - 30:
                 self.x += self.velocity
+                self.dir = RIGHT
             else:
                 self.x -= self.velocity
+                self.dir = LEFT
             return BehaviorTree.SUCCESS
 
     def strengthen_wall(self):
@@ -386,9 +391,12 @@ class ShovelMan:
         if self.cur_state == IDLE:
             self.image.clip_draw(60 * (self.frame // 2), 60 * 0, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
         elif self.cur_state == MOVE:
-            self.image.clip_draw(60 * (self.frame//2), 60 * 1, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
+            if self.dir == RIGHT:
+                self.image.clip_draw(60 * (self.frame//2), 60 * 1, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
+            else:
+                self.image.clip_composite_draw(60 * (self.frame // 2), 60 * 1, 60, 60, 0, 'h', self.x - stage_state.base_x, self.y, 60, 60)
         elif self.cur_state == MAKE_WALL:
-            self.image.clip_draw(60 * (self.frame // 2), 60 * 5, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
+            self.image.clip_draw(60 * (self.frame // 2), 60 * 2, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
 
     def hit(self):
         pass

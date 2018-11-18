@@ -294,8 +294,9 @@ class Character:
         self.arrow_image = load_image('image\\main_character\\arrow.png')
         self.throw_image = load_image('image\\main_character\\throw_parts.png')
         self.throw_objects = load_image('image\\main_character\\throw_objects.png')
-        self.reloading_bar = load_image('image\\main_character\\reloading_bar.png')
+        self.gauge_bar = load_image('image\\main_character\\gauge_bar.png')
         self.reloading_gauge = load_image('image\\main_character\\reloading_gauge.png')
+        self.hp_gauge = load_image('image\\main_character\\hp_gauge.png')
         self.font = load_font('font\\neodgm.ttf')
         self.x, self.y = 300, 30 + 260
         self.cur_state = IdleState
@@ -386,26 +387,34 @@ class Character:
     def draw_reloading_gauge(self):
         t = 50 * self.timer // self.reload_time//2
 
-        self.reloading_bar.draw(self.x - stage_state.base_x, self.y + 20)
+
         self.reloading_gauge.clip_draw(0, 0, 4, 10, self.x - stage_state.base_x - 27, self.y + 20)
         if self.timer > 0:
             self.reloading_gauge.clip_draw(4, 0, 4, 10, self.x - stage_state.base_x - 25 + t, self.y + 20, t*2, 10)
         self.reloading_gauge.clip_draw(54, 0, 4, 10, self.x - stage_state.base_x - 23 + t*2, self.y + 20)
+        self.gauge_bar.draw(self.x - stage_state.base_x, self.y + 20)
 
     def draw_hp_gauge(self):
         t = 50 * self.hp // self.max_hp // 2
 
-        self.reloading_bar.draw(self.x - stage_state.base_x, self.y - 50)
-        self.reloading_gauge.clip_draw(0, 0, 4, 10, self.x - stage_state.base_x - 27, self.y - 50)
         if self.hp > 0:
-            self.reloading_gauge.clip_draw(4, 0, 4, 10, self.x - stage_state.base_x - 25 + t, self.y - 50, t * 2, 10)
-        self.reloading_gauge.clip_draw(54, 0, 4, 10, self.x - stage_state.base_x - 23 + t * 2, self.y - 50)
+            self.hp_gauge.clip_draw(0, 0, 4, 10, self.x - stage_state.base_x - 27, self.y - 50)
+            self.hp_gauge.clip_draw(4, 0, 4, 10, self.x - stage_state.base_x - 25 + t, self.y - 50, t * 2, 10)
+            self.hp_gauge.clip_draw(54, 0, 4, 10, self.x - stage_state.base_x - 23 + t * 2, self.y - 50)
+        self.gauge_bar.draw(self.x - stage_state.base_x, self.y - 50)
 
     def snow_collision_check(self):
         for snow in game_world.layer_objects(game_world.snow_layer):
             if snow.vx < 0:
-                if snow.collision_object(self.x - 10, self.y + 25, self.x + 10, self.y - 25):
+                if snow.collision_object(*self.get_hit_box()):
                     self.hit()
+
+    def get_hit_box(self):
+        if self.cur_state == SitState or self.cur_state == ReloadState:
+            return self.x - 10, self.y + 5, self.x + 10, self.y - 25
+        else:
+            return self.x - 10, self.y + 20, self.x + 10, self.y - 25
+
 
     def handle_event(self, event):
         if (event.type, event.key) in key_event_table:

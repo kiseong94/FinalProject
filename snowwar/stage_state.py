@@ -35,7 +35,8 @@ def enter():
     game_world.add_object(player, game_world.player_layer)
     game_world.add_object(background, game_world.back_ground_layer)
     game_world.add_object(ally.ReloadMan(), game_world.player_layer)
-    game_world.add_object(ally.ThrowMan(), game_world.player_layer)
+    for i in range(5):
+        game_world.add_object(ally.ThrowMan(), game_world.player_layer)
     game_world.add_object(ally.ShovelMan(), game_world.player_layer)
 
 def exit():
