@@ -11,7 +11,7 @@ class Data:
 
     def get_player_inform(self,option):
         if option == HP:
-            return self.main_inform[0]
+            return 5 + self.main_inform[0]*3
         elif option == THROW_POWER:
             return 280 + self.main_inform[1] * 10
         elif option == RELOAD_SPEED:

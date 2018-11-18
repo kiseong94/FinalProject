@@ -302,6 +302,7 @@ class Character:
         self.frame = 0
         self.velocity = 0
         self.hp = main_state.Data.get_player_inform(game_data.HP)
+        self.max_hp = main_state.Data.get_player_inform(game_data.HP)
         self.reload_time = main_state.Data.get_player_inform(game_data.RELOAD_SPEED)
         self.max_throw_power = main_state.Data.get_player_inform(game_data.THROW_POWER)
         self.snow_wall_level = main_state.Data.get_player_inform(game_data.WALL_LEVEL)
@@ -329,11 +330,13 @@ class Character:
     def update(self):
         self.cur_state.do(self)
         self.get_snow()
+        self.snow_collision_check()
         if len(self.event_que) > 0:
             event = self.event_que.pop()
             self.change_state(next_state_table[self.cur_state][event])
 
     def draw(self):
+        self.draw_hp_gauge()
         self.cur_state.draw(self)
 
     def throw(self):
@@ -369,7 +372,8 @@ class Character:
             self.snow_stack = 0
 
     def hit(self):
-        pass
+        if self.hp > 0:
+            self.hp -= 1
 
     def get_snow(self):
         if self.snow_stack == 0 and self.num_ammo[SNOW] == 0:
@@ -387,6 +391,21 @@ class Character:
         if self.timer > 0:
             self.reloading_gauge.clip_draw(4, 0, 4, 10, self.x - stage_state.base_x - 25 + t, self.y + 20, t*2, 10)
         self.reloading_gauge.clip_draw(54, 0, 4, 10, self.x - stage_state.base_x - 23 + t*2, self.y + 20)
+
+    def draw_hp_gauge(self):
+        t = 50 * self.hp // self.max_hp // 2
+
+        self.reloading_bar.draw(self.x - stage_state.base_x, self.y - 50)
+        self.reloading_gauge.clip_draw(0, 0, 4, 10, self.x - stage_state.base_x - 27, self.y - 50)
+        if self.hp > 0:
+            self.reloading_gauge.clip_draw(4, 0, 4, 10, self.x - stage_state.base_x - 25 + t, self.y - 50, t * 2, 10)
+        self.reloading_gauge.clip_draw(54, 0, 4, 10, self.x - stage_state.base_x - 23 + t * 2, self.y - 50)
+
+    def snow_collision_check(self):
+        for snow in game_world.layer_objects(game_world.snow_layer):
+            if snow.vx < 0:
+                if snow.collision_object(self.x - 10, self.y + 25, self.x + 10, self.y - 25):
+                    self.hit()
 
     def handle_event(self, event):
         if (event.type, event.key) in key_event_table:
