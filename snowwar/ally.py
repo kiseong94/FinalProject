@@ -10,13 +10,46 @@ IDLE, MOVE, AIM, THROW, HIT, DEAD1, DEAD2, DEAD3, SIT, MAKE_WALL, RELOAD, ATTACK
 
 LEFT, RIGHT = range(2)
 
+class Ally:
+    hp_bar = None
+    hp_gauge = None
+
+    def hit(self):
+        if self.hp > 0:
+            self.hp -= 1
+
+    def draw_hp_gauge(self):
+        t = 30 * self.hp // self.max_hp // 2
+
+        self.hp_bar.draw(self.x - stage_state.base_x, self.y - 50)
+        if self.hp > 0:
+            self.hp_gauge.draw(self.x - stage_state.base_x - 15 + t, self.y - 50, t * 2, 5)
+
+    def snow_collision_check(self):
+        for snow in game_world.layer_objects(game_world.snow_layer):
+            if snow.vx < 0:
+                if snow.collision_object(*self.get_hit_box()):
+                    self.hit()
+
+    def get_hit_box(self):
+        if self.cur_state == RELOAD:
+            return self.x - 10, self.y + 5, self.x + 10, self.y - 25
+        else:
+            return self.x - 10, self.y + 20, self.x + 10, self.y - 25
+
 # initialization code
-class ReloadMan:
+class ReloadMan(Ally):
     image = None
     giving_snow_queue = []
     def __init__(self):
+        if Ally.hp_bar == None:
+            Ally.hp_bar = load_image('image\\ui\\hp_bar.png')
+        if Ally.hp_gauge == None:
+            Ally.hp_gauge = load_image('image\\ui\\hp_gauge.png')
         if ReloadMan.image == None:
             ReloadMan.image = load_image('image\\ally\\reload_man\\reloadman.png')
+        self.hp = 5
+        self.max_hp = 5
         self.velocity = 2
         self.cur_state = IDLE
         self.event_que = []
@@ -91,7 +124,7 @@ class ReloadMan:
 
     def update(self):
         self.bt.run()
-
+        self.snow_collision_check()
         self.frame = (self.frame + 1) % 16
 
 
@@ -109,12 +142,20 @@ class ReloadMan:
         elif self.cur_state == RELOAD:
             self.image.clip_draw(60 * (self.frame // 2), 60 * 4, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
 
+        self.draw_hp_gauge()
 
-class ThrowMan:
+
+class ThrowMan(Ally):
     image = None
     def __init__(self):
+        if Ally.hp_bar == None:
+            Ally.hp_bar = load_image('image\\ui\\hp_bar.png')
+        if Ally.hp_gauge == None:
+            Ally.hp_gauge = load_image('image\\ui\\hp_gauge.png')
         if ThrowMan.image == None:
             ThrowMan.image = load_image('image\\ally\\throw_man\\throwman.png')
+        self.hp = 5
+        self.max_hp = 5
         self.velocity = 2
         self.cur_state = IDLE
         self.event_que = []
@@ -239,7 +280,7 @@ class ThrowMan:
 
     def update(self):
         self.bt.run()
-
+        self.snow_collision_check()
         self.frame = (self.frame + 1) % 16
 
 
@@ -254,7 +295,7 @@ class ThrowMan:
             self.image.clip_draw(60 * (self.frame // 2), 60 * 3, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
         elif self.cur_state == THROW:
             self.image.clip_draw(60 * (self.frame // 2), 60 * 4, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
-
+        self.draw_hp_gauge()
 
     def throw_snow(self):
         distance = self.target_x - self.x + random.randint(-150, 100)
@@ -266,11 +307,17 @@ class ThrowMan:
         self.snow_stack = 0
 
 
-class ShovelMan:
+class ShovelMan(Ally):
     image = None
     def __init__(self):
+        if Ally.hp_bar == None:
+            Ally.hp_bar = load_image('image\\ui\\hp_bar.png')
+        if Ally.hp_gauge == None:
+            Ally.hp_gauge = load_image('image\\ui\\hp_gauge.png')
         if ShovelMan.image == None:
             ShovelMan.image = load_image('image\\ally\\shovel_man\\shovelman.png')
+        self.hp = 10
+        self.max_hp = 10
         self.velocity = 3
         self.cur_state = IDLE
         self.event_que = []
@@ -383,7 +430,7 @@ class ShovelMan:
 
     def update(self):
         self.bt.run()
-
+        self.snow_collision_check()
         self.frame = (self.frame + 1) % 16
 
 
@@ -397,6 +444,4 @@ class ShovelMan:
                 self.image.clip_composite_draw(60 * (self.frame // 2), 60 * 1, 60, 60, 0, 'h', self.x - stage_state.base_x, self.y, 60, 60)
         elif self.cur_state == MAKE_WALL:
             self.image.clip_draw(60 * (self.frame // 2), 60 * 2, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
-
-    def hit(self):
-        pass
+        self.draw_hp_gauge()

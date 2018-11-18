@@ -80,7 +80,7 @@ class ReloadState:
     def enter(character):
         character.frame = 0
         character.timer = 0
-        if (character.weapon_type == SNOW and character.snow_stack == 4) or (character.weapon_type == STONE_SNOW and character.ammo[1] == 1) or character.weapon_type == ICICLE :
+        if (character.weapon_type == SNOW and character.snow_stack == 4) or (character.weapon_type == STONE_SNOW and character.num_ammo[1] == 1) or character.weapon_type == ICICLE :
             character.add_event(TIME_UP)
 
     @staticmethod
@@ -103,7 +103,7 @@ class ReloadState:
                         character.num_ammo[0] += 1
                     character.snow_stack += 1
                 else:
-                    character.ammo[character.weapon_type] += 1
+                    character.num_ammo[character.weapon_type] += 1
                 character.add_event(TIME_UP)
             else:
                 character.timer += 1
