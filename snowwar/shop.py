@@ -150,6 +150,23 @@ class Shop:
                         x, y = self.page_left_button
                         if x - 25 <= mouse_x <= x + 25 and y - 100 <= mouse_y <= y + 100:
                             self.page_number -= 1
+            elif self.sheet_state == Ally:
+                for i in range(2):
+                    x, y = self.sheet3_button_pos[i]
+                    if x - 75 <= mouse_x <= x + 75 and y - 25 <= mouse_y <= y + 25:
+                        if main_state.Data.available_weapon[self.page_number * 2 + i]:
+                            pass
+                        else:
+                            main_state.Data.available_weapon[self.page_number * 2 + i] = True
+                        break
+                    if self.page_number == 0:
+                        x, y = self.page_right_button
+                        if x - 25 <= mouse_x <= x + 25 and y - 100 <= mouse_y <= y + 100:
+                            self.page_number += 1
+                    elif self.page_number == 1:
+                        x, y = self.page_left_button
+                        if x - 25 <= mouse_x <= x + 25 and y - 100 <= mouse_y <= y + 100:
+                            self.page_number -= 1
 
 
 
@@ -167,6 +184,14 @@ class Shop:
             elif self.sheet_state == Weapon:
                 for i in range(2):
                     x, y = self.sheet2_button_pos[i]
+                    if x - 75 <= mouse_x <= x + 75 and y - 25 <= mouse_y <= y + 25:
+                        self.mouse_on_button = i
+                        break
+                    else:
+                        self.mouse_on_button = None
+            elif self.sheet_state == Ally:
+                for i in range(2):
+                    x, y = self.sheet3_button_pos[i]
                     if x - 75 <= mouse_x <= x + 75 and y - 25 <= mouse_y <= y + 25:
                         self.mouse_on_button = i
                         break
