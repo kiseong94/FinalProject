@@ -6,6 +6,7 @@ class Data:
         self.main_inform = [1, 1, 1, 1, 1]
         # main_inform = {'hp': 5, 'throw_power': 1, 'shovel_power': 0, 'reload_speed': 1}
         self.available_weapon = [True, False, False, False]
+        self.available_ally = [True, False, False, False]
         self.weapon_inform = [[], [], [], []]
 
 

@@ -3,7 +3,8 @@ import stage_state
 import main_character
 import main_state
 import game_world
-import snow
+import ally
+import game_data
 
 SNOW, STONE_SNOW, ICICLE = range(3)
 
@@ -13,10 +14,12 @@ class UI:
         self.image = load_image('image\\ui\\inform.png')
         self.weapon_image = load_image('image\\ui\\weapon.png')
         self.select_image = load_image('image\\ui\\select.png')
+        self.ally_button_image = load_image('image\\ui\\ally_button.png')
         self.font = load_font('font\\neodgm.ttf', 30)
         self.player_inform = load_font('font\\neodgm.ttf', 20)
         self.x, self.y = 800, 100
 
+        self.ally_button_pos = [(1050, 140, '눈 뭉치기 용병 고용'), (1130, 140, '눈 투척 용병 고용'), (1210, 140, '눈 벽 수리 용병'), (1290, 140, '이동식 눈 저장소')]
 
     def draw(self):
         self.image.draw(self.x, self.y)
@@ -36,6 +39,10 @@ class UI:
                     self.weapon_image.clip_draw(i * 120, 0, 120, 180, 300 + 150*i, 95)
                     self.font.draw(300 - 35 + i*150, 30, '%d / 1' % stage_state.player.num_ammo[i], (0, 0, 0))
 
+        for i in range(4):
+            x, y, = self.ally_button_pos[i][0], self.ally_button_pos[i][1]
+            self.ally_button_image.draw(x, y)
+
 
         self.font.draw(300 + 20, 80, '+%d' % stage_state.player.snow_stack, (255, 255, 0))
 
@@ -51,3 +58,5 @@ class UI:
 
     def update(self):
         pass
+
+   

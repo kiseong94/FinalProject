@@ -56,6 +56,7 @@ def resume():
 def handle_events():
     global player
     global background
+    global ui
     events = get_events()
     for event in events:
         if event.type == SDL_QUIT:
@@ -63,7 +64,10 @@ def handle_events():
         elif event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
                 game_framework.pop_state()
         else:
-            player.handle_event(event)
+            if not(event.type == SDL_MOUSEBUTTONDOWN and 900 - event.y - 1 < 200):
+                player.handle_event(event)
+
+            ui.handle_event(event)
             background.handle_event(event)
 
 

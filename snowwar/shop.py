@@ -30,7 +30,7 @@ class Shop:
         self.sheet2_image_pos = [[(400, 475, '눈덩이'), (400, 250, '돌을 넣은 눈덩이')],
                                 [(400, 475, '고드름'), (400, 250, '눈 양동이')]]
 
-        self.sheet3_select_image = None
+        self.sheet3_select_image = load_image('image\\shop\\frame3_select_image.png')
         self.sheet3_button_pos = [(1200, 475), (1200, 250)]
         self.sheet3_image_pos = [[(400, 475, '눈 뭉치기 용병', '눈을 뭉쳐 줍니다'), (400, 250, '눈 던지기 용병', '눈을 던져 적을 공격합니다')],
                                  [(400, 475, '눈벽 보수 용병', '눈벽을 보수해줍니다'), (400, 250, '이동식 저장소', '눈을 저장합니다')]]
@@ -98,7 +98,7 @@ class Shop:
             for i in range(2):
                 x, y, option_name, inform = self.sheet3_image_pos[self.page_number][i]
                 # option_name = option_name + ' %d'
-                self.sheet2_select_image.clip_draw(150 * (self.page_number * 2 + i), 0, 150, 150, x, y)
+                self.sheet3_select_image.clip_draw(150 * (self.page_number * 2 + i), 0, 150, 150, x, y)
                 self.font.draw(x + 100, y + 50, option_name, (0, 0, 0))
 
             if self.page_number == 0:
@@ -150,14 +150,15 @@ class Shop:
                         x, y = self.page_left_button
                         if x - 25 <= mouse_x <= x + 25 and y - 100 <= mouse_y <= y + 100:
                             self.page_number -= 1
+
             elif self.sheet_state == Ally:
                 for i in range(2):
                     x, y = self.sheet3_button_pos[i]
                     if x - 75 <= mouse_x <= x + 75 and y - 25 <= mouse_y <= y + 25:
-                        if main_state.Data.available_weapon[self.page_number * 2 + i]:
+                        if main_state.Data.available_ally[self.page_number * 2 + i]:
                             pass
                         else:
-                            main_state.Data.available_weapon[self.page_number * 2 + i] = True
+                            main_state.Data.available_ally[self.page_number * 2 + i] = True
                         break
                     if self.page_number == 0:
                         x, y = self.page_right_button
