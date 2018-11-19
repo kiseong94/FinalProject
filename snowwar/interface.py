@@ -59,4 +59,20 @@ class UI:
     def update(self):
         pass
 
-   
+    def handle_event(self, event):
+        if event.type == SDL_MOUSEBUTTONDOWN:
+            for i in range(4):
+                if main_state.Data.available_ally[i]:
+                    mouse_x, mouse_y = event.x, 900 - event.y - 1
+                    x, y, = self.ally_button_pos[i][0], self.ally_button_pos[i][1]
+                    if x - 35 <= mouse_x <= x + 35 and y - 35 <= mouse_y <= y + 35:
+                        self.hire_ally(i)
+
+
+    def hire_ally(self, type):
+        if type == 0:
+            game_world.add_object(ally.ReloadMan(), game_world.player_layer)
+        if type == 1:
+            game_world.add_object(ally.ThrowMan(), game_world.player_layer)
+        if type == 2:
+            game_world.add_object(ally.ShovelMan(), game_world.player_layer)
