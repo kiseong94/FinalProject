@@ -73,9 +73,9 @@ def update():
 
     if cnt == 0:
         if random.randint(0, 1) == 1:
-            game_world.add_object(enemy.EnemyBasic(), game_world.enemy_layer)
+            game_world.add_object(enemy.EnemyType1(2), game_world.enemy_layer)
         else:
-            game_world.add_object(enemy.EnemyType1(), game_world.enemy_layer)
+            game_world.add_object(enemy.EnemyType1(2), game_world.enemy_layer)
 
         cnt = 50
     else:

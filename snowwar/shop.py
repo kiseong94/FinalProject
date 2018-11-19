@@ -30,6 +30,10 @@ class Shop:
         self.sheet2_image_pos = [[(400, 475, '눈덩이'), (400, 250, '돌을 넣은 눈덩이')],
                                 [(400, 475, '고드름'), (400, 250, '눈 양동이')]]
 
+        self.sheet3_select_image = None
+        self.sheet3_button_pos = [(1200, 475), (1200, 250)]
+        self.sheet3_image_pos = [[(400, 475, '눈 뭉치기 용병', '눈을 뭉쳐 줍니다'), (400, 250, '눈 던지기 용병', '눈을 던져 적을 공격합니다')],
+                                 [(400, 475, '눈벽 보수 용병', '눈벽을 보수해줍니다'), (400, 250, '이동식 저장소', '눈을 저장합니다')]]
 
 
     def draw(self):
@@ -66,6 +70,33 @@ class Shop:
 
             for i in range(2):
                 x, y, option_name = self.sheet2_image_pos[self.page_number][i]
+                # option_name = option_name + ' %d'
+                self.sheet2_select_image.clip_draw(150 * (self.page_number * 2 + i), 0, 150, 150, x, y)
+                self.font.draw(x + 100, y + 50, option_name, (0, 0, 0))
+
+            if self.page_number == 0:
+                draw_rectangle(self.page_right_button[0] - 25, self.page_right_button[1] - 100,
+                               self.page_right_button[0] + 25, self.page_right_button[1] + 100)
+            elif self.page_number == 1:
+                draw_rectangle(self.page_left_button[0] - 25, self.page_left_button[1] - 100,
+                               self.page_left_button[0] + 25, self.page_left_button[1] + 100)
+
+        elif self.sheet_state == Ally:
+            for i in range(2):
+                x, y = self.sheet3_button_pos[i]
+                if main_state.Data.available_weapon[self.page_number * 2 + i]:
+                    if i == self.mouse_on_button:
+                        self.upgrade_button_image.clip_draw(150, 0, 150, 50, x, y)
+                    else:
+                        self.upgrade_button_image.clip_draw(0, 0, 150, 50, x, y)
+                else:
+                    if i == self.mouse_on_button:
+                        self.buy_button_image.clip_draw(150, 0, 150, 50, x, y)
+                    else:
+                        self.buy_button_image.clip_draw(0, 0, 150, 50, x, y)
+
+            for i in range(2):
+                x, y, option_name, inform = self.sheet3_image_pos[self.page_number][i]
                 # option_name = option_name + ' %d'
                 self.sheet2_select_image.clip_draw(150 * (self.page_number * 2 + i), 0, 150, 150, x, y)
                 self.font.draw(x + 100, y + 50, option_name, (0, 0, 0))

@@ -4,260 +4,29 @@ import stage_state
 import random
 import snow
 import game_world
+from BehaviorTree import BehaviorTree, SelectorNode, SequenceNode, LeafNode
 
 IDLE, MOVE, AIM, THROW, HIT, DEAD1, DEAD2, DEAD3, SIT, MAKE_WALL, RELOAD, ATTACK = range(12)
 
 
 # initialization code
 class Enemy:
-
-    def enter_IDLE(self):
-        pass
-
-    def exit_IDLE(self):
-        pass
-
-    def do_IDLE(self):
-        pass
-
-    def draw_IDLE(self):
-        pass
-
-
-
-    def enter_MOVE(self):
-        self.frame = 0
-
-    def exit_MOVE(self):
-        pass
-
-    def do_MOVE(self):
-        self.frame = (self.frame + 1) % 16
-        self.x += self.velocity
-
-
-    def draw_MOVE(self):
-        self.image.clip_draw(60 * (self.frame // 2), 60 * 0, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
-
-
-
-
-    def enter_RELOAD(self):
-        self.frame = 0
-        self.timer = 0
-
-    def exit_RELOAD(self):
-        pass
-
-    def do_RELOAD(self):
-
-        self.frame = (self.frame + 1) % 16
-        if self.timer == self.reload_time:
-            self.snow_stack += 1
-            self.change_state(AIM)
-        else:
-            self.timer += 1
-
-
-
-    def draw_RELOAD(self):
-        self.image.clip_draw(60 * (self.frame//2), 60 * 2, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
-
-
-
-    def enter_SIT(self):
-        pass
-
-    def exit_SIT(self):
-        pass
-
-    def do_SIT(self):
-        pass
-
-    def draw_SIT(self):
-        pass
-
-
-    def enter_MAKE_WALL(self):
-        pass
-
-    def exit_MAKE_WALL(self):
-        pass
-
-    def do_MAKE_WALL(self):
-        pass
-
-    def draw_MAKE_WALL(self):
-        pass
-
-
-    def enter_AIM(self):
-        self.timer = 0
-        self.frame = 0
-
-
-    def exit_AIM(self):
-        pass
-
-    def do_AIM(self):
-        if self.frame < 16:
-            self.frame += self.frame
-        if self.timer == 40:
-            self.snow_stack += 1
-            self.change_state(THROW)
-        else:
-            self.timer += 1
-
-    def draw_AIM(self):
-        self.image.clip_draw(60 * (self.frame // 2), 60 * 3, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
-
-
-    def enter_THROW(self):
-        self.frame = 0
-
-
-    def exit_THROW(self):
-        self.snow_stack = 0
-        self.throw_snow()
-        self.target_distance -= random.randint(0, 50)
-
-
-    def do_THROW(self):
-        if self.frame == 8:
-            self.change_state(IDLE)
-        else:
-            self.frame += 1
-
-    def draw_THROW(self):
-        self.image.clip_draw(60 * (self.frame // 2), 60 * 4, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
-
-
-
-
-    def enter_HIT(self):
-        pass
-
-    def exit_HIT(self):
-        pass
-
-    def do_HIT(self):
-        pass
-
-    def draw_HIT(self):
-        pass
-
-
-    def enter_DEAD1(self):
-        self.frame = 0
-
-    def exit_DEAD1(self):
-        pass
-
-    def do_DEAD1(self):
-        if self.frame < 15:
-            self.frame += 1
-
-    def draw_DEAD1(self):
-        self.image.clip_draw(60 * (self.frame//2), 60 * 1, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
-
-    def enter_DEAD2(self):
-        self.frame = 0
-
-    def exit_DEAD2(self):
-        pass
-
-    def do_DEAD2(self):
-        if self.frame < 15:
-            self.frame += 1
-            self.x += 3
-
-    def draw_DEAD2(self):
-        self.image.clip_draw(60 * (self.frame//2), 60 * 5, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
-
-
-    def enter_DEAD3(self):
-        self.frame = 0
-
-    def exit_DEAD3(self):
-        pass
-
-    def do_DEAD3(self):
-        if self.frame < 15:
-            self.frame += 1
-
-    def draw_DEAD3(self):
-        self.image.clip_draw(60 * (self.frame//2), 60 * 6, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
-
-    ###################### type1 상태 ####################
-
-    def enter_ATTACK(self):
-        self.frame = 0
-
-    def exit_ATTACK(self):
-        pass
-
-    def do_ATTACK(self):
-        if self.frame < 15:
-            if self.frame == 9:
-                self.attack_target.hit()
-                self.attack_target = None
-            self.frame += 1
-        else:
-            self.change_state(IDLE)
-
-    def draw_ATTACK(self):
-        self.image.clip_draw(60 * (self.frame//2), 60 * 2, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
-
-
-    enter_state = {IDLE: enter_IDLE, MOVE: enter_MOVE, DEAD1: enter_DEAD1, DEAD2: enter_DEAD2, DEAD3: enter_DEAD3,
-                   RELOAD: enter_RELOAD, AIM: enter_AIM, THROW: enter_THROW, ATTACK: enter_ATTACK}
-    exit_state = {IDLE: exit_IDLE, MOVE: exit_MOVE, DEAD1: exit_DEAD1, DEAD2: exit_DEAD2, DEAD3: exit_DEAD3,
-                  RELOAD: exit_RELOAD, AIM: exit_AIM, THROW: exit_THROW, ATTACK: exit_ATTACK}
-    do_state = {IDLE: do_IDLE, MOVE: do_MOVE, DEAD1: do_DEAD1, DEAD2: do_DEAD2, DEAD3: do_DEAD3, RELOAD: do_RELOAD,
-                AIM: do_AIM, THROW: do_THROW, ATTACK: do_ATTACK}
-    draw_state = {IDLE: draw_IDLE, MOVE: draw_MOVE, DEAD1: draw_DEAD1, DEAD2: draw_DEAD2, DEAD3: draw_DEAD3,
-                  RELOAD: draw_RELOAD, AIM: draw_AIM, THROW: draw_THROW, ATTACK: draw_ATTACK}
-
-
-    def add_event(self, event):
-        self.event_que.insert(0, event)
-
+    hp_gauge = None
+    hp_bar = None
 
     def change_state(self, state):
-        if self.cur_state != state:
-            self.exit_state[self.cur_state](self)
-            self.enter_state[state](self)
-            self.cur_state = state
-
-    def update(self):
-        self.do_state[self.cur_state](self)
-        if self.cur_state == IDLE or (self.cur_state != DEAD1 and self.cur_state != DEAD2 and self.cur_state != DEAD3):
-            self.select_state()
-
-        if self.cur_state != DEAD1 and self.cur_state != DEAD2 and self.cur_state != DEAD3:
-            for s in game_world.layer_objects(game_world.snow_layer):
-                if s.vx >= 0:
-                    if s.collision_object(self.x - 10, self.y + 25, self.x + 10, self.y - 25):
-                        if s.type == 0 or s.type == 3:
-                            self.change_state(DEAD1)
-                        elif s.type == 1:
-                            self.change_state(DEAD2)
-                        elif s.type == 2:
-                            self.change_state(DEAD3)
-        if (self.cur_state == DEAD1 or self.cur_state == DEAD2 or self.cur_state == DEAD3) and self.out_of_sight():
-            self.delete()
-
-    def draw(self):
-        self.draw_state[self.cur_state](self)
-        #draw_rectangle(self.x - 10 - stage_state.base_x, self.y + 25, self.x + 10 - stage_state.base_x, self.y - 25)
+        self.cur_state = state
+        self.timer = 0
+        self.frame = 0
 
     def throw_snow(self):
-        distance = self.x - stage_state.base_x - 200 + random.randint(-150, 100)
+        distance = self.x - self.target.x + random.randint(-150, 100)
         vx = random.randint(20, 25)
         t = distance/vx
         #vy = (28*math.sqrt(t**2 + 100) + 40*t)/50
         vy = t/5-(40/t)
         game_world.add_object(snow.SmallSnow(self.x, self.y + 10, -vx, vy, 0), game_world.snow_layer)
+        self.snow_stack -= 1
 
     def out_of_sight(self):
         if stage_state.base_x > self.x or self.x > stage_state.base_x + 1600:
@@ -266,43 +35,187 @@ class Enemy:
     def delete(self):
         game_world.remove_object(self, game_world.enemy_layer)
 
-
-class EnemyBasic(Enemy):
-    image = None
-
-    def __init__(self):
-        if EnemyBasic.image == None:
-            EnemyBasic.image = load_image('image\\enemy\\basic\\enemy_image.png')
-        self.velocity = -2
-        self.cur_state = MOVE
-        self.event_que = []
-        self.x, self.y = 1800 + stage_state.base_x, 30 + 260
-        self.frame = 0
-        self.reload_time = 80
-        self.throw_power = 0
-        self.timer = 0
-        self.throw_degree = 0
-        self.target_distance = random.randint(800, 1200)
-        self.snow_stack = 0
+    def snow_collision_check(self):
+        for snow in game_world.layer_objects(game_world.snow_layer):
+            if snow.vx > 0:
+                if snow.collision_object(*self.get_hit_box()):
+                    self.hit(snow)
 
 
-    def select_state(self):
-         # 일정 거리에 도달하면 공격상태에 들어감
-
-        if self.x - stage_state.base_x <= self.target_distance:
-            # 눈덩이가 없다면 눈을 뭉침
-            if self.snow_stack == 0:
-                self.change_state(RELOAD)
+    def get_hit_box(self):
+        if self.cur_state == RELOAD:
+            return self.x - 10, self.y + 5, self.x + 10, self.y - 25
         else:
-            self.change_state(MOVE)
+            return self.x - 10, self.y + 20, self.x + 10, self.y - 25
 
+    def hit(self, snow):
+        self.hp -= 1
+
+        if self.hp == 0:
+            if snow.type == 0 or snow.type == 3:
+                self.change_state(DEAD1)
+            elif snow.type == 1:
+                self.change_state(DEAD2)
+            elif snow.type == 2:
+                self.change_state(DEAD3)
+
+    def draw_hp_gauge(self):
+        t = 30 * self.hp // self.max_hp // 2
+
+        self.hp_bar.draw(self.x - stage_state.base_x, self.y - 50)
+        if self.hp > 0:
+            self.hp_gauge.draw(self.x - stage_state.base_x - 15 + t, self.y - 50, t * 2, 5)
 
 class EnemyType1(Enemy):
     image = None
 
-    def __init__(self):
+    def __init__(self, level):
         if EnemyType1.image == None:
-            EnemyType1.image = load_image('image\\enemy\\type1\\enemy2_image.png')
+            EnemyType1.image = load_image('image\\enemy\\basic\\enemy_image.png')
+        if Enemy.hp_bar == None:
+            Enemy.hp_bar = load_image('image\\ui\\hp_bar.png')
+        if Enemy.hp_gauge == None:
+            Enemy.hp_gauge = load_image('image\\ui\\hp_gauge.png')
+        self.hp = level
+        self.max_hp = level
+        self.velocity = -2
+        self.cur_state = MOVE
+        self.x, self.y = 1800 + stage_state.base_x, 30 + 260
+        self.frame = 0
+        self.reload_time = 80
+        self.aim_time = 30
+        self.range = 800
+        self.timer = 0
+        self.target_position = random.randint(800, 1200)
+        self.is_target_position_set = True
+        self.snow_stack = 0
+        self.build_behavior_tree()
+        self.target = None
+
+    def check_range(self):
+        for target in game_world.layer_objects(game_world.player_layer):
+            if target.x > self.x - self.range:
+                return BehaviorTree.SUCCESS
+        return BehaviorTree.FAIL
+
+    def reload(self):
+        if self.snow_stack == 1:
+            return BehaviorTree.SUCCESS
+        else:
+            if self.cur_state != RELOAD:
+                self.change_state(RELOAD)
+            else:
+                if self.timer >= self.reload_time:
+                    self.snow_stack = 1
+                else:
+                    self.timer += 1
+            return BehaviorTree.RUNNING
+
+    def set_target(self):
+        for target in game_world.layer_objects(game_world.player_layer):
+            if target.cur_state != DEAD1 and target.cur_state != DEAD2 and target.cur_state != DEAD3:
+                if target.x > self.x - self.range:
+                    self.target = target
+                return BehaviorTree.SUCCESS
+        return BehaviorTree.FAIL
+
+    def aim(self):
+        if self.cur_state != AIM:
+            self.change_state(AIM)
+            return BehaviorTree.RUNNING
+        else:
+            if self.timer >= self.aim_time:
+                return BehaviorTree.SUCCESS
+            else:
+                self.timer += 1
+                return BehaviorTree.RUNNING
+
+    def throw(self):
+        if self.cur_state != THROW:
+            self.change_state(THROW)
+            return BehaviorTree.RUNNING
+        else:
+            if self.frame >= 7:
+                self.throw_snow()
+                return BehaviorTree.SUCCESS
+            else:
+                self.timer += 1
+                return BehaviorTree.RUNNING
+
+
+    def set_target_position(self):
+        if self.is_target_position_set == False:
+            self.target_position = self.x - random.randint(0, 50)
+            self.is_target_position_set = True
+
+        return BehaviorTree.SUCCESS
+
+    def move_to_position(self):
+        if self.x >= self.target_position:
+            self.x += self.velocity
+            return BehaviorTree.RUNNING
+        else:
+            self.is_target_position_set = False
+            return BehaviorTree.SUCCESS
+
+    def build_behavior_tree(self):
+        check_range_node = LeafNode('Check Range', self.check_range)
+        reload_node = LeafNode('Reload', self.reload)
+        set_target_node = LeafNode('Set Target', self.set_target)
+        aim_node = LeafNode('Aim', self.aim)
+        throw_node = LeafNode('Throw', self.throw)
+
+        set_target_position_node = LeafNode('Set Target Position', self.set_target_position)
+        move_to_position_node = LeafNode('Move To Position', self.move_to_position)
+
+        attack_node = SequenceNode('Attack_node')
+        move_node = SequenceNode('Move_node')
+
+        attack_node.add_children(check_range_node, reload_node, set_target_node, aim_node, throw_node)
+        move_node.add_children(set_target_position_node, move_to_position_node)
+
+        start_node = SelectorNode('Start Node')
+        start_node.add_children(attack_node, move_node)
+
+        self.bt = BehaviorTree(start_node)
+
+    def update(self):
+        if self.cur_state != DEAD1 and self.cur_state != DEAD2 and self.cur_state != DEAD3:
+            self.bt.run()
+            self.snow_collision_check()
+            self.frame = (self.frame + 1) % 16
+        else:
+            if self.out_of_sight():
+                self.delete()
+            if self.frame < 15:
+                self.frame += 1
+
+    def draw(self):
+        if self.cur_state == MOVE:
+            self.image.clip_draw(60 * (self.frame // 2), 60 * 0, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
+        elif self.cur_state == RELOAD:
+            self.image.clip_draw(60 * (self.frame//2), 60 * 2, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
+        elif self.cur_state == AIM:
+            self.image.clip_draw(60 * (self.frame // 2), 60 * 3, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
+        elif self.cur_state == THROW:
+            self.image.clip_draw(60 * (self.frame // 2), 60 * 4, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
+        elif self.cur_state == DEAD1:
+            self.image.clip_draw(60 * (self.frame // 2), 60 * 1, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
+        elif self.cur_state == DEAD2:
+            self.image.clip_draw(60 * (self.frame // 2), 60 * 5, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
+        elif self.cur_state == DEAD3:
+            self.image.clip_draw(60 * (self.frame // 2), 60 * 6, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
+
+class EnemyType2(Enemy):
+    image = None
+
+    def __init__(self):
+        if EnemyType2.image == None:
+            EnemyType2.image = load_image('image\\enemy\\type1\\enemy2_image.png')
+        if Enemy.hp_bar == None:
+            Enemy.hp_bar = load_image('image\\ui\\hp_bar.png')
+        if Enemy.hp_gauge == None:
+            Enemy.hp_gauge = load_image('image\\ui\\hp_gauge.png')
         self.velocity = -2
         self.cur_state = MOVE
         self.x, self.y = 1800 + stage_state.base_x, 30 + 260
@@ -310,21 +223,3 @@ class EnemyType1(Enemy):
         self.frame = 0
         self.timer = 0
 
-
-    def select_state(self):
-        # 아군 혹은 눈벽을 만나면 공격하도록 함
-
-        if self.find_target():
-            self.change_state(ATTACK)
-        else:
-            self.change_state(MOVE)
-
-    def find_target(self):
-        for o in game_world.layer_objects(game_world.player_layer):
-            if o.x + 20 >= self.x - 20:
-                self.attack_target = o
-                return True
-        for o in game_world.layer_objects(game_world.snow_wall_layer):
-            if o.x + 20 >= self.x - 20:
-                self.attack_target = o
-                return True
