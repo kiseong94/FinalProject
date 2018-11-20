@@ -302,7 +302,7 @@ class ThrowMan(Ally):
         vx = random.randint(20, 25)
         t = distance / vx
         vy = t / 5 - (40 / t)
-        game_world.add_object(snow.SmallSnow(self.x, self.y + 10, vx, vy, 0), game_world.snow_layer)
+        game_world.add_object(snow.SmallSnow(self.x, self.y + 10, vx, vy, self.snow_stack), game_world.snow_layer)
 
         self.snow_stack = 0
 

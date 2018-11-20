@@ -8,6 +8,8 @@ class Data:
         self.available_weapon = [True, False, False, False]
         self.available_ally = [True, False, False, False]
         self.weapon_inform = [[], [], [], []]
+        self.weapon_level = [1, 0, 0, 0, 0]
+        self.ally_level = [1, 0, 0, 0, 0]
 
 
     def get_player_inform(self,option):

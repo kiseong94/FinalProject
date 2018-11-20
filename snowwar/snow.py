@@ -15,7 +15,7 @@ class Snow:
             self.prev_x, self.prev_y = self.x, self.y
             self.x += self.vx
             self.y += self.vy
-            self.vy = self.vy - 0.4 - 0.1 * self.size
+            self.vy = self.vy - 0.4
             self.collision_ground()
             self.out_of_sight()
         elif self.cur_state == HIT:
@@ -58,6 +58,8 @@ class SmallSnow(Snow):
             SmallSnow.image = load_image('image\\snows\\snow.png')
         if SmallSnow.destroy_image == None:
             SmallSnow.destroy_image = load_image('image\\snows\\snow_destroy.png')
+        self.damage = size
+        self.armor_piercing_point = 0
         self.x, self.y = x, y
         self.prev_x, self.prev_y = x, y
         self.vx, self.vy = vx, vy
@@ -68,9 +70,9 @@ class SmallSnow(Snow):
 
     def draw(self):
         if self.cur_state == FLY:
-            self.image.draw(self.x - stage_state.base_x, self.y, 10+(self.size + 1)*2,10+(self.size + 1)*2)
+            self.image.draw(self.x - stage_state.base_x, self.y, 10+(self.size - 1)*4,10+(self.size - 1)*4)
         elif self.cur_state == HIT:
-            self.destroy_image.clip_draw((self.frame//2)*30, 0, 30, 30, self.x-stage_state.base_x, self.y, 30 + (self.size + 1)*6, 30 + (self.size + 1)*6)
+            self.destroy_image.clip_draw((self.frame//2)*30, 0, 30, 30, self.x-stage_state.base_x, self.y, 30 + (self.size - 1)*12, 30 + (self.size - 1)*12)
 
 
 
@@ -82,6 +84,8 @@ class BigSnow(Snow):
             BigSnow.image = load_image('image\\snows\\big_snow.png')
         if BigSnow.destroy_image == None:
             BigSnow.destroy_image = load_image('image\\snows\\big_snow_destroy.png')
+        self.damage = size
+        self.armor_piercing_point = 0
         self.x, self.y = x, y
         self.prev_x, self.prev_y = x, y
         self.vx, self.vy = vx, vy
@@ -92,9 +96,9 @@ class BigSnow(Snow):
 
     def draw(self):
         if self.cur_state == FLY:
-            self.image.draw(self.x - stage_state.base_x, self.y)
+            self.image.draw(self.x - stage_state.base_x, self.y, 10 + (self.size - 1)*6, 10 + (self.size - 1)*6)
         elif self.cur_state == HIT:
-            self.destroy_image.clip_draw((self.frame//3)*80, 0, 80, 80, self.x-stage_state.base_x, self.y, 80, 80)
+            self.destroy_image.clip_draw((self.frame//3)*80, 0, 80, 80, self.x-stage_state.base_x, self.y, 80 + (self.size - 1)*6, 80 + (self.size - 1)*6)
 
     def collision_object(self, left, top, right, bottom):
         if self.cur_state == FLY:
@@ -138,12 +142,13 @@ class StoneSnow(Snow):
             StoneSnow.image = load_image('image\\snows\\stone_snow.png')
         if StoneSnow.destroy_image == None:
             StoneSnow.destroy_image = load_image('image\\snows\\snow_destroy.png')
+        self.damage = 1
+        self.armor_piercing_point = 0
         self.x, self.y = x, y
         self.prev_x, self.prev_y = x, y
         self.vx, self.vy = vx, vy
         self.cur_state = FLY
         self.frame = 0
-        self.size = 2
         self.hp = 2
         self.type = 1
 
@@ -178,6 +183,8 @@ class Icicle(Snow):
             Icicle.image = load_image('image\\snows\\icicle.png')
         if Icicle.destroy_image == None:
             Icicle.destroy_image = load_image('image\\snows\\snow_destroy.png')
+        self.damage = 1
+        self.armor_piercing_point = 1
         self.x, self.y = x, y
         self.prev_x, self.prev_y = x, y
         self.vx, self.vy = vx, vy
@@ -227,6 +234,7 @@ class SpreadSnow(Snow):
 
     def draw(self):
         self.destroy_image.clip_draw((self.frame//3)*120, 0, 120, 60, self.x-stage_state.base_x, self.y)
+        #draw_rectangle(*self.get_hit_box())
 
     def collision_object(self, left, top, right, bottom):
         snow_left, snow_top, snow_right, snow_bottom = self.get_hit_box()
@@ -239,12 +247,12 @@ class SpreadSnow(Snow):
         else:
             self.frame = self.frame + 1
 
-        draw_rectangle(*self.get_hit_box())
+
 
     def get_hit_box(self):
-        if 0 <= self.frame < 10:
+        if 0 == self.frame:
             return self.x - 60, self.y + 30, self.x - 20, self.y - 30
-        elif 10 <= self.frame < 20:
+        elif 10 == self.frame:
             return self.x - 20, self.y + 30, self.x + 20, self.y - 30
-        elif 20 <= self.frame <= 30:
+        elif 20 == self.frame:
             return self.x + 20, self.y + 30, self.x + 60, self.y - 30

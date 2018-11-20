@@ -25,7 +25,7 @@ class Enemy:
         t = distance/vx
         #vy = (28*math.sqrt(t**2 + 100) + 40*t)/50
         vy = t/5-(40/t)
-        game_world.add_object(snow.SmallSnow(self.x, self.y + 10, -vx, vy, 0), game_world.snow_layer)
+        game_world.add_object(snow.SmallSnow(self.x, self.y + 10, -vx, vy, self.snow_stack), game_world.snow_layer)
         self.snow_stack -= 1
 
     def out_of_sight(self):
@@ -49,9 +49,9 @@ class Enemy:
             return self.x - 10, self.y + 20, self.x + 10, self.y - 25
 
     def hit(self, snow):
-        self.hp -= 1
+        self.hp -= snow.armor_piercing_point + snow.damage - self.armor
 
-        if self.hp == 0:
+        if self.hp <= 0:
             if snow.type == 0 or snow.type == 3:
                 self.change_state(DEAD1)
             elif snow.type == 1:
@@ -78,6 +78,7 @@ class EnemyType1(Enemy):
             Enemy.hp_gauge = load_image('image\\ui\\hp_gauge.png')
         self.hp = level
         self.max_hp = level
+        self.armor = 0
         self.velocity = -2
         self.cur_state = MOVE
         self.x, self.y = 1800 + stage_state.base_x, 30 + 260
@@ -220,6 +221,7 @@ class EnemyType2(Enemy):
             Enemy.hp_gauge = load_image('image\\ui\\hp_gauge.png')
         self.hp = 1 + level
         self.max_hp = 1 + level
+        self.armor = 0
         self.velocity = -2
         self.cur_state = MOVE
         self.x, self.y = 1800 + stage_state.base_x, 30 + 260

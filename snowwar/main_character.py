@@ -346,14 +346,14 @@ class Character:
         if self.weapon_type == SNOW:
             if self.snow_stack < 3:
                 game_world.add_object(snow.SmallSnow(self.x, self.y + 15,
-                                            self.throw_power * bias_x / 10 + 6 - self.snow_stack * 2,
-                                            self.throw_power * bias_y / 10 - self.snow_stack * 2, self.snow_stack-1),
+                                            max(self.throw_power * bias_x / 10 + 6 - self.snow_stack * 2, 1),
+                                            self.throw_power * bias_y / 10 - self.snow_stack * 2, self.snow_stack),
                                 game_world.snow_layer)
             else:
                 game_world.add_object(snow.BigSnow(self.x, self.y + 15,
-                                                 self.throw_power * bias_x / 10 + 6 - self.snow_stack * 2,
+                                                 max(self.throw_power * bias_x / 10 + 6 - self.snow_stack * 2, 1),
                                                  self.throw_power * bias_y / 10 - self.snow_stack * 2,
-                                                 self.snow_stack - 1),
+                                                 self.snow_stack),
                                   game_world.snow_layer)
         elif self.weapon_type == STONE_SNOW:
             game_world.add_object(snow.StoneSnow(self.x, self.y + 15,

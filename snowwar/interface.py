@@ -20,6 +20,8 @@ class UI:
         self.x, self.y = 800, 100
 
         self.ally_button_pos = [(1050, 140, '눈 뭉치기 용병 고용'), (1130, 140, '눈 투척 용병 고용'), (1210, 140, '눈 벽 수리 용병'), (1290, 140, '이동식 눈 저장소')]
+        self.ally_inform_num = None
+        self.mouse_x, self.mouse_y = 0, 0
 
     def draw(self):
         self.image.draw(self.x, self.y)
@@ -39,6 +41,8 @@ class UI:
                     self.weapon_image.clip_draw(i * 120, 0, 120, 180, 300 + 150*i, 95)
                     self.font.draw(300 - 35 + i*150, 30, '%d / 1' % stage_state.player.num_ammo[i], (0, 0, 0))
 
+
+
         for i in range(4):
             x, y, = self.ally_button_pos[i][0], self.ally_button_pos[i][1]
             self.ally_button_image.draw(x, y)
@@ -55,6 +59,8 @@ class UI:
         elif stage_state.player.weapon_type == main_character.BUCKET:
             self.select_image.draw(300 + 450, 95)
 
+        if self.ally_inform_num != None:
+            self.font.draw(self.mouse_x + 20, self.mouse_y, self.ally_button_pos[self.ally_inform_num][2], (0, 0, 0))
 
     def update(self):
         pass
@@ -67,6 +73,19 @@ class UI:
                     x, y, = self.ally_button_pos[i][0], self.ally_button_pos[i][1]
                     if x - 35 <= mouse_x <= x + 35 and y - 35 <= mouse_y <= y + 35:
                         self.hire_ally(i)
+
+        elif event.type == SDL_MOUSEMOTION:
+            for i in range(4):
+                if main_state.Data.available_ally[i]:
+                    mouse_x, mouse_y = event.x, 900 - event.y - 1
+                    x, y, = self.ally_button_pos[i][0], self.ally_button_pos[i][1]
+                    if x - 35 <= mouse_x <= x + 35 and y - 35 <= mouse_y <= y + 35:
+                        self.ally_inform_num = i
+                        self.mouse_x = mouse_x
+                        self.mouse_y = mouse_y
+                        break
+                    else:
+                        self.ally_inform_num = None
 
 
     def hire_ally(self, type):
