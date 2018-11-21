@@ -1,5 +1,6 @@
 
-HP, THROW_POWER, RELOAD_SPEED, SHOVEL_POWER, WALL_LEVEL = range(5)
+SNOW, STONE_SNOW, ICICLE, BUCKET, HP, THROW_POWER, RELOAD_SPEED, SHOVEL_POWER, WALL_LEVEL, MAX_SNOW_STACK, SPLASH_DAMAGE, SPLASH_RANGE = range(12)
+
 
 class Data:
     def __init__(self):
@@ -23,3 +24,24 @@ class Data:
             return self.main_inform[3]
         elif option == WALL_LEVEL:
             return self.main_inform[4]
+
+    def get_player_snow_inform(self, option):
+        if option == MAX_SNOW_STACK:
+            if self.weapon_level[SNOW] >= 4:
+                return 4
+            elif self.weapon_level[SNOW] >= 2:
+                return 3
+            elif self.weapon_level[SNOW] >= 1:
+                return 2
+        elif option == SPLASH_DAMAGE:
+            if self.weapon_level[SNOW] >= 3:
+                return 2
+        elif option == SPLASH_RANGE:
+            if self.weapon_level[SNOW] == 5:
+                return True
+            else:
+                return False
+
+
+    def get_player_stone_snow_inform(self, option):
+        pass

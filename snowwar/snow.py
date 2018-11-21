@@ -1,6 +1,8 @@
 from pico2d import *
 import stage_state
 import game_world
+import game_data
+import main_state
 
 FLY, HIT, DESTROY = range(3)
 
@@ -94,6 +96,9 @@ class BigSnow(Snow):
         self.size = size
         self.type = 0
 
+        self.splash_damage = main_state.Data.get_player_snow_inform(game_data.SPLASH_DAMAGE)
+        self.wide_splash_range = main_state.Data.get_player_snow_inform(game_data.SPLASH_RANGE)
+
     def draw(self):
         if self.cur_state == FLY:
             self.image.draw(self.x - stage_state.base_x, self.y, 10 + (self.size - 1)*6, 10 + (self.size - 1)*6)
@@ -113,6 +118,7 @@ class BigSnow(Snow):
                 self.frame = 0
                 return True
         elif self.cur_state == HIT and self.frame == 15:
+            self.damage = self.splash_damage
             snow_left, snow_top, snow_right, snow_bottom = self.get_hit_box()
             if snow_left <= right and snow_right >= left and snow_bottom <= top and snow_top >= bottom:
                 return True

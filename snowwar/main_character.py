@@ -80,7 +80,7 @@ class ReloadState:
     def enter(character):
         character.frame = 0
         character.timer = 0
-        if (character.weapon_type == SNOW and character.snow_stack == 4) or (character.weapon_type == STONE_SNOW and character.num_ammo[1] == 1) or character.weapon_type == ICICLE :
+        if (character.weapon_type == SNOW and character.snow_stack == character.max_snow_stack) or (character.weapon_type == STONE_SNOW and character.num_ammo[1] == 1) or character.weapon_type == ICICLE :
             character.add_event(TIME_UP)
 
     @staticmethod
@@ -314,6 +314,7 @@ class Character:
         self.timer = 0
         self.throw_degree = 0
         self.snow_stack = 0
+        self.max_snow_stack = main_state.Data.get_player_snow_inform(game_data.MAX_SNOW_STACK)
         self.weapon_type = SNOW
         self.num_ammo = [0, 0, 30, 1]
 

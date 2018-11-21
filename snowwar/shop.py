@@ -90,7 +90,7 @@ class Shop:
                 x, y, option_name = self.sheet2_image_pos[self.page_number][i]
                 # option_name = option_name + ' %d'
                 self.sheet2_select_image.clip_draw(150 * (self.page_number * 2 + i), 0, 150, 150, x, y)
-                self.font.draw(x + 100, y + 50, option_name, (0, 0, 0))
+                self.font.draw(x + 100, y + 50, option_name + ' LV.%d' % main_state.Data.weapon_level[self.page_number * 2 + i], (0, 0, 0))
 
             # 레벨에 따른 특성 정보
             for i in range(2):
@@ -169,9 +169,10 @@ class Shop:
                     x, y = self.sheet2_button_pos[i]
                     if x - 75 <= mouse_x <= x + 75 and y - 25 <= mouse_y <= y + 25:
                         if main_state.Data.available_weapon[self.page_number * 2 + i]:
-                            pass
+                            main_state.Data.weapon_level[self.page_number * 2 + i] += 1
                         else:
                             main_state.Data.available_weapon[self.page_number * 2 + i] = True
+                            main_state.Data.weapon_level[self.page_number * 2 + i] += 1
                         break
                     if self.page_number == 0:
                         x, y = self.page_right_button
