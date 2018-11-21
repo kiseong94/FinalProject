@@ -67,6 +67,8 @@ class Enemy:
                 self.change_state(DEAD2)
             elif snow.type == 2:
                 self.change_state(DEAD3)
+            main_state.Data.cur_money += self.money
+            main_state.Data.total_money += self.money
 
     def draw_hp_gauge(self):
         t = 30 * self.hp // self.max_hp // 2
@@ -101,6 +103,7 @@ class EnemyType1(Enemy):
         self.snow_stack = 0
         self.build_behavior_tree()
         self.target = None
+        self.money = 50 + level * 50
 
     def check_range(self):
         for target in game_world.layer_objects(game_world.player_layer):
@@ -239,6 +242,7 @@ class EnemyType2(Enemy):
         self.timer = 0
         self.build_behavior_tree()
         self.target = None
+        self.money = 70 + level*70
 
     def move(self):
         if self.cur_state != MOVE:

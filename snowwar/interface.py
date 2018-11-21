@@ -16,6 +16,7 @@ class UI:
         self.select_image = load_image('image\\ui\\select.png')
         self.ally_button_image = load_image('image\\ui\\ally_button.png')
         self.font = load_font('font\\neodgm.ttf', 30)
+        self.big_font = load_font('font\\neodgm.ttf', 60)
         self.player_inform = load_font('font\\neodgm.ttf', 20)
         self.x, self.y = 800, 100
 
@@ -61,6 +62,8 @@ class UI:
 
         if self.ally_inform_num != None:
             self.font.draw(self.mouse_x + 20, self.mouse_y, self.ally_button_pos[self.ally_inform_num][2], (0, 0, 0))
+
+        self.big_font.draw(1350, 850, '%6d' %main_state.Data.cur_money, (255, 255, 0) )
 
     def update(self):
         pass
