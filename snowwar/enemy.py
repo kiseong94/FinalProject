@@ -55,6 +55,9 @@ class Enemy:
                 damage = snow.damage * 2
             else:
                 damage = snow.damage
+        elif snow.type == 2:
+            self.armor = min(snow.destroy_armor - self.armor, 0)
+
         else:
             damage = snow.damage
 

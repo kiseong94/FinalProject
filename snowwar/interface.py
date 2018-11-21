@@ -14,6 +14,9 @@ class UI:
         self.image = load_image('image\\ui\\inform.png')
         self.weapon_image = load_image('image\\ui\\weapon.png')
         self.select_image = load_image('image\\ui\\select.png')
+        self.progress_pointer = load_image('image\\ui\\progress_pointer.png')
+        self.stage_progress_bar = load_image('image\\ui\\stage_progress_bar.png')
+        self.stage_progress_gauge = load_image('image\\ui\\stage_progress_gauge.png')
         self.ally_button_image = load_image('image\\ui\\ally_button.png')
         self.font = load_font('font\\neodgm.ttf', 30)
         self.big_font = load_font('font\\neodgm.ttf', 60)
@@ -63,6 +66,8 @@ class UI:
         if self.ally_inform_num != None:
             self.font.draw(self.mouse_x + 20, self.mouse_y, self.ally_button_pos[self.ally_inform_num][2], (0, 0, 0))
 
+        self.draw_stage_progress_bar()
+
         self.big_font.draw(1350, 850, '%6d' % main_state.Data.cur_money, (255, 255, 0))
 
     def update(self):
@@ -98,3 +103,13 @@ class UI:
             game_world.add_object(ally.ThrowMan(), game_world.player_layer)
         if type == 2:
             game_world.add_object(ally.ShovelMan(), game_world.player_layer)
+
+    def draw_stage_progress_bar(self):
+        t = 550 * stage_state.base_x // stage_state.end_point // 2
+        cur_distance = stage_state.base_x//stage_state.PIXEL_PER_METER
+        self.stage_progress_bar.draw(800, 870)
+        self.stage_progress_gauge.draw(800 - 550/2 + t, 870-2, t * 2, 6)
+        self.progress_pointer.draw(800 - 550/2 + t*2, 870 - 20)
+        self.font.draw(800 - 550/2 + t*2 - 10, 870 - 50, '%dm' % cur_distance, (0, 0, 0))
+
+

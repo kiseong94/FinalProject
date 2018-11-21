@@ -14,11 +14,14 @@ import ally
 
 name = "StageState"
 
+PIXEL_PER_METER = 40
+
 player = None
 background = None
 font = None
 ui = None
 base_x = 0
+end_point = 100 * PIXEL_PER_METER
 cnt = 10
 start_image = None
 
