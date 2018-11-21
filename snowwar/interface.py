@@ -18,6 +18,7 @@ class UI:
         self.stage_progress_bar = load_image('image\\ui\\stage_progress_bar.png')
         self.stage_progress_gauge = load_image('image\\ui\\stage_progress_gauge.png')
         self.ally_button_image = load_image('image\\ui\\ally_button.png')
+        self.coin_image = load_image('image\\ui\\coin.png')
         self.font = load_font('font\\neodgm.ttf', 30)
         self.big_font = load_font('font\\neodgm.ttf', 60)
         self.player_inform = load_font('font\\neodgm.ttf', 20)
@@ -68,7 +69,8 @@ class UI:
 
         self.draw_stage_progress_bar()
 
-        self.big_font.draw(1350, 850, '%6d' % main_state.Data.cur_money, (255, 255, 0))
+        self.coin_image.draw(1280, 855)
+        self.big_font.draw(1350, 850, '%6d' % main_state.Data.cur_money, (0, 0, 0))
 
     def update(self):
         pass
