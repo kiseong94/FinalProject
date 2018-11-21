@@ -1,5 +1,6 @@
 
-SNOW, STONE_SNOW, ICICLE, BUCKET, HP, THROW_POWER, RELOAD_SPEED, SHOVEL_POWER, WALL_LEVEL, MAX_SNOW_STACK, SPLASH_DAMAGE, SPLASH_RANGE = range(12)
+SNOW, STONE_SNOW, ICICLE, BUCKET, HP, THROW_POWER, RELOAD_SPEED, SHOVEL_POWER, WALL_LEVEL, MAX_SNOW_STACK,\
+SPLASH_DAMAGE, SPLASH_RANGE, PIERCING_NUM, DAMAGE, CRITICAL_CHANCE = range(15)
 
 
 class Data:
@@ -44,4 +45,20 @@ class Data:
 
 
     def get_player_stone_snow_inform(self, option):
-        pass
+        if option == PIERCING_NUM:
+            if self.weapon_level[STONE_SNOW] >= 4:
+                return 3
+            else:
+                return 2
+        elif option == DAMAGE:
+            if self.weapon_level[STONE_SNOW] >= 2:
+                return 2
+            else:
+                return 1
+        elif option == CRITICAL_CHANCE:
+            if self.weapon_level[STONE_SNOW] >= 5:
+                return 30
+            elif self.weapon_level[STONE_SNOW] >= 3:
+                return 15
+            else:
+                return 0

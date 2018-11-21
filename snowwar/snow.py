@@ -148,14 +148,15 @@ class StoneSnow(Snow):
             StoneSnow.image = load_image('image\\snows\\stone_snow.png')
         if StoneSnow.destroy_image == None:
             StoneSnow.destroy_image = load_image('image\\snows\\snow_destroy.png')
-        self.damage = 1
+        self.damage = main_state.Data.get_player_stone_snow_inform(game_data.DAMAGE)
+        self.critical_chance = main_state.Data.get_player_stone_snow_inform(game_data.CRITICAL_CHANCE)
+        self.piercing_num = main_state.Data.get_player_stone_snow_inform(game_data.PIERCING_NUM)
         self.armor_piercing_point = 0
         self.x, self.y = x, y
         self.prev_x, self.prev_y = x, y
         self.vx, self.vy = vx, vy
         self.cur_state = FLY
         self.frame = 0
-        self.hp = 2
         self.type = 1
 
     def draw(self):
@@ -168,15 +169,15 @@ class StoneSnow(Snow):
         if self.cur_state == FLY:
             if self.y < top and self.prev_x < left < self.x and self.vx > 0:
                 self.x = left
-                self.hp -= 1
-                if self.hp == 0:
+                self.piercing_num -= 1
+                if self.piercing_num == 0:
                     self.cur_state = HIT
                 self.frame = 0
                 return True
             elif self.y < top and self.x < right < self.prev_x and self.vx < 0:
                 self.x = right
-                self.hp -= 1
-                if self.hp == 0:
+                self.piercing_num -= 1
+                if self.piercing_num == 0:
                     self.cur_state = HIT
                 self.frame = 0
                 return True

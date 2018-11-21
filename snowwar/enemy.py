@@ -49,7 +49,16 @@ class Enemy:
             return self.x - 10, self.y + 20, self.x + 10, self.y - 25
 
     def hit(self, snow):
-        self.hp -= snow.armor_piercing_point + snow.damage - self.armor
+
+        if snow.type == 1:
+            if snow.critical_chance >= random.randint(0, 100):
+                damage = snow.damage * 2
+            else:
+                damage = snow.damage
+        else:
+            damage = snow.damage
+
+        self.hp -= snow.armor_piercing_point + damage - self.armor
 
         if self.hp <= 0:
             if snow.type == 0 or snow.type == 3:
