@@ -1,6 +1,6 @@
 
 SNOW, STONE_SNOW, ICICLE, BUCKET, HP, THROW_POWER, RELOAD_SPEED, SHOVEL_POWER, WALL_LEVEL, MAX_SNOW_STACK,\
-SPLASH_DAMAGE, SPLASH_RANGE, PIERCING_NUM, DAMAGE, CRITICAL_CHANCE = range(15)
+SPLASH_DAMAGE, SPLASH_RANGE, PIERCING_NUM, DAMAGE, CRITICAL_CHANCE, PIERCING_ARMOR, PIERCING_WALL, DESTROY_ARMOR = range(18)
 
 
 class Data:
@@ -65,3 +65,28 @@ class Data:
                 return 15
             else:
                 return 0
+
+    def get_player_icicle_inform(self, option):
+        if option == PIERCING_ARMOR:
+            return 1
+        elif option == DAMAGE:
+            if self.weapon_level[ICICLE] >= 4:
+                return 3
+            elif self.weapon_level[ICICLE] >= 3:
+                return 2
+            else:
+                return 1
+        elif option == PIERCING_WALL:
+            if self.weapon_level[ICICLE] >= 2:
+                return True
+            else:
+                return False
+        elif option == DESTROY_ARMOR:
+            if self.weapon_level[ICICLE] >= 5:
+                return 1
+            else:
+                return 0
+
+
+    def get_player_bucket_inform(self, option):
+        pass

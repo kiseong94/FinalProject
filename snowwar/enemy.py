@@ -39,7 +39,7 @@ class Enemy:
         for snow in game_world.layer_objects(game_world.snow_layer):
             if snow.vx > 0:
                 if snow.collision_object(*self.get_hit_box()):
-                    self.hit(snow)
+                    self.hit_by_snow(snow)
 
 
     def get_hit_box(self):
@@ -48,7 +48,7 @@ class Enemy:
         else:
             return self.x - 10, self.y + 20, self.x + 10, self.y - 25
 
-    def hit(self, snow):
+    def hit_by_snow(self, snow):
 
         if snow.type == 1:
             if snow.critical_chance >= random.randint(0, 100):
@@ -58,7 +58,7 @@ class Enemy:
         else:
             damage = snow.damage
 
-        self.hp -= snow.armor_piercing_point + damage - self.armor
+        self.hp -= min(snow.armor_piercing_point - self.armor, 0) + damage
 
         if self.hp <= 0:
             if snow.type == 0 or snow.type == 3:
@@ -69,6 +69,8 @@ class Enemy:
                 self.change_state(DEAD3)
             main_state.Data.cur_money += self.money
             main_state.Data.total_money += self.money
+
+
 
     def draw_hp_gauge(self):
         t = 30 * self.hp // self.max_hp // 2
@@ -269,7 +271,7 @@ class EnemyType2(Enemy):
             return BehaviorTree.RUNNING
         else:
             if self.timer >= 16:
-                self.target.hit()
+                self.target.hit_by_melee(1)
                 self.timer = 0
                 return BehaviorTree.SUCCESS
             else:

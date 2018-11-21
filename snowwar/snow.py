@@ -190,8 +190,10 @@ class Icicle(Snow):
             Icicle.image = load_image('image\\snows\\icicle.png')
         if Icicle.destroy_image == None:
             Icicle.destroy_image = load_image('image\\snows\\snow_destroy.png')
-        self.damage = 1
-        self.armor_piercing_point = 1
+        self.damage = main_state.Data.get_player_icicle_inform(game_data.DAMAGE)
+        self.armor_piercing_point = main_state.Data.get_player_icicle_inform(game_data.PIERCING_ARMOR)
+        self.destroy_armor = main_state.Data.get_player_icicle_inform(game_data.DESTROY_ARMOR)
+        self.piercing_wall = main_state.Data.get_player_icicle_inform(game_data.PIERCING_WALL)
         self.x, self.y = x, y
         self.prev_x, self.prev_y = x, y
         self.vx, self.vy = vx, vy

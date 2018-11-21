@@ -373,9 +373,13 @@ class Character:
         if self.weapon_type == SNOW:
             self.snow_stack = 0
 
-    def hit(self):
+    def hit_by_snow(self, snow):
         if self.hp > 0:
-            self.hp -= 1
+            self.hp -= snow.damage
+
+    def hit_by_melee(self, damage):
+        if self.hp > 0:
+            self.hp -= damage
 
     def get_snow(self):
         if self.snow_stack == 0 and self.num_ammo[SNOW] == 0:
@@ -408,7 +412,7 @@ class Character:
         for snow in game_world.layer_objects(game_world.snow_layer):
             if snow.vx < 0:
                 if snow.collision_object(*self.get_hit_box()):
-                    self.hit()
+                    self.hit_by_snow(snow)
 
     def get_hit_box(self):
         if self.cur_state == SitState or self.cur_state == ReloadState:

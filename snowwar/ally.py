@@ -14,9 +14,13 @@ class Ally:
     hp_bar = None
     hp_gauge = None
 
-    def hit(self):
+    def hit_by_snow(self, snow):
         if self.hp > 0:
-            self.hp -= 1
+            self.hp -= snow.damage
+
+    def hit_by_melee(self, damage):
+        if self.hp > 0:
+            self.hp -= damage
 
     def draw_hp_gauge(self):
         t = 30 * self.hp // self.max_hp // 2
@@ -29,7 +33,7 @@ class Ally:
         for snow in game_world.layer_objects(game_world.snow_layer):
             if snow.vx < 0:
                 if snow.collision_object(*self.get_hit_box()):
-                    self.hit()
+                    self.hit_by_snow(snow)
 
     def get_hit_box(self):
         if self.cur_state == RELOAD:
