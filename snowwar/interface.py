@@ -6,7 +6,7 @@ import game_world
 import ally
 import game_data
 
-SNOW, STONE_SNOW, ICICLE = range(3)
+SNOW, STONE_SNOW, ICICLE, START, RUNNING, END = range(6)
 
 
 class UI:
@@ -21,10 +21,14 @@ class UI:
         self.ally_button_locked_image = load_image('image\\ui\\ally_button_locked.png')
         self.ally_button_image = load_image('image\\ui\\ally_button.png')
         self.coin_image = load_image('image\\ui\\coin.png')
+        self.start_image = load_image('image\\ui\\stage_start_image.png')
         self.font = load_font('font\\neodgm.ttf', 30)
         self.big_font = load_font('font\\neodgm.ttf', 60)
         self.player_inform = load_font('font\\neodgm.ttf', 20)
         self.x, self.y = 800, 100
+
+        self.game_state = 0
+        self.timer = 0
 
         self.ally_button_pos = [(1050, 140, '눈 뭉치기 용병 고용'), (1130, 140, '눈 투척 용병 고용'), (1210, 140, '눈 벽 수리 용병'), (1290, 140, '이동식 눈 저장소')]
         self.ally_inform_num = None
@@ -80,8 +84,26 @@ class UI:
         self.coin_image.draw(1280, 855)
         self.big_font.draw(1350, 850, '%6d' % main_state.Data.cur_money, (0, 0, 0))
 
+        if self.game_state == START:
+            self.start_image.draw(800, 450, 1600, 900)
+            if self.timer >= 100:
+                self.game_state = RUNNING
+            elif self.timer >= 50:
+                opacity = 1 - (self.timer - 50)/50
+                self.start_image.opacify(opacity)
+            else:
+                self.big_font.draw(650, 450, 'statge 1', (255, 255, 255))
+
+
+
+
+
     def update(self):
-        pass
+            self.timer += 1
+
+    def game_start(self):
+        self.timer = 0
+        self.game_state = START
 
     def handle_event(self, event):
         if event.type == SDL_MOUSEBUTTONDOWN:

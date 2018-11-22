@@ -96,7 +96,7 @@ class Shop:
             for i in range(2):
                 for j in range(5):
                     start_x, start_y = self.ability_box_pos[i][0] + j*60, self.ability_box_pos[i][1]
-                    self.weapon_ability_image.clip_draw(j*60, i*60, 60, 60, start_x, start_y)
+                    self.weapon_ability_image.clip_draw(j*60, i*60 + self.page_number*120, 60, 60, start_x, start_y)
                     #draw_rectangle(start_x - 30, start_y - 30, start_x + 30, start_y + 30)
 
             # 페이지 이동 버튼

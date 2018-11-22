@@ -12,6 +12,7 @@ import enemy
 import interface
 import ally
 
+
 name = "StageState"
 
 PIXEL_PER_METER = 40
@@ -21,7 +22,7 @@ background = None
 font = None
 ui = None
 base_x = 0
-end_point = 100 * PIXEL_PER_METER
+end_point = 30 * PIXEL_PER_METER
 cnt = 10
 start_image = None
 
@@ -41,6 +42,9 @@ def enter():
     for i in range(5):
         game_world.add_object(ally.ThrowMan(), game_world.player_layer)
     game_world.add_object(ally.ShovelMan(), game_world.player_layer)
+
+    ui.game_start()
+
 
 def exit():
     global player, background, ui
@@ -77,6 +81,7 @@ def handle_events():
 
 def update():
     global cnt
+    global ui
 
     if cnt == 0:
         if random.randint(0, 1) == 1:
@@ -90,6 +95,7 @@ def update():
 
     for game_object in game_world.all_objects():
         game_object.update()
+    ui.update()
 
 
 def draw():
@@ -97,7 +103,6 @@ def draw():
     clear_canvas()
     for game_object in game_world.all_objects():
         game_object.draw()
-
     ui.draw()
     update_canvas()
 
