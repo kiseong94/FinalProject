@@ -135,6 +135,8 @@ class UI:
             game_world.add_object(ally.ThrowMan(), game_world.player_layer)
         if type == 2:
             game_world.add_object(ally.ShovelMan(), game_world.player_layer)
+        if type == 3:
+            game_world.add_object(ally.Storage(), game_world.player_layer)
 
     def draw_stage_progress_bar(self):
         t = 550 * stage_state.base_x // stage_state.end_point // 2

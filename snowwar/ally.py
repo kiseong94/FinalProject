@@ -175,7 +175,6 @@ class ThrowMan(Ally):
         self.timer = 0
         self.target_x = 0
         self.target = None
-        self.is_aim_done = False
         self.snow_stack = 0
         self.build_behavior_tree()
 
@@ -458,4 +457,66 @@ class ShovelMan(Ally):
                 self.image.clip_composite_draw(60 * (self.frame // 2), 60 * 1, 60, 60, 0, 'h', self.x - stage_state.base_x, self.y, 60, 60)
         elif self.cur_state == MAKE_WALL:
             self.image.clip_draw(60 * (self.frame // 2), 60 * 2, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
+        self.draw_hp_gauge()
+
+class Storage(Ally):
+    image = None
+    def __init__(self):
+        if Ally.hp_bar == None:
+            Ally.hp_bar = load_image('image\\ui\\hp_bar.png')
+        if Ally.hp_gauge == None:
+            Ally.hp_gauge = load_image('image\\ui\\hp_gauge.png')
+        if Storage.image == None:
+            Storage.image = load_image('image\\ally\\storage\\storage.png')
+        self.hp = 15
+        self.max_hp = 15
+        self.velocity = 2
+        self.cur_state = IDLE
+        self.x, self.y = stage_state.base_x - 20, 30 + 260
+        self.frame = 0
+        self.timer = 0
+        self.move_target_x = 0
+        self.build_behavior_tree()
+
+    def check_player_distance(self):
+        if stage_state.player.x - self.x > 280:
+            self.change_state(MOVE)
+            self.target_x = stage_state.player.x - random.randint(180, 260)
+            return BehaviorTree.SUCCESS
+        else:
+            return BehaviorTree.FAIL
+
+    def follow_player(self):
+        self.x += self.velocity
+        if self.x >= self.target_x:
+            return BehaviorTree.SUCCESS
+        return BehaviorTree.RUNNING
+
+    def wait(self):
+        self.cur_state = IDLE
+
+    def build_behavior_tree(self):
+        check_position_node = LeafNode("Check Player Position", self.check_player_distance)
+        follow_player_node = LeafNode("Follow Player", self.follow_player)
+
+        wait_node = LeafNode("Wait", self.wait)
+
+        move_node = SequenceNode("Move")
+        move_node.add_children(check_position_node, follow_player_node)
+
+        start_node = SelectorNode("Start Action")
+        start_node.add_children(move_node, wait_node)
+        self.bt = BehaviorTree(start_node)
+
+    def update(self):
+        self.bt.run()
+        self.snow_collision_check()
+        self.frame = (self.frame + 1) % 16
+
+
+    def draw(self):
+        if self.cur_state == IDLE:
+            self.image.clip_draw(80 * (self.frame // 2), 60 * 0, 80, 60, self.x - stage_state.base_x, self.y)
+        elif self.cur_state == MOVE:
+            self.image.clip_draw(80 * (self.frame//2), 60 * 1, 80, 60, self.x - stage_state.base_x, self.y)
         self.draw_hp_gauge()
