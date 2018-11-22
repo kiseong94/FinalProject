@@ -57,7 +57,7 @@ class ReloadMan(Ally):
         self.velocity = 2
         self.cur_state = IDLE
         self.event_que = []
-        self.x, self.y = 0, 30 + 260
+        self.x, self.y = stage_state.base_x - 20, 30 + 260
         self.frame = 0
         self.reload_time = 140
         self.timer = 0
@@ -163,7 +163,7 @@ class ThrowMan(Ally):
         self.velocity = 2
         self.cur_state = IDLE
         self.event_que = []
-        self.x, self.y = 0, 30 + 260
+        self.x, self.y = stage_state.base_x - 20, 30 + 260
         self.frame = 0
         self.reload_time = 140
         self.aim_time = 40
@@ -325,7 +325,7 @@ class ShovelMan(Ally):
         self.velocity = 3
         self.cur_state = IDLE
         self.event_que = []
-        self.x, self.y = 0, 30 + 260
+        self.x, self.y = stage_state.base_x - 20, 30 + 260
         self.frame = 0
         self.timer = 0
         self.move_target_point = 0

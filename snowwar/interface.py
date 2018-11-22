@@ -13,10 +13,12 @@ class UI:
     def __init__(self):
         self.image = load_image('image\\ui\\inform.png')
         self.weapon_image = load_image('image\\ui\\weapon.png')
+        self.weapon_locked_image = load_image('image\\ui\\weapon_locked.png')
         self.select_image = load_image('image\\ui\\select.png')
         self.progress_pointer = load_image('image\\ui\\progress_pointer.png')
         self.stage_progress_bar = load_image('image\\ui\\stage_progress_bar.png')
         self.stage_progress_gauge = load_image('image\\ui\\stage_progress_gauge.png')
+        self.ally_button_locked_image = load_image('image\\ui\\ally_button_locked.png')
         self.ally_button_image = load_image('image\\ui\\ally_button.png')
         self.coin_image = load_image('image\\ui\\coin.png')
         self.font = load_font('font\\neodgm.ttf', 30)
@@ -45,15 +47,21 @@ class UI:
                 else:
                     self.weapon_image.clip_draw(i * 120, 0, 120, 180, 300 + 150*i, 95)
                     self.font.draw(300 - 35 + i*150, 30, '%d / 1' % stage_state.player.num_ammo[i], (0, 0, 0))
+            else:
+                self.weapon_locked_image.draw(300+150*i, 95)
 
 
 
         for i in range(4):
             x, y, = self.ally_button_pos[i][0], self.ally_button_pos[i][1]
-            self.ally_button_image.draw(x, y)
+            if main_state.Data.available_ally[i]:
+                self.ally_button_image.clip_draw(i*70, 0, 70, 70, x, y)
+            else:
+                self.ally_button_locked_image.draw(x, y)
 
 
         self.font.draw(300 + 20, 80, '+%d' % stage_state.player.snow_stack, (255, 255, 0))
+
 
         if stage_state.player.weapon_type == main_character.SNOW:
             self.select_image.draw(300, 95)
