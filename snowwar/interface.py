@@ -92,7 +92,7 @@ class UI:
                 opacity = 1 - (self.timer - 50)/50
                 self.start_image.opacify(opacity)
             else:
-                self.big_font.draw(650, 450, 'statge 1', (255, 255, 255))
+                self.big_font.draw(650, 450, 'stage 1', (255, 255, 255))
 
 
 

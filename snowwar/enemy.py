@@ -109,6 +109,7 @@ class EnemyType1(Enemy):
         self.build_behavior_tree()
         self.target = None
         self.money = 50 + level * 50
+        self.targeted = False
 
     def check_range(self):
         for target in game_world.layer_objects(game_world.player_layer):
@@ -248,6 +249,7 @@ class EnemyType2(Enemy):
         self.build_behavior_tree()
         self.target = None
         self.money = 70 + level*70
+        self.targeted = False
 
     def move(self):
         if self.cur_state != MOVE:
