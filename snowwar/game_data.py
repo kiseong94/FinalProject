@@ -12,6 +12,7 @@ class Data:
         self.weapon_inform = [[], [], [], []]
         self.weapon_level = [1, 0, 0, 0, 0]
         self.ally_level = [1, 0, 0, 0, 0]
+        self.num_ally = [0, 0, 0, 0]
 
         self.total_money = 0
         self.cur_money = 0

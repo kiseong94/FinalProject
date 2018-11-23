@@ -11,6 +11,7 @@ import back_ground
 import enemy
 import interface
 import ally
+import object_creator
 
 
 name = "StageState"
@@ -21,16 +22,19 @@ player = None
 background = None
 font = None
 ui = None
+obj_creator = None
 base_x = 0
 end_point = 30 * PIXEL_PER_METER
-cnt = 10
 start_image = None
+
 
 def enter():
     global player
     global background
     global ui
     global base_x
+    global obj_creator
+    obj_creator = object_creator.ObjectCreator()
     base_x = 0
     player = main_character.Character()
     background = back_ground.Back_Ground()
@@ -38,10 +42,7 @@ def enter():
     game_world.objects = [[], [], [], [], []]
     game_world.add_object(player, game_world.player_layer)
     game_world.add_object(background, game_world.back_ground_layer)
-    game_world.add_object(ally.ReloadMan(), game_world.player_layer)
-    for i in range(5):
-        game_world.add_object(ally.ThrowMan(), game_world.player_layer)
-    game_world.add_object(ally.ShovelMan(), game_world.player_layer)
+    obj_creator.create_ally()
 
     ui.game_start()
 
@@ -80,22 +81,14 @@ def handle_events():
 
 
 def update():
-    global cnt
     global ui
+    global obj_creator
 
-    if cnt == 0:
-        if random.randint(0, 1) == 1:
-            game_world.add_object(enemy.EnemyType1(2), game_world.enemy_layer)
-        else:
-            game_world.add_object(enemy.EnemyType2(1), game_world.enemy_layer)
-
-        cnt = 50
-    else:
-        cnt -= 1
 
     for game_object in game_world.all_objects():
         game_object.update()
     ui.update()
+    obj_creator.update()
 
 
 def draw():

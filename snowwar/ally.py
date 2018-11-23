@@ -7,7 +7,7 @@ import snow
 import game_world
 
 IDLE, MOVE, AIM, THROW, HIT, DEAD1, DEAD2, DEAD3, SIT, MAKE_WALL, RELOAD, ATTACK = range(12)
-
+RELOAD_MAN, THROW_MAN, SHOVEL_MAN, STORAGE = range(4)
 LEFT, RIGHT = range(2)
 
 class Ally:
@@ -18,9 +18,16 @@ class Ally:
         if self.hp > 0:
             self.hp -= snow.damage
 
+        if self.hp <= 0:
+            self.dead()
+
+
     def hit_by_melee(self, damage):
         if self.hp > 0:
             self.hp -= damage
+
+        if self.hp <= 0:
+            self.dead()
 
     def draw_hp_gauge(self):
         t = 30 * self.hp // self.max_hp // 2
@@ -45,6 +52,8 @@ class Ally:
         self.cur_state = state
         self.timer = 0
         self.frame = 0
+
+
 
 # initialization code
 class ReloadMan(Ally):
@@ -152,6 +161,10 @@ class ReloadMan(Ally):
             self.image.clip_draw(60 * (self.frame // 2), 60 * 4, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
 
         self.draw_hp_gauge()
+
+    def dead(self):
+        self.change_state(DEAD1)
+        main_state.Data.num_ally[STORAGE] -= 1
 
 
 class ThrowMan(Ally):
@@ -319,6 +332,10 @@ class ThrowMan(Ally):
         self.target.targeted = False
         self.snow_stack = 0
 
+    def dead(self):
+        self.change_state(DEAD1)
+        main_state.Data.num_ally[STORAGE] -= 1
+
 
 class ShovelMan(Ally):
     image = None
@@ -459,8 +476,14 @@ class ShovelMan(Ally):
             self.image.clip_draw(60 * (self.frame // 2), 60 * 2, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
         self.draw_hp_gauge()
 
+    def dead(self):
+        self.change_state(DEAD1)
+        main_state.Data.num_ally[SHOVEL_MAN] -= 1
+
+
 class Storage(Ally):
     image = None
+
     def __init__(self):
         if Ally.hp_bar == None:
             Ally.hp_bar = load_image('image\\ui\\hp_bar.png')
@@ -520,3 +543,7 @@ class Storage(Ally):
         elif self.cur_state == MOVE:
             self.image.clip_draw(80 * (self.frame//2), 60 * 1, 80, 60, self.x - stage_state.base_x, self.y)
         self.draw_hp_gauge()
+
+    def dead(self):
+        self.change_state(DEAD1)
+        main_state.Data.num_ally[STORAGE] -= 1
