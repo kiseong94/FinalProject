@@ -7,7 +7,7 @@ LEVEL1, LEVEL2, LEVEL3 = range(3)
 
 class SnowWall:
     image = None
-    def __init__(self, x, dir, max_hp, shovel_power):
+    def __init__(self, x, dir, max_hp_level, shovel_power):
         if SnowWall.image == None:
             SnowWall.image = load_image('image\\snows\\snow_wall.png')
         self.y = 260 + 25
@@ -17,7 +17,7 @@ class SnowWall:
             self.x = x + 20
         self.cur_state = LEVEL1
         self.hp = shovel_power
-        self.max_hp = 5 + max_hp*10
+        self.max_hp = 5 + max_hp_level*5
         self.shovel_tick = shovel_power
         self.dir = dir
         self.occupied = False
