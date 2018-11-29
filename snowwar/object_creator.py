@@ -37,3 +37,6 @@ class ObjectCreator:
             game_world.add_object(ally.Storage(), game_world.player_layer)
 
 
+    def stage_start(self,stage_num):
+
+

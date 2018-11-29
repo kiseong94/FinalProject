@@ -4,6 +4,7 @@ import main_character
 import main_state
 import game_world
 import ally
+import game_framework
 import game_data
 
 SNOW, STONE_SNOW, ICICLE, START, RUNNING, END = range(6)
@@ -25,6 +26,7 @@ class UI:
         self.font = load_font('font\\neodgm.ttf', 30)
         self.big_font = load_font('font\\neodgm.ttf', 60)
         self.player_inform = load_font('font\\neodgm.ttf', 20)
+        self.biggest_font = load_font('font\\neodgm.ttf', 120)
         self.x, self.y = 800, 100
 
         self.game_state = 0
@@ -93,17 +95,32 @@ class UI:
                 self.start_image.opacify(opacity)
             else:
                 self.big_font.draw(650, 450, 'stage 1', (255, 255, 255))
-
+        elif self.game_state == END:
+            if self.timer >= 100:
+                game_framework.pop_state()
+                self.start_image.draw(800, 450, 1600, 900)
+            elif self.timer >= 50:
+                opacity = (self.timer - 50) / 50
+                self.start_image.opacify(opacity)
+                self.start_image.draw(800, 450, 1600, 900)
+            else:
+                self.biggest_font.draw(630, 450, '승리!', (0, 0, 0))
 
 
 
 
     def update(self):
-            self.timer += 1
+        self.timer += 1
+        if self.game_state == RUNNING and stage_state.base_x >= stage_state.end_point:
+            self.game_end()
 
     def game_start(self):
         self.timer = 0
         self.game_state = START
+
+    def game_end(self):
+        self.timer = 0
+        self.game_state = END
 
     def handle_event(self, event):
         if event.type == SDL_MOUSEBUTTONDOWN:

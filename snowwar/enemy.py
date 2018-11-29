@@ -527,7 +527,7 @@ class EnemyType4(Enemy):
         if not self.cover:
             for wall in game_world.layer_objects(game_world.snow_wall_layer):
                 if self.x - 150 <= wall.x <= min(self.x + 150, self.target.x + self.range):
-                    self.target_position = wall.x + 50 + random.randint(-20, 20)
+                    self.target_position = wall.x + 50 + random.randint(-10, 30)
                     return BehaviorTree.SUCCESS
         return BehaviorTree.FAIL
 
@@ -675,3 +675,12 @@ class EnemyType4(Enemy):
             self.image.clip_draw(60 * (self.frame // 2), 60 * 6, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
         if self.cur_state != DEAD1 and self.cur_state != DEAD2 and self.cur_state != DEAD3:
             self.draw_hp_gauge()
+
+        def throw_snow(self):
+            distance = self.x - self.target.x + random.randint(-200, 100)
+            vx = random.randint(15, 20)
+            t = distance / vx
+            # vy = (28*math.sqrt(t**2 + 100) + 40*t)/50
+            vy = t / 5 - (40 / t)
+            game_world.add_object(snow.SmallSnow(self.x, self.y + 10, -vx, vy, self.snow_stack), game_world.snow_layer)
+            self.snow_stack -= 1
