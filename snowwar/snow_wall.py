@@ -10,7 +10,11 @@ class SnowWall:
     def __init__(self, x, dir, max_hp, shovel_power):
         if SnowWall.image == None:
             SnowWall.image = load_image('image\\snows\\snow_wall.png')
-        self.x, self.y = x, 260 + 25
+        self.y = 260 + 25
+        if dir:
+            self.x = x - 20
+        else:
+            self.x = x + 20
         self.cur_state = LEVEL1
         self.hp = shovel_power
         self.max_hp = 5 + max_hp*10
@@ -20,12 +24,10 @@ class SnowWall:
 
 
     def draw(self):
-        if self.cur_state == LEVEL1:
-            self.image.clip_draw(0 * 40, 0, 40, 50, self.x - stage_state.base_x, self.y)
-        elif self.cur_state == LEVEL2:
-            self.image.clip_draw(1 * 40, 0, 40, 50, self.x - stage_state.base_x, self.y)
-        elif self.cur_state == LEVEL3:
-            self.image.clip_draw(2 * 40, 0, 40, 50, self.x - stage_state.base_x, self.y)
+        if dir:
+            self.image.clip_composite_draw(self.cur_state * 40, 0, 40, 50, 0, 'n', self.x - stage_state.base_x, self.y, 40, 50)
+        else:
+            self.image.clip_composite_draw(self.cur_state * 40, 0, 40, 50, 0, 'h', self.x - stage_state.base_x, self.y, 40, 50)
 
         #draw_rectangle(*self.get_hit_box())
 

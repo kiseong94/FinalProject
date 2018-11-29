@@ -159,7 +159,7 @@ class MakeWallState:
                     find_wall = True
 
             if find_wall == False:
-                game_world.add_object(snow_wall.SnowWall(character.x + 20, 0, character.snow_wall_level, character.shovel_power), game_world.snow_wall_layer)
+                game_world.add_object(snow_wall.SnowWall(character.x, False, character.snow_wall_level, character.shovel_power), game_world.snow_wall_layer)
 
             character.frame = 0
         else:
@@ -321,6 +321,8 @@ class Character:
 
     def add_event(self, event):
         self.event_que.insert(0, event)
+
+
 
 
     def change_state(self, state):

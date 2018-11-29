@@ -4,6 +4,7 @@ import stage_state
 import random
 import snow
 import game_world
+import snow_wall
 from BehaviorTree import BehaviorTree, SelectorNode, SequenceNode, LeafNode
 
 IDLE, MOVE, AIM, THROW, HIT, DEAD1, DEAD2, DEAD3, SIT, MAKE_WALL, RELOAD, ATTACK = range(12)
@@ -250,6 +251,119 @@ class EnemyType2(Enemy):
         self.target = None
         self.money = 70 + level*70
         self.targeted = False
+
+    def move(self):
+        if self.cur_state != MOVE:
+            self.change_state(MOVE)
+        else:
+            self.x += self.velocity
+
+        return BehaviorTree.SUCCESS
+
+    def set_target(self):
+        for target in game_world.layer_objects(game_world.player_layer):
+            if target.x >= self.x - self.range:
+                self.target = target
+                return BehaviorTree.SUCCESS
+        for snow_wall in game_world.layer_objects(game_world.snow_wall_layer):
+            if snow_wall.x >= self.x - self.range:
+                self.target = snow_wall
+                return BehaviorTree.SUCCESS
+        return BehaviorTree.FAIL
+
+    def attack_target(self):
+        if self.cur_state != ATTACK:
+            self.cur_state = ATTACK
+            return BehaviorTree.RUNNING
+        else:
+            if self.timer >= 16:
+                self.target.hit_by_melee(1)
+                self.timer = 0
+                return BehaviorTree.SUCCESS
+            else:
+                self.timer += 1
+                return BehaviorTree.RUNNING
+
+
+    def build_behavior_tree(self):
+
+        set_target_node = LeafNode('Set Target', self.set_target)
+        attack_target_node = LeafNode('Attack', self.attack_target)
+
+        move_node = LeafNode('Move', self.move)
+
+        attack_node = SequenceNode('Attack')
+        attack_node.add_children(set_target_node,attack_target_node)
+
+        start_node = SelectorNode('Start Node')
+        start_node.add_children(attack_node, move_node)
+
+        self.bt = BehaviorTree(start_node)
+
+    def update(self):
+        if self.cur_state != DEAD1 and self.cur_state != DEAD2 and self.cur_state != DEAD3:
+            self.bt.run()
+            self.snow_collision_check()
+            self.frame = (self.frame + 1) % 16
+        else:
+            if self.out_of_sight():
+                self.delete()
+            if self.frame < 15:
+                self.frame += 1
+
+    def draw(self):
+        if self.cur_state == MOVE:
+            self.image.clip_draw(60 * (self.frame // 2), 60 * 0, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
+        elif self.cur_state == ATTACK:
+            self.image.clip_draw(60 * (self.frame//2), 60 * 2, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
+        elif self.cur_state == DEAD1:
+            self.image.clip_draw(60 * (self.frame // 2), 60 * 1, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
+        elif self.cur_state == DEAD2:
+            self.image.clip_draw(60 * (self.frame // 2), 60 * 5, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
+        elif self.cur_state == DEAD3:
+            self.image.clip_draw(60 * (self.frame // 2), 60 * 6, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
+        if self.cur_state != DEAD1 and self.cur_state != DEAD2 and self.cur_state != DEAD3:
+            self.draw_hp_gauge()
+
+
+class EnemyType3(Enemy):
+    image = None
+
+    def __init__(self, level):
+        if EnemyType3.image == None:
+            EnemyType3.image = load_image('image\\enemy\\type1\\enemy2_image.png')
+        if Enemy.hp_bar == None:
+            Enemy.hp_bar = load_image('image\\ui\\hp_bar.png')
+        if Enemy.hp_gauge == None:
+            Enemy.hp_gauge = load_image('image\\ui\\hp_gauge.png')
+        self.hp = 1 + level
+        self.max_hp = 1 + level
+        self.armor = 0
+        self.velocity = -2
+        self.cur_state = MOVE
+        self.x, self.y = 1800 + stage_state.base_x, 30 + 260
+        self.range = 60
+        self.frame = 0
+        self.timer = 0
+        self.build_behavior_tree()
+        self.target = None
+        self.max_wall_hp = 10
+        self.shovel_power = 3
+        self.wall_pos = random.randint(700, 1200)
+        self.is_wall_built = False
+        self.money = 70 + level * 70
+        self.targeted = False
+
+
+    def check_wall_build_position(self):
+        if not self.is_wall_built and self.x - stage_state.base_x <= self.wall_pos:
+            return BehaviorTree.SUCCESS
+        return BehaviorTree.FAIL
+
+    def build_wall(self):
+        if not self.is_wall_built:
+            game_world.add_object(snow_wall.SnowWall(self.x, True, self.max_wall_hp, self.shovel_power), game_world.snow_wall_layer)
+
 
     def move(self):
         if self.cur_state != MOVE:
