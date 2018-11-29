@@ -478,7 +478,7 @@ class EnemyType3(Enemy):
 
     def wall_duplication_check(self):
         for w in game_world.layer_objects(game_world.snow_wall_layer):
-            if w.dir and self.wall_pos - 60 < w.x + 60 and self.wall_pos + 60 > w.x - 60:
+            if w.dir and self.wall_pos - 60 < w.x - stage_state.base_x + 60 and self.wall_pos + 60 > w.x - stage_state.base_x - 60:
                 return True
         return False
 
@@ -602,7 +602,6 @@ class EnemyType4(Enemy):
                 self.timer += 1
                 return BehaviorTree.RUNNING
 
-
     def set_target_position(self):
         if self.is_target_position_set == False:
             self.target_position = self.x - random.randint(0, 50)
@@ -615,7 +614,6 @@ class EnemyType4(Enemy):
             self.x -= self.velocity
             return BehaviorTree.RUNNING
         else:
-            self.is_target_position_set = False
             return BehaviorTree.SUCCESS
 
     def build_behavior_tree(self):
