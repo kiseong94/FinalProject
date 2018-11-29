@@ -12,16 +12,15 @@ import main_state
 
 class ObjectCreator:
     def __init__(self):
-        self.time = 0
+        self.time = 4
 
     def update(self):
+
         if self.time == 0:
             if random.randint(0, 1) == 1:
-                game_world.add_object(enemy.EnemyType1(2), game_world.enemy_layer)
+                game_world.add_object(enemy.EnemyType3(1), game_world.enemy_layer)
             else:
-                game_world.add_object(enemy.EnemyType2(1), game_world.enemy_layer)
-
-            self.time = 50
+                game_world.add_object(enemy.EnemyType3(1), game_world.enemy_layer)
         else:
             self.time -= 1
 

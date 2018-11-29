@@ -266,7 +266,7 @@ class EnemyType2(Enemy):
                 self.target = target
                 return BehaviorTree.SUCCESS
         for snow_wall in game_world.layer_objects(game_world.snow_wall_layer):
-            if snow_wall.x >= self.x - self.range:
+            if snow_wall.x >= self.x - self.range and not snow_wall.dir:
                 self.target = snow_wall
                 return BehaviorTree.SUCCESS
         return BehaviorTree.FAIL
@@ -349,8 +349,9 @@ class EnemyType3(Enemy):
         self.target = None
         self.max_wall_hp = 10
         self.shovel_power = 3
-        self.wall_pos = random.randint(700, 1200)
+        self.wall_pos = random.randint(900, 1450)
         self.is_wall_built = False
+        self.my_wall = None
         self.money = 70 + level * 70
         self.targeted = False
 
@@ -362,7 +363,28 @@ class EnemyType3(Enemy):
 
     def build_wall(self):
         if not self.is_wall_built:
-            game_world.add_object(snow_wall.SnowWall(self.x, True, self.max_wall_hp, self.shovel_power), game_world.snow_wall_layer)
+            if not self.wall_duplication_check():
+                self.my_wall = snow_wall.SnowWall(self.x, True, self.max_wall_hp, self.shovel_power)
+                game_world.add_object(self.my_wall, game_world.snow_wall_layer)
+                self.is_wall_built = True
+                return BehaviorTree.RUNNING
+            else:
+                if self.x >= 900:
+                    self.wall_pos -= 100
+                else:
+                    self.is_wall_built = True
+        else:
+            if self.cur_state != MAKE_WALL:
+                self.change_state(MAKE_WALL)
+                self.my_wall.strengthen_wall(self.shovel_power)
+                return BehaviorTree.RUNNING
+            else:
+                if self.my_wall.hp == self.my_wall.max_hp:
+                    self.my_wall = None
+                    return BehaviorTree.FAIL
+                else:
+                    self.my_wall.strengthen_wall(self.shovel_power)
+                    return BehaviorTree.RUNNING
 
 
     def move(self):
@@ -379,7 +401,7 @@ class EnemyType3(Enemy):
                 self.target = target
                 return BehaviorTree.SUCCESS
         for snow_wall in game_world.layer_objects(game_world.snow_wall_layer):
-            if snow_wall.x >= self.x - self.range:
+            if snow_wall.x >= self.x - self.range and not snow_wall.dir:
                 self.target = snow_wall
                 return BehaviorTree.SUCCESS
         return BehaviorTree.FAIL
@@ -403,13 +425,19 @@ class EnemyType3(Enemy):
         set_target_node = LeafNode('Set Target', self.set_target)
         attack_target_node = LeafNode('Attack', self.attack_target)
 
+        check_position_node = LeafNode('Check Position', self.check_wall_build_position)
+        build_wall_node = LeafNode('Build Wall', self.build_wall)
+
         move_node = LeafNode('Move', self.move)
 
         attack_node = SequenceNode('Attack')
         attack_node.add_children(set_target_node,attack_target_node)
 
+        make_wall_node = SequenceNode('Make Wall')
+        make_wall_node.add_children(check_position_node, build_wall_node)
+
         start_node = SelectorNode('Start Node')
-        start_node.add_children(attack_node, move_node)
+        start_node.add_children(attack_node, make_wall_node, move_node)
 
         self.bt = BehaviorTree(start_node)
 
@@ -437,3 +465,10 @@ class EnemyType3(Enemy):
             self.image.clip_draw(60 * (self.frame // 2), 60 * 6, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
         if self.cur_state != DEAD1 and self.cur_state != DEAD2 and self.cur_state != DEAD3:
             self.draw_hp_gauge()
+
+
+    def wall_duplication_check(self):
+        for w in game_world.layer_objects(game_world.snow_wall_layer):
+            if w.dir and self.wall_pos - 50 < w.x + 50 and self.wall_pos + 50 > w.x - 50:
+                return True
+        return False

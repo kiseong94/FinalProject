@@ -24,10 +24,10 @@ class SnowWall:
 
 
     def draw(self):
-        if dir:
-            self.image.clip_composite_draw(self.cur_state * 40, 0, 40, 50, 0, 'n', self.x - stage_state.base_x, self.y, 40, 50)
-        else:
+        if self.dir:
             self.image.clip_composite_draw(self.cur_state * 40, 0, 40, 50, 0, 'h', self.x - stage_state.base_x, self.y, 40, 50)
+        else:
+            self.image.clip_composite_draw(self.cur_state * 40, 0, 40, 50, 0, 'n', self.x - stage_state.base_x, self.y, 40, 50)
 
         #draw_rectangle(*self.get_hit_box())
 
