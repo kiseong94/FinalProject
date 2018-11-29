@@ -11,6 +11,7 @@ from pico2d import *
 name = "MainState"
 Data = None
 Shop = None
+stage_num = 1
 IsShopOpened = False
 
 def enter():

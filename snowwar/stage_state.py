@@ -8,9 +8,8 @@ import game_framework
 import game_world
 import main_character
 import back_ground
-import enemy
+import main_state
 import interface
-import ally
 import object_creator
 
 
@@ -25,7 +24,6 @@ ui = None
 obj_creator = None
 base_x = 0
 end_point = 0
-stage_num = 1
 start_image = None
 
 
@@ -34,9 +32,7 @@ def enter():
     global background
     global ui
     global base_x
-    global obj_creator
-    global end_point
-    global stage_num
+    global obj_creator, end_point
     obj_creator = object_creator.ObjectCreator()
     base_x = 0
     player = main_character.Character()
@@ -46,13 +42,14 @@ def enter():
     game_world.add_object(player, game_world.player_layer)
     game_world.add_object(background, game_world.back_ground_layer)
     obj_creator.create_ally()
-    end_point = obj_creator.stage_start(stage_num)*PIXEL_PER_METER
+    end_point = obj_creator.stage_start(main_state.stage_num)*PIXEL_PER_METER
     ui.game_start()
 
 
 def exit():
-    global player, background, ui
+    global player, background, ui, obj_creator
     game_world.clear()
+    obj_creator.clear()
 
 
 

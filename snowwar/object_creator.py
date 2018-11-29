@@ -51,7 +51,7 @@ class ObjectCreator:
             enemy_type, level, num = enemy_data[stage_num - 1][i][0], enemy_data[stage_num - 1][i][1], enemy_data[stage_num - 1][i][2]
 
             for j in range(num):
-                distance = random.randint(0, (stage_distance - 10)*stage_state.PIXEL_PER_METER)
+                distance = random.randint(0, (stage_distance - 20)*stage_state.PIXEL_PER_METER)
                 if len(self.enemy_queue) == 0:
                     self.enemy_queue.insert(0, (enemy_type, level, distance))
                 else:
@@ -63,4 +63,6 @@ class ObjectCreator:
 
         return stage_distance
 
+    def clear(self):
+        self.enemy_queue.clear()
 

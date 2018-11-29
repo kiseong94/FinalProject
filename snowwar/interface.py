@@ -94,7 +94,7 @@ class UI:
                 opacity = 1 - (self.timer - 50)/50
                 self.start_image.opacify(opacity)
             else:
-                self.big_font.draw(650, 450, 'stage 1', (255, 255, 255))
+                self.big_font.draw(650, 450, 'stage %d' %main_state.stage_num, (255, 255, 255))
         elif self.game_state == END:
             if self.timer >= 100:
                 game_framework.pop_state()
@@ -120,6 +120,7 @@ class UI:
 
     def game_end(self):
         self.timer = 0
+        main_state.stage_num += 1
         self.game_state = END
 
     def handle_event(self, event):
