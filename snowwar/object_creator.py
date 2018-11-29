@@ -18,7 +18,7 @@ class ObjectCreator:
 
         if self.time == 0:
             if random.randint(0, 1) == 1:
-                game_world.add_object(enemy.EnemyType3(1), game_world.enemy_layer)
+                game_world.add_object(enemy.EnemyType4(1), game_world.enemy_layer)
             else:
                 game_world.add_object(enemy.EnemyType3(1), game_world.enemy_layer)
 
