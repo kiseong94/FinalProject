@@ -79,6 +79,7 @@ class ReloadMan(Ally):
         self.Is_move_point_set = False
         self.snow_stack = 0
         self.build_behavior_tree()
+        self.targeted = False
 
     def check_player_distance(self):
         if stage_state.player.x - self.x > 280 or self.Is_move_point_set:
@@ -190,11 +191,12 @@ class ThrowMan(Ally):
         self.target = None
         self.snow_stack = 0
         self.build_behavior_tree()
+        self.targeted = False
 
     def check_player_distance(self):
         if stage_state.player.x - self.x > 280:
             self.change_state(MOVE)
-            self.target_x = stage_state.player.x - random.randint(180, 260)
+            self.target_x = stage_state.player.x - random.randint(100, 200)
             return BehaviorTree.SUCCESS
         else:
             return BehaviorTree.FAIL
@@ -325,7 +327,7 @@ class ThrowMan(Ally):
 
     def throw_snow(self):
         distance = self.target.x - self.x + random.randint(0, 200)
-        vx = random.randint(20, 25)
+        vx = random.randint(15, 20)
         t = distance / vx
         vy = t / 5 - (40 / t)
         game_world.add_object(snow.SmallSnow(self.x, self.y + 10, vx, vy, self.snow_stack), game_world.snow_layer)
@@ -362,6 +364,7 @@ class ShovelMan(Ally):
         self.build_behavior_tree()
         self.shoveling_time = 50
         self.dir = RIGHT
+        self.targeted = False
 
     def check_player_distance(self):
         if stage_state.player.x - self.x > 280 or self.is_move_point_set:
@@ -500,6 +503,7 @@ class Storage(Ally):
         self.timer = 0
         self.move_target_x = 0
         self.build_behavior_tree()
+        self.targeted = False
 
     def check_player_distance(self):
         if stage_state.player.x - self.x > 280:

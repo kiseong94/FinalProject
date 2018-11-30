@@ -317,6 +317,7 @@ class Character:
         self.max_snow_stack = main_state.Data.get_player_snow_inform(game_data.MAX_SNOW_STACK)
         self.weapon_type = SNOW
         self.num_ammo = [0, 0, 30, 1]
+        self.targeted = False
 
 
     def add_event(self, event):

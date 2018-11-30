@@ -22,12 +22,13 @@ class Enemy:
 
     def throw_snow(self):
         distance = self.x - self.target.x + random.randint(-150, 100)
-        vx = random.randint(20, 25)
+        vx = random.randint(18, 22)
         t = distance/vx
         #vy = (28*math.sqrt(t**2 + 100) + 40*t)/50
         vy = t/5-(40/t)
         game_world.add_object(snow.SmallSnow(self.x, self.y + 10, -vx, vy, self.snow_stack), game_world.snow_layer)
         self.snow_stack -= 1
+        self.target.targeted = False
 
     def out_of_sight(self):
         if stage_state.base_x > self.x or self.x > stage_state.base_x + 1600:
@@ -65,16 +66,18 @@ class Enemy:
         self.hp -= min(snow.armor_piercing_point - self.armor, 0) + damage
 
         if self.hp <= 0:
-            if snow.type == 0 or snow.type == 3:
-                self.change_state(DEAD1)
-            elif snow.type == 1:
-                self.change_state(DEAD2)
-            elif snow.type == 2:
-                self.change_state(DEAD3)
-            main_state.Data.cur_money += self.money
-            main_state.Data.total_money += self.money
+            self.die(snow.type)
 
 
+    def die(self, type):
+        if type == 0 or type == 3:
+            self.change_state(DEAD1)
+        elif type == 1:
+            self.change_state(DEAD2)
+        elif type == 2:
+            self.change_state(DEAD3)
+        main_state.Data.cur_money += self.money
+        main_state.Data.total_money += self.money
 
     def draw_hp_gauge(self):
         t = 30 * self.hp // self.max_hp // 2
@@ -105,9 +108,9 @@ class EnemyType1(Enemy):
         self.frame = 0
         self.reload_time = 80
         self.aim_time = 30
-        self.range = 800 + (level * 50)
+        self.range = 1000 + (level * 100)
         self.timer = 0
-        self.target_position = random.randint(800 + level*100, 1200 + level * 100) + stage_state.base_x
+        self.target_position = random.randint(800 + level*100, 1200 + level * 100)
         self.is_target_position_set = True
         self.snow_stack = 0
         self.build_behavior_tree()
@@ -135,12 +138,22 @@ class EnemyType1(Enemy):
             return BehaviorTree.RUNNING
 
     def set_target(self):
-        for target in game_world.layer_objects(game_world.player_layer):
-            if target.cur_state != DEAD1 and target.cur_state != DEAD2 and target.cur_state != DEAD3:
-                if target.x > self.x - self.range:
+        chance = random.randint(0, 10)
+
+        if chance < 8:
+            for target in game_world.layer_objects(game_world.player_layer):
+                if target.cur_state != DEAD1 and target.cur_state != DEAD2 and target.cur_state != DEAD3:
+                    if target.x > self.x - self.range:
+                        self.target = target
+                        return BehaviorTree.SUCCESS
+        else:
+            for target in game_world.layer_objects(game_world.player_layer):
+                if target.cur_state != DEAD1 and target.cur_state != DEAD2 and target.cur_state != DEAD3 and target.x > self.x - self.range and not target.targeted:
                     self.target = target
+                    self.target.targeted = True
                     return BehaviorTree.SUCCESS
         return BehaviorTree.FAIL
+
 
     def aim(self):
         if self.cur_state != AIM:
@@ -168,7 +181,7 @@ class EnemyType1(Enemy):
 
     def set_target_position(self):
         if self.is_target_position_set == False:
-            self.target_position = self.x - random.randint(0, 50)
+            self.target_position = self.x - stage_state.base_x - random.randint(0, 50)
             self.is_target_position_set = True
 
         return BehaviorTree.SUCCESS
@@ -177,7 +190,7 @@ class EnemyType1(Enemy):
         if self.cur_state != MOVE:
             self.change_state(MOVE)
 
-        if self.x >= self.target_position:
+        if self.x >= self.target_position + stage_state.base_x:
             self.x += self.velocity
             return BehaviorTree.RUNNING
         else:
@@ -233,6 +246,19 @@ class EnemyType1(Enemy):
             self.image.clip_draw(60 * (self.frame // 2), 60 * 6, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
         if self.cur_state != DEAD1 and self.cur_state != DEAD2 and self.cur_state != DEAD3:
             self.draw_hp_gauge()
+
+    def die(self, type):
+        if type == 0 or type == 3:
+            self.change_state(DEAD1)
+        elif type == 1:
+            self.change_state(DEAD2)
+        elif type == 2:
+            self.change_state(DEAD3)
+        main_state.Data.cur_money += self.money
+        main_state.Data.total_money += self.money
+
+        if self.target != None:
+            self.target.targeted = False
 
 ####################################################################################################################################
 ####################################################################################################################################
@@ -494,6 +520,8 @@ class EnemyType3(Enemy):
         else:
             self.my_wall.strengthen_wall(self.shovel_power)
 
+
+
 ####################################################################################################################################
 ####################################################################################################################################
 
@@ -519,7 +547,7 @@ class EnemyType4(Enemy):
         self.aim_time = 30
         self.range = 1200 + (level * 50)
         self.timer = 0
-        self.target_position = random.randint(900, 1200) + stage_state.base_x
+        self.target_position = random.randint(900, 1200)
         self.is_target_position_set = True
         self.snow_stack = 0
         self.build_behavior_tree()
@@ -577,10 +605,18 @@ class EnemyType4(Enemy):
             return BehaviorTree.RUNNING
 
     def set_target(self):
-        for target in game_world.layer_objects(game_world.player_layer):
-            if target.cur_state != DEAD1 and target.cur_state != DEAD2 and target.cur_state != DEAD3:
-                if target.x > self.x - self.range:
+        if random.randint(0, 1):
+            for target in game_world.layer_objects(game_world.player_layer):
+                if target.cur_state != DEAD1 and target.cur_state != DEAD2 and target.cur_state != DEAD3:
+                    if target.x > self.x - self.range:
+                        self.target = target
+                        return BehaviorTree.SUCCESS
+        else:
+            for target in game_world.layer_objects(game_world.player_layer):
+                if target.cur_state != DEAD1 and target.cur_state != DEAD2 and target.cur_state != DEAD3 and \
+                        target.x > self.x - self.range and not target.targeted:
                     self.target = target
+                    self.target.targeted = True
                     return BehaviorTree.SUCCESS
         return BehaviorTree.FAIL
 
@@ -609,7 +645,7 @@ class EnemyType4(Enemy):
 
     def set_target_position(self):
         if self.is_target_position_set == False:
-            self.target_position = self.x - random.randint(0, 50)
+            self.target_position = self.x - stage_state.base_x - random.randint(0, 50)
             self.is_target_position_set = True
 
         return BehaviorTree.SUCCESS
@@ -618,7 +654,7 @@ class EnemyType4(Enemy):
         if self.cur_state != MOVE:
             self.change_state(MOVE)
 
-        if self.x >= self.target_position:
+        if self.x >= self.target_position + stage_state.base_x:
             self.x -= self.velocity
             return BehaviorTree.RUNNING
         else:
@@ -694,3 +730,16 @@ class EnemyType4(Enemy):
         vy = t / 5 - (40 / t)
         game_world.add_object(snow.SmallSnow(self.x, self.y + 10, -vx, vy, self.snow_stack), game_world.snow_layer)
         self.snow_stack -= 1
+        self.target.targeted = False
+
+    def die(self, type):
+        if type == 0 or type == 3:
+            self.change_state(DEAD1)
+        elif type == 1:
+            self.change_state(DEAD2)
+        elif type == 2:
+            self.change_state(DEAD3)
+        main_state.Data.cur_money += self.money
+        main_state.Data.total_money += self.money
+        if self.target != None:
+            self.target.targeted = False
