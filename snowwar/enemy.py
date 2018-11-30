@@ -91,7 +91,7 @@ class EnemyType1(Enemy):
 
     def __init__(self, level):
         if EnemyType1.image == None:
-            EnemyType1.image = load_image('image\\enemy\\basic\\enemy_image.png')
+            EnemyType1.image = load_image('image\\enemy\\type1\\enemy_image.png')
         if Enemy.hp_bar == None:
             Enemy.hp_bar = load_image('image\\ui\\hp_bar.png')
         if Enemy.hp_gauge == None:
@@ -174,6 +174,9 @@ class EnemyType1(Enemy):
         return BehaviorTree.SUCCESS
 
     def move_to_position(self):
+        if self.cur_state != MOVE:
+            self.change_state(MOVE)
+
         if self.x >= self.target_position:
             self.x += self.velocity
             return BehaviorTree.RUNNING
@@ -239,7 +242,7 @@ class EnemyType2(Enemy):
 
     def __init__(self, level):
         if EnemyType2.image == None:
-            EnemyType2.image = load_image('image\\enemy\\type1\\enemy2_image.png')
+            EnemyType2.image = load_image('image\\enemy\\type2\\enemy2_image.png')
         if Enemy.hp_bar == None:
             Enemy.hp_bar = load_image('image\\ui\\hp_bar.png')
         if Enemy.hp_gauge == None:
@@ -339,14 +342,14 @@ class EnemyType3(Enemy):
 
     def __init__(self, level):
         if EnemyType3.image == None:
-            EnemyType3.image = load_image('image\\enemy\\type1\\enemy2_image.png')
+            EnemyType3.image = load_image('image\\enemy\\type3\\enemy3_image.png')
         if Enemy.hp_bar == None:
             Enemy.hp_bar = load_image('image\\ui\\hp_bar.png')
         if Enemy.hp_gauge == None:
             Enemy.hp_gauge = load_image('image\\ui\\hp_gauge.png')
         self.hp = 1 + level
         self.max_hp = 1 + level
-        self.armor = 0
+        self.armor = 1
         self.velocity = -2
         self.cur_state = MOVE
         self.x, self.y = 1800 + stage_state.base_x, 30 + 260
@@ -464,14 +467,16 @@ class EnemyType3(Enemy):
     def draw(self):
         if self.cur_state == MOVE:
             self.image.clip_draw(60 * (self.frame // 2), 60 * 0, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
+        elif self.cur_state == MAKE_WALL:
+            self.image.clip_draw(60 * (self.frame // 2), 60 * 1, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
         elif self.cur_state == ATTACK:
             self.image.clip_draw(60 * (self.frame//2), 60 * 2, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
         elif self.cur_state == DEAD1:
-            self.image.clip_draw(60 * (self.frame // 2), 60 * 1, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
+            self.image.clip_draw(60 * (self.frame // 2), 60 * 3, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
         elif self.cur_state == DEAD2:
-            self.image.clip_draw(60 * (self.frame // 2), 60 * 5, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
+            self.image.clip_draw(60 * (self.frame // 2), 60 * 4, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
         elif self.cur_state == DEAD3:
-            self.image.clip_draw(60 * (self.frame // 2), 60 * 6, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
+            self.image.clip_draw(60 * (self.frame // 2), 60 * 5, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
         if self.cur_state != DEAD1 and self.cur_state != DEAD2 and self.cur_state != DEAD3:
             self.draw_hp_gauge()
 
@@ -497,7 +502,7 @@ class EnemyType4(Enemy):
 
     def __init__(self, level):
         if EnemyType4.image == None:
-            EnemyType4.image = load_image('image\\enemy\\basic\\enemy_image.png')
+            EnemyType4.image = load_image('image\\enemy\\type4\\enemy4_image.png')
         if Enemy.hp_bar == None:
             Enemy.hp_bar = load_image('image\\ui\\hp_bar.png')
         if Enemy.hp_gauge == None:
@@ -505,7 +510,7 @@ class EnemyType4(Enemy):
         self.hp = level
         self.max_hp = level
         self.armor = 0
-        self.velocity = 2
+        self.velocity = 4
         self.dir = LEFT
         self.cur_state = MOVE
         self.x, self.y = 1800 + stage_state.base_x, 30 + 260
@@ -547,7 +552,7 @@ class EnemyType4(Enemy):
                     self.cover = True
                     return BehaviorTree.SUCCESS
         else:
-            self.cur_state = self.change_state(MOVE)
+            self.change_state(MOVE)
         return BehaviorTree.RUNNING
 
 
@@ -595,7 +600,7 @@ class EnemyType4(Enemy):
             self.change_state(THROW)
             return BehaviorTree.RUNNING
         else:
-            if self.frame >= 7:
+            if self.frame >= 15:
                 self.throw_snow()
                 return BehaviorTree.SUCCESS
             else:
@@ -610,6 +615,9 @@ class EnemyType4(Enemy):
         return BehaviorTree.SUCCESS
 
     def move_to_position(self):
+        if self.cur_state != MOVE:
+            self.change_state(MOVE)
+
         if self.x >= self.target_position:
             self.x -= self.velocity
             return BehaviorTree.RUNNING
@@ -662,25 +670,27 @@ class EnemyType4(Enemy):
             else:
                 self.image.clip_composite_draw(60 * (self.frame // 2), 60 * 0, 60, 60, 0, 'h',self.x - stage_state.base_x, self.y, 60, 60)
         elif self.cur_state == RELOAD:
-            self.image.clip_draw(60 * (self.frame//2), 60 * 2, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
+            self.image.clip_draw(60 * (self.frame//2), 60 * 1, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
         elif self.cur_state == AIM:
-            self.image.clip_draw(60 * (self.frame // 2), 60 * 3, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
+            self.image.clip_draw(60 * (self.frame // 2), 60 * 2, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
         elif self.cur_state == THROW:
-            self.image.clip_draw(60 * (self.frame // 2), 60 * 4, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
+            self.image.clip_draw(60 * (self.frame // 2), 60 * 3, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
         elif self.cur_state == DEAD1:
-            self.image.clip_draw(60 * (self.frame // 2), 60 * 1, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
+            self.image.clip_draw(60 * (self.frame // 2), 60 * 4, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
         elif self.cur_state == DEAD2:
             self.image.clip_draw(60 * (self.frame // 2), 60 * 5, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
         elif self.cur_state == DEAD3:
             self.image.clip_draw(60 * (self.frame // 2), 60 * 6, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
+        else:
+            self.image.clip_draw(60 * (self.frame // 2), 60 * 6, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
         if self.cur_state != DEAD1 and self.cur_state != DEAD2 and self.cur_state != DEAD3:
             self.draw_hp_gauge()
 
-        def throw_snow(self):
-            distance = self.x - self.target.x + random.randint(-200, 100)
-            vx = random.randint(15, 20)
-            t = distance / vx
-            # vy = (28*math.sqrt(t**2 + 100) + 40*t)/50
-            vy = t / 5 - (40 / t)
-            game_world.add_object(snow.SmallSnow(self.x, self.y + 10, -vx, vy, self.snow_stack), game_world.snow_layer)
-            self.snow_stack -= 1
+    def throw_snow(self):
+        distance = self.x - self.target.x + random.randint(-200, 100)
+        vx = random.randint(12, 16)
+        t = distance / vx
+        # vy = (28*math.sqrt(t**2 + 100) + 40*t)/50
+        vy = t / 5 - (40 / t)
+        game_world.add_object(snow.SmallSnow(self.x, self.y + 10, -vx, vy, self.snow_stack), game_world.snow_layer)
+        self.snow_stack -= 1
