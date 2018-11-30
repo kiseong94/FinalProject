@@ -40,7 +40,7 @@ class ObjectCreator:
 
 
     def stage_start(self, stage_num):
-        file = open('data.txt', 'r')
+        file = open('data\\data.txt', 'r')
         #data_str = file.read()
         enemy_data = json.load(file)
         file.close()
