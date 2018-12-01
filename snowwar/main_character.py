@@ -437,6 +437,9 @@ class Character:
         else:
             return self.x - 10, self.y + 20, self.x + 10, self.y - 25
 
+    def player_velocity_init(self):
+        self.velocity = 0
+        self.add_event(TIME_UP)
 
     def handle_event(self, event):
         if (event.type, event.key) in key_event_table:
@@ -470,7 +473,5 @@ class Character:
 
         elif event.type == SDL_MOUSEMOTION and self.cur_state == AimState:
             self.aim_draw_x, self.aim_draw_y = event.x, 900 - event.y - 1
-
-        return self.velocity
 
 

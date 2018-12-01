@@ -11,7 +11,8 @@ import back_ground
 import main_state
 import object_creator
 import interface
-import ally
+import pause_state
+
 
 name = "StageState"
 
@@ -67,7 +68,9 @@ def handle_events():
         if event.type == SDL_QUIT:
             game_framework.quit()
         elif event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
-                game_framework.pop_state()
+            player.player_velocity_init()
+            background.bg_velocity_init()
+            game_framework.push_state(pause_state)
         else:
             if not(event.type == SDL_MOUSEBUTTONDOWN and 900 - event.y - 1 < 200):
                 player.handle_event(event)

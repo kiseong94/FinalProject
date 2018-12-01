@@ -86,6 +86,8 @@ class Back_Ground:
             event = self.event_que.pop()
             self.cur_state = next_state_table[self.cur_state][event]
 
+    def bg_velocity_init(self):
+        self.velocity = 0
 
     def handle_event(self, event):
         if (event.type, event.key) in key_event_table:
