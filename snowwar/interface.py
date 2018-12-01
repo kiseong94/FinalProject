@@ -7,7 +7,7 @@ import ally
 import game_framework
 import game_data
 
-SNOW, STONE_SNOW, ICICLE, START, RUNNING, END = range(6)
+SNOW, STONE_SNOW, ICICLE, START, RUNNING, FAIL, END = range(7)
 
 
 class UI:
@@ -105,6 +105,14 @@ class UI:
                 self.start_image.draw(800, 450, 1600, 900)
             else:
                 self.biggest_font.draw(630, 450, '승리!', (0, 0, 0))
+        elif self.game_state == FAIL:
+            if self.timer >= 100:
+                self.start_image.draw(800, 450, 1600, 900)
+            elif self.timer >= 0:
+                opacity = self.timer / 100
+                self.start_image.opacify(opacity)
+                self.start_image.draw(800, 450, 1600, 900)
+
 
 
 
@@ -122,6 +130,11 @@ class UI:
         self.timer = 0
         main_state.stage_num += 1
         self.game_state = END
+
+    def game_fail(self):
+        self.timer = 0
+        self.game_state = FAIL
+
 
     def handle_event(self, event):
         if event.type == SDL_MOUSEBUTTONDOWN:

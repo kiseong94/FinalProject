@@ -37,6 +37,7 @@ def enter():
     base_x = 0
     player = main_character.Character()
     background = back_ground.Back_Ground()
+    background.set_player(player)
     ui = interface.UI()
     game_world.objects = [[], [], [], [], []]
     game_world.add_object(player, game_world.player_layer)
@@ -74,9 +75,9 @@ def handle_events():
         else:
             if not(event.type == SDL_MOUSEBUTTONDOWN and 900 - event.y - 1 < 200):
                 player.handle_event(event)
-
-            ui.handle_event(event)
             background.handle_event(event)
+            ui.handle_event(event)
+
 
 
 
@@ -93,10 +94,13 @@ def update():
 
 def draw():
     global ui
+    global player
     clear_canvas()
     for game_object in game_world.all_objects():
         game_object.draw()
     ui.draw()
+    if ui.game_state == interface.FAIL:
+        player.draw()
     update_canvas()
 
 

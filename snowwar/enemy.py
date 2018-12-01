@@ -7,8 +7,8 @@ import game_world
 import snow_wall
 from BehaviorTree import BehaviorTree, SelectorNode, SequenceNode, LeafNode
 
-IDLE, MOVE, AIM, THROW, HIT, DEAD1, DEAD2, DEAD3, SIT, MAKE_WALL, RELOAD, ATTACK = range(12)
-LEFT,RIGHT = range(2)
+IDLE, MOVE, AIM, THROW, HIT, DEAD1, DEAD2, DEAD3, DEAD4, SIT, MAKE_WALL, RELOAD, ATTACK, PUSH, DIVIDED = range(15)
+LEFT, RIGHT = range(2)
 
 # initialization code
 class Enemy:
@@ -92,9 +92,9 @@ class Enemy:
 class EnemyType1(Enemy):
     image = None
 
-    def __init__(self, level):
+    def __init__(self, level, position):
         if EnemyType1.image == None:
-            EnemyType1.image = load_image('image\\enemy\\type1\\enemy_image.png')
+            EnemyType1.image = load_image('image\\enemy\\enemy1_image.png')
         if Enemy.hp_bar == None:
             Enemy.hp_bar = load_image('image\\ui\\hp_bar.png')
         if Enemy.hp_gauge == None:
@@ -104,7 +104,7 @@ class EnemyType1(Enemy):
         self.armor = 0
         self.velocity = -2
         self.cur_state = MOVE
-        self.x, self.y = 1800 + stage_state.base_x, 30 + 260
+        self.x, self.y = position, 30 + 260
         self.frame = 0
         self.reload_time = 80
         self.aim_time = 30
@@ -268,7 +268,7 @@ class EnemyType2(Enemy):
 
     def __init__(self, level):
         if EnemyType2.image == None:
-            EnemyType2.image = load_image('image\\enemy\\type2\\enemy2_image.png')
+            EnemyType2.image = load_image('image\\enemy\\enemy2_image.png')
         if Enemy.hp_bar == None:
             Enemy.hp_bar = load_image('image\\ui\\hp_bar.png')
         if Enemy.hp_gauge == None:
@@ -297,7 +297,7 @@ class EnemyType2(Enemy):
 
     def set_target(self):
         for target in game_world.layer_objects(game_world.player_layer):
-            if target.x >= self.x - self.range:
+            if target.x >= self.x - self.range and not target.cur_state == DEAD1:
                 self.target = target
                 return BehaviorTree.SUCCESS
         for snow_wall in game_world.layer_objects(game_world.snow_wall_layer):
@@ -312,7 +312,8 @@ class EnemyType2(Enemy):
             return BehaviorTree.RUNNING
         else:
             if self.timer >= 16:
-                self.target.hit_by_melee(1)
+                if not self.target.cur_state == DEAD1:
+                    self.target.hit_by_melee(1)
                 self.timer = 0
                 return BehaviorTree.SUCCESS
             else:
@@ -368,7 +369,7 @@ class EnemyType3(Enemy):
 
     def __init__(self, level):
         if EnemyType3.image == None:
-            EnemyType3.image = load_image('image\\enemy\\type3\\enemy3_image.png')
+            EnemyType3.image = load_image('image\\enemy\\enemy3_image.png')
         if Enemy.hp_bar == None:
             Enemy.hp_bar = load_image('image\\ui\\hp_bar.png')
         if Enemy.hp_gauge == None:
@@ -434,7 +435,7 @@ class EnemyType3(Enemy):
 
     def set_target(self):
         for target in game_world.layer_objects(game_world.player_layer):
-            if target.x >= self.x - self.range:
+            if target.x >= self.x - self.range and not target.cur_state == DEAD1:
                 self.target = target
                 return BehaviorTree.SUCCESS
         for snow_wall in game_world.layer_objects(game_world.snow_wall_layer):
@@ -449,7 +450,8 @@ class EnemyType3(Enemy):
             return BehaviorTree.RUNNING
         else:
             if self.timer >= 16:
-                self.target.hit_by_melee(1)
+                if not self.target.cur_state == DEAD1:
+                    self.target.hit_by_melee(1)
                 self.timer = 0
                 return BehaviorTree.SUCCESS
             else:
@@ -530,7 +532,7 @@ class EnemyType4(Enemy):
 
     def __init__(self, level):
         if EnemyType4.image == None:
-            EnemyType4.image = load_image('image\\enemy\\type4\\enemy4_image.png')
+            EnemyType4.image = load_image('image\\enemy\\enemy4_image.png')
         if Enemy.hp_bar == None:
             Enemy.hp_bar = load_image('image\\ui\\hp_bar.png')
         if Enemy.hp_gauge == None:
@@ -586,7 +588,7 @@ class EnemyType4(Enemy):
 
     def check_range(self):
         for target in game_world.layer_objects(game_world.player_layer):
-            if target.x > self.x - self.range:
+            if target.x > self.x - self.range and not target.cur_state == DEAD1:
                 self.target = target
                 return BehaviorTree.SUCCESS
         return BehaviorTree.FAIL
@@ -607,13 +609,13 @@ class EnemyType4(Enemy):
     def set_target(self):
         if random.randint(0, 1):
             for target in game_world.layer_objects(game_world.player_layer):
-                if target.cur_state != DEAD1 and target.cur_state != DEAD2 and target.cur_state != DEAD3:
+                if target.cur_state != DEAD1:
                     if target.x > self.x - self.range:
                         self.target = target
                         return BehaviorTree.SUCCESS
         else:
             for target in game_world.layer_objects(game_world.player_layer):
-                if target.cur_state != DEAD1 and target.cur_state != DEAD2 and target.cur_state != DEAD3 and \
+                if target.cur_state != DEAD1 and \
                         target.x > self.x - self.range and not target.targeted:
                     self.target = target
                     self.target.targeted = True
@@ -743,3 +745,156 @@ class EnemyType4(Enemy):
         main_state.Data.total_money += self.money
         if self.target != None:
             self.target.targeted = False
+
+class EnemyType5(Enemy):
+    image = None
+
+    def __init__(self, level):
+        if EnemyType5.image == None:
+            EnemyType5.image = load_image('image\\enemy\\enemy5_image.png')
+        if Enemy.hp_bar == None:
+            Enemy.hp_bar = load_image('image\\ui\\hp_bar.png')
+        if Enemy.hp_gauge == None:
+            Enemy.hp_gauge = load_image('image\\ui\\hp_gauge.png')
+        self.hp = 1
+        self.max_hp = 1
+        self.armor = 0
+        self.velocity = 3
+        self.cur_state = MOVE
+        self.x, self.y = 1800 + stage_state.base_x, 30 + 260
+        self.range = 30
+        self.frame = 0
+        self.timer = 0
+        self.build_behavior_tree()
+        self.target = None
+        self.money = 100 + level*50
+        self.targeted = False
+        self.push_point = 1000 + random.randint(-100, 100)
+        self.is_divided = False
+
+    def move(self):
+        if self.cur_state != MOVE and self.is_divided == False:
+            self.change_state(MOVE)
+        else:
+            self.x -= self.velocity
+
+        return BehaviorTree.SUCCESS
+
+    def check_push_point(self):
+        if not self.is_divided and self.push_point + stage_state.base_x > self.x:
+            return BehaviorTree.SUCCESS
+        return BehaviorTree.FAIL
+
+
+    def push_sled(self):
+        if self.cur_state != PUSH:
+            self.change_state(PUSH)
+            self.velocity += 2
+        else:
+            if self.frame >= 1:
+                self.change_state(DIVIDED)
+                game_world.add_object(EnemyType1(1, self.x + 20), game_world.enemy_layer)
+                self.is_divided = True
+                return BehaviorTree.SUCCESS
+        return BehaviorTree.RUNNING
+
+
+    def set_target(self):
+        for target in game_world.layer_objects(game_world.player_layer):
+            if target.x >= self.x - self.range and not target.cur_state == DEAD1:
+                self.target = target
+                return BehaviorTree.SUCCESS
+        for snow_wall in game_world.layer_objects(game_world.snow_wall_layer):
+            if snow_wall.x >= self.x - self.range and not snow_wall.dir:
+                self.target = snow_wall
+                return BehaviorTree.SUCCESS
+        return BehaviorTree.FAIL
+
+    def attack_target(self):
+        if self.cur_state != ATTACK:
+            self.cur_state = ATTACK
+            return BehaviorTree.RUNNING
+        else:
+            if isinstance(self.target, snow_wall.SnowWall):
+                self.target.hit_by_melee(20)
+                self.change_state(DEAD2)
+            else:
+                self.target.hit_by_melee(5)
+                self.change_state(DEAD2)
+
+
+    def build_behavior_tree(self):
+
+        set_target_node = LeafNode('Set Target', self.set_target)
+        attack_target_node = LeafNode('Attack', self.attack_target)
+
+        check_push_point_node = LeafNode('Check Push Point', self.check_push_point)
+        push_sled_node = LeafNode('Push Sled', self.push_sled)
+
+        move_node = LeafNode('Move', self.move)
+
+        divide_node = SequenceNode('Divide')
+        divide_node.add_children(check_push_point_node, push_sled_node)
+
+        attack_node = SequenceNode('Attack')
+        attack_node.add_children(set_target_node, attack_target_node)
+
+        start_node = SelectorNode('Start Node')
+        start_node.add_children(divide_node, attack_node, move_node)
+
+
+        self.bt = BehaviorTree(start_node)
+
+    def update(self):
+        if self.cur_state != DEAD1 and self.cur_state != DEAD2 and self.cur_state != DEAD3:
+            self.bt.run()
+            self.snow_collision_check()
+            self.frame = (self.frame + 1) % 16
+        else:
+            if self.out_of_sight():
+                self.delete()
+            if self.frame < 15:
+                self.frame += 1
+            else:
+                if self.cur_state == DEAD1:
+                    self.cur_state = DEAD2
+                    game_world.add_object(EnemyType1(1, self.x + 20), game_world.enemy_layer)
+
+
+    def draw(self):
+        if self.cur_state == MOVE:
+            self.image.clip_draw(100 * (self.frame // 2), 60 * 0, 100, 60, self.x - stage_state.base_x, self.y, 100, 60)
+        elif self.cur_state == PUSH:
+            self.image.clip_draw(100 * (self.frame//2), 60 * 1, 100, 60, self.x - stage_state.base_x, self.y, 100, 60)
+        elif self.cur_state == DIVIDED:
+            self.image.clip_draw(100 * (self.frame//2), 60 * 4, 100, 60, self.x - stage_state.base_x, self.y, 100, 60)
+        elif self.cur_state == DEAD1:
+            self.image.clip_draw(100 * (self.frame // 2), 60 * 2, 100, 60, self.x - stage_state.base_x, self.y, 100, 60)
+        elif self.cur_state == DEAD2:
+            self.image.clip_draw(100 * (self.frame // 2), 60 * 3, 100, 60, self.x - stage_state.base_x, self.y, 100, 60)
+        if self.cur_state != DEAD1 and self.cur_state != DEAD2 and self.cur_state != DEAD3:
+            self.draw_hp_gauge()
+
+    def snow_collision_check(self):
+        for snow in game_world.layer_objects(game_world.snow_layer):
+            if snow.vx > 0:
+                if self.is_divided:
+                    if snow.collision_object(*self.get_sled_hit_box()):
+                        self.hit_by_snow(snow)
+                else:
+                    if snow.collision_object(*self.get_sled_hit_box()) or snow.collision_object(*self.get_person_hit_box()):
+                        self.hit_by_snow(snow)
+
+    def get_sled_hit_box(self):
+            return self.x - 40, self.y - 10, self.x, self.y - 30
+
+    def get_person_hit_box(self):
+            return self.x + 10, self.y + 20, self.x + 30, self.y - 25
+
+    def die(self, type):
+        if self.is_divided:
+            self.change_state(DEAD2)
+        else:
+            self.change_state(DEAD1)
+        main_state.Data.cur_money += self.money
+        main_state.Data.total_money += self.money

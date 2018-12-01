@@ -8,7 +8,7 @@ import math
 import game_world
 import ally
 
-SNOW, STONE_SNOW, ICICLE, BUCKET, A_DOWN, A_UP, S_DOWN, S_UP, W_DOWN, W_UP, D_DOWN, D_UP, R_DOWN, LEFT_BUTTON_DOWN, LEFT_BUTTON_UP, TIME_UP = range(16)
+SNOW, STONE_SNOW, ICICLE, BUCKET, A_DOWN, A_UP, S_DOWN, S_UP, W_DOWN, W_UP, D_DOWN, D_UP, R_DOWN, LEFT_BUTTON_DOWN, LEFT_BUTTON_UP, TIME_UP, DEAD = range(17)
 
 
 key_event_table = {
@@ -247,11 +247,11 @@ class ThrowState:
 
 
 
-class HitState:
+class DeadState:
 
     @staticmethod
     def enter(character):
-        pass
+        character.frame = 0
 
     @staticmethod
     def exit(character):
@@ -259,29 +259,31 @@ class HitState:
 
     @staticmethod
     def do(character):
-        pass
+        if character.frame < 127:
+            character.frame += 1
 
     @staticmethod
     def draw(character):
-        pass
+        character.image.clip_draw(60 * (character.frame // 16), 60 * 10, 60, 60, 300, character.y, 60, 60)
 
 
 next_state_table = {
     IdleState: {A_DOWN: MoveState, D_DOWN: MoveState, A_UP: IdleState, D_UP: IdleState, S_DOWN: SitState, S_UP: IdleState, W_DOWN: MakeWallState,
-                W_UP: IdleState, R_DOWN: ReloadState, LEFT_BUTTON_DOWN: AimState, LEFT_BUTTON_UP: IdleState, TIME_UP: IdleState},
+                W_UP: IdleState, R_DOWN: ReloadState, LEFT_BUTTON_DOWN: AimState, LEFT_BUTTON_UP: IdleState, TIME_UP: IdleState, DEAD:DeadState},
     MoveState: {A_DOWN: MoveState, D_DOWN: MoveState, A_UP: IdleState, D_UP: IdleState, S_DOWN: SitState, S_UP: MoveState, W_DOWN: MakeWallState,
-           W_UP: MoveState, R_DOWN: ReloadState, LEFT_BUTTON_DOWN: AimState, LEFT_BUTTON_UP: MoveState, TIME_UP: IdleState},
+           W_UP: MoveState, R_DOWN: ReloadState, LEFT_BUTTON_DOWN: AimState, LEFT_BUTTON_UP: MoveState, TIME_UP: IdleState, DEAD:DeadState},
     ReloadState: {A_DOWN: MoveState, D_DOWN: MoveState, A_UP: ReloadState, D_UP: ReloadState, S_DOWN: SitState, S_UP: ReloadState, W_DOWN: MakeWallState,
-             W_UP: ReloadState, R_DOWN: ReloadState, LEFT_BUTTON_DOWN: AimState, LEFT_BUTTON_UP: ReloadState, TIME_UP: IdleState},
+             W_UP: ReloadState, R_DOWN: ReloadState, LEFT_BUTTON_DOWN: AimState, LEFT_BUTTON_UP: ReloadState, TIME_UP: IdleState, DEAD:DeadState},
     SitState: {A_DOWN: MoveState, D_DOWN: MoveState, A_UP: SitState, D_UP: SitState, S_DOWN: SitState, S_UP: IdleState, W_DOWN: MakeWallState,
-          W_UP: SitState, R_DOWN: ReloadState, LEFT_BUTTON_DOWN: AimState, LEFT_BUTTON_UP: SitState, TIME_UP: IdleState},
+          W_UP: SitState, R_DOWN: ReloadState, LEFT_BUTTON_DOWN: AimState, LEFT_BUTTON_UP: SitState, TIME_UP: IdleState, DEAD:DeadState},
     MakeWallState: {A_DOWN: MoveState, D_DOWN: MoveState, A_UP: MakeWallState, D_UP: MakeWallState, S_DOWN: SitState, S_UP: MakeWallState,
-                W_DOWN: MakeWallState, W_UP: IdleState, R_DOWN: ReloadState, LEFT_BUTTON_DOWN: AimState, LEFT_BUTTON_UP: MakeWallState, TIME_UP: IdleState },
+                W_DOWN: MakeWallState, W_UP: IdleState, R_DOWN: ReloadState, LEFT_BUTTON_DOWN: AimState, LEFT_BUTTON_UP: MakeWallState, TIME_UP: IdleState, DEAD:DeadState},
     AimState: {A_DOWN: AimState, D_DOWN: AimState, A_UP: AimState, D_UP: AimState, S_DOWN: AimState, S_UP: AimState, TIME_UP: IdleState,
-          W_DOWN: AimState, W_UP: AimState, R_DOWN: AimState, LEFT_BUTTON_DOWN: AimState, LEFT_BUTTON_UP: ThrowState},
+          W_DOWN: AimState, W_UP: AimState, R_DOWN: AimState, LEFT_BUTTON_DOWN: AimState, LEFT_BUTTON_UP: ThrowState, DEAD:DeadState},
     ThrowState: {A_DOWN: ThrowState, D_DOWN: ThrowState, A_UP: ThrowState, D_UP: ThrowState, S_DOWN: ThrowState, S_UP: ThrowState,
-            W_DOWN: ThrowState, W_UP: ThrowState, R_DOWN: ThrowState, LEFT_BUTTON_DOWN: ThrowState, LEFT_BUTTON_UP: ThrowState, TIME_UP: IdleState},
-    HitState: {},
+            W_DOWN: ThrowState, W_UP: ThrowState, R_DOWN: ThrowState, LEFT_BUTTON_DOWN: ThrowState, LEFT_BUTTON_UP: ThrowState, TIME_UP: IdleState, DEAD:DeadState},
+    DeadState: {A_DOWN: DeadState, D_DOWN: DeadState, A_UP: DeadState, D_UP: DeadState, S_DOWN: DeadState, S_UP: DeadState,
+            W_DOWN: DeadState, W_UP: DeadState, R_DOWN: DeadState, LEFT_BUTTON_DOWN: DeadState, LEFT_BUTTON_UP: DeadState, TIME_UP: DeadState, DEAD:DeadState}
 
 }
 
@@ -377,12 +379,19 @@ class Character:
             self.snow_stack = 0
 
     def hit_by_snow(self, snow):
-        if self.hp > 0:
+        if self.cur_state != DeadState:
             self.hp -= snow.damage
+            if self.hp <= 0:
+                self.event_que.insert(0, DEAD)
+                stage_state.ui.game_fail()
 
     def hit_by_melee(self, damage):
-        if self.hp > 0:
+        if self.cur_state != DeadState:
             self.hp -= damage
+            if self.hp <= 0:
+                self.event_que.insert(0, DEAD)
+                stage_state.ui.game_fail()
+
 
     def get_snow(self):
         if self.snow_stack == 0 and self.num_ammo[SNOW] == 0:

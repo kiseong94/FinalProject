@@ -19,7 +19,7 @@ class Ally:
             self.hp -= snow.damage
 
         if self.hp <= 0:
-            self.dead()
+            self.die()
 
 
     def hit_by_melee(self, damage):
@@ -27,7 +27,7 @@ class Ally:
             self.hp -= damage
 
         if self.hp <= 0:
-            self.dead()
+            self.die()
 
     def draw_hp_gauge(self):
         t = 30 * self.hp // self.max_hp // 2
@@ -42,6 +42,13 @@ class Ally:
                 if snow.collision_object(*self.get_hit_box()):
                     self.hit_by_snow(snow)
 
+    def out_of_sight(self):
+        if stage_state.base_x > self.x or self.x > stage_state.base_x + 1600:
+            return True
+
+    def delete(self):
+        game_world.remove_object(self, game_world.player_layer)
+
     def get_hit_box(self):
         if self.cur_state == RELOAD:
             return self.x - 10, self.y + 5, self.x + 10, self.y - 25
@@ -52,6 +59,19 @@ class Ally:
         self.cur_state = state
         self.timer = 0
         self.frame = 0
+
+    def die(self):
+        self.change_state(DEAD1)
+
+        if isinstance(self, ReloadMan):
+            main_state.Data.num_ally[RELOAD_MAN] -= 1
+        elif isinstance(self, ThrowMan):
+            main_state.Data.num_ally[THROW_MAN] -= 1
+        elif isinstance(self, ShovelMan):
+            main_state.Data.num_ally[SHOVEL_MAN] -= 1
+        elif isinstance(self, Storage):
+            main_state.Data.num_ally[STORAGE] -= 1
+
 
 
 
@@ -65,9 +85,9 @@ class ReloadMan(Ally):
         if Ally.hp_gauge == None:
             Ally.hp_gauge = load_image('image\\ui\\hp_gauge.png')
         if ReloadMan.image == None:
-            ReloadMan.image = load_image('image\\ally\\reload_man\\reloadman.png')
-        self.hp = 5
-        self.max_hp = 5
+            ReloadMan.image = load_image('image\\ally\\reloadman.png')
+        self.hp = 2
+        self.max_hp = 2
         self.velocity = 2
         self.cur_state = IDLE
         self.event_que = []
@@ -142,9 +162,15 @@ class ReloadMan(Ally):
         self.bt = BehaviorTree(start_node)
 
     def update(self):
-        self.bt.run()
-        self.snow_collision_check()
-        self.frame = (self.frame + 1) % 16
+        if self.cur_state != DEAD1:
+            self.bt.run()
+            self.snow_collision_check()
+            self.frame = (self.frame + 1) % 16
+        else:
+            if self.out_of_sight():
+                self.delete()
+            if self.frame < 15:
+                self.frame += 1
 
 
     def draw(self):
@@ -160,12 +186,12 @@ class ReloadMan(Ally):
                 self.image.clip_draw(60 * (self.frame // 2), 60 * 3, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
         elif self.cur_state == RELOAD:
             self.image.clip_draw(60 * (self.frame // 2), 60 * 4, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
+        elif self.cur_state == DEAD1:
+            self.image.clip_draw(60 * (self.frame // 2), 60 * 5, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
 
-        self.draw_hp_gauge()
+        if self.cur_state != DEAD1:
+            self.draw_hp_gauge()
 
-    def dead(self):
-        self.change_state(DEAD1)
-        main_state.Data.num_ally[STORAGE] -= 1
 
 
 class ThrowMan(Ally):
@@ -176,9 +202,9 @@ class ThrowMan(Ally):
         if Ally.hp_gauge == None:
             Ally.hp_gauge = load_image('image\\ui\\hp_gauge.png')
         if ThrowMan.image == None:
-            ThrowMan.image = load_image('image\\ally\\throw_man\\throwman.png')
-        self.hp = 5
-        self.max_hp = 5
+            ThrowMan.image = load_image('image\\ally\\throwman.png')
+        self.hp = 3
+        self.max_hp = 3
         self.velocity = 2
         self.cur_state = IDLE
         self.event_que = []
@@ -307,9 +333,15 @@ class ThrowMan(Ally):
         self.bt = BehaviorTree(start_node)
 
     def update(self):
-        self.bt.run()
-        self.snow_collision_check()
-        self.frame = (self.frame + 1) % 16
+        if self.cur_state != DEAD1 and self.cur_state != DEAD2 and self.cur_state != DEAD3:
+            self.bt.run()
+            self.snow_collision_check()
+            self.frame = (self.frame + 1) % 16
+        else:
+            if self.out_of_sight():
+                self.delete()
+            if self.frame < 15:
+                self.frame += 1
 
 
     def draw(self):
@@ -323,7 +355,11 @@ class ThrowMan(Ally):
             self.image.clip_draw(60 * (self.frame // 2), 60 * 3, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
         elif self.cur_state == THROW:
             self.image.clip_draw(60 * (self.frame // 2), 60 * 4, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
-        self.draw_hp_gauge()
+        elif self.cur_state == DEAD1:
+            self.image.clip_draw(60 * (self.frame // 2), 60 * 5, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
+
+        if self.cur_state != DEAD1:
+            self.draw_hp_gauge()
 
     def throw_snow(self):
         distance = self.target.x - self.x + random.randint(0, 200)
@@ -334,9 +370,6 @@ class ThrowMan(Ally):
         self.target.targeted = False
         self.snow_stack = 0
 
-    def dead(self):
-        self.change_state(DEAD1)
-        main_state.Data.num_ally[STORAGE] -= 1
 
 
 class ShovelMan(Ally):
@@ -347,9 +380,9 @@ class ShovelMan(Ally):
         if Ally.hp_gauge == None:
             Ally.hp_gauge = load_image('image\\ui\\hp_gauge.png')
         if ShovelMan.image == None:
-            ShovelMan.image = load_image('image\\ally\\shovel_man\\shovelman.png')
-        self.hp = 10
-        self.max_hp = 10
+            ShovelMan.image = load_image('image\\ally\\shovelman.png')
+        self.hp = 6
+        self.max_hp = 6
         self.velocity = 3
         self.cur_state = IDLE
         self.event_que = []
@@ -462,9 +495,15 @@ class ShovelMan(Ally):
         self.bt = BehaviorTree(start_node)
 
     def update(self):
-        self.bt.run()
-        self.snow_collision_check()
-        self.frame = (self.frame + 1) % 16
+        if self.cur_state != DEAD1 and self.cur_state != DEAD2 and self.cur_state != DEAD3:
+            self.bt.run()
+            self.snow_collision_check()
+            self.frame = (self.frame + 1) % 16
+        else:
+            if self.out_of_sight():
+                self.delete()
+            if self.frame < 15:
+                self.frame += 1
 
 
     def draw(self):
@@ -477,11 +516,11 @@ class ShovelMan(Ally):
                 self.image.clip_composite_draw(60 * (self.frame // 2), 60 * 1, 60, 60, 0, 'h', self.x - stage_state.base_x, self.y, 60, 60)
         elif self.cur_state == MAKE_WALL:
             self.image.clip_draw(60 * (self.frame // 2), 60 * 2, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
-        self.draw_hp_gauge()
+        elif self.cur_state == DEAD1:
+            self.image.clip_draw(60 * (self.frame // 2), 60 * 3, 60, 60, self.x - stage_state.base_x, self.y, 60, 60)
 
-    def dead(self):
-        self.change_state(DEAD1)
-        main_state.Data.num_ally[SHOVEL_MAN] -= 1
+        if self.cur_state != DEAD1:
+            self.draw_hp_gauge()
 
 
 class Storage(Ally):
@@ -493,9 +532,9 @@ class Storage(Ally):
         if Ally.hp_gauge == None:
             Ally.hp_gauge = load_image('image\\ui\\hp_gauge.png')
         if Storage.image == None:
-            Storage.image = load_image('image\\ally\\storage\\storage.png')
-        self.hp = 15
-        self.max_hp = 15
+            Storage.image = load_image('image\\ally\\storage_image.png')
+        self.hp = 10
+        self.max_hp = 10
         self.velocity = 2
         self.cur_state = IDLE
         self.x, self.y = stage_state.base_x - 20, 30 + 260
@@ -536,9 +575,15 @@ class Storage(Ally):
         self.bt = BehaviorTree(start_node)
 
     def update(self):
-        self.bt.run()
-        self.snow_collision_check()
-        self.frame = (self.frame + 1) % 16
+        if self.cur_state != DEAD1 and self.cur_state != DEAD2 and self.cur_state != DEAD3:
+            self.bt.run()
+            self.snow_collision_check()
+            self.frame = (self.frame + 1) % 16
+        else:
+            if self.out_of_sight():
+                self.delete()
+            if self.frame < 15:
+                self.frame += 1
 
 
     def draw(self):
@@ -546,8 +591,9 @@ class Storage(Ally):
             self.image.clip_draw(80 * (self.frame // 2), 60 * 0, 80, 60, self.x - stage_state.base_x, self.y)
         elif self.cur_state == MOVE:
             self.image.clip_draw(80 * (self.frame//2), 60 * 1, 80, 60, self.x - stage_state.base_x, self.y)
-        self.draw_hp_gauge()
+        elif self.cur_state == DEAD1:
+            self.image.clip_draw(80 * (self.frame // 2), 60 * 2, 80, 60, self.x - stage_state.base_x, self.y, 80, 60)
 
-    def dead(self):
-        self.change_state(DEAD1)
-        main_state.Data.num_ally[STORAGE] -= 1
+        if self.cur_state != DEAD1:
+            self.draw_hp_gauge()
+

@@ -17,15 +17,17 @@ class ObjectCreator:
 
     def update(self):
         while stage_state.base_x > self.enemy_queue[0][2]:
-            enemy_type, level = self.enemy_queue[0][0], self.enemy_queue[0][1]
+            enemy_type, level, position = self.enemy_queue[0][0], self.enemy_queue[0][1], self.enemy_queue[0][2]
             if enemy_type == 0:
-                game_world.add_object(enemy.EnemyType1(level), game_world.enemy_layer)
+                game_world.add_object(enemy.EnemyType1(level, position + 1700), game_world.enemy_layer)
             elif enemy_type == 1:
                 game_world.add_object(enemy.EnemyType2(level), game_world.enemy_layer)
             elif enemy_type == 2:
                 game_world.add_object(enemy.EnemyType3(level), game_world.enemy_layer)
             elif enemy_type == 3:
                 game_world.add_object(enemy.EnemyType4(level), game_world.enemy_layer)
+            elif enemy_type == 4:
+                game_world.add_object(enemy.EnemyType5(level), game_world.enemy_layer)
             self.enemy_queue.pop(0)
 
     def create_ally(self):
@@ -39,6 +41,7 @@ class ObjectCreator:
             game_world.add_object(ally.Storage(), game_world.player_layer)
 
 
+
     def stage_start(self, stage_num):
         file = open('data\\data.txt', 'r')
         #data_str = file.read()
@@ -47,7 +50,7 @@ class ObjectCreator:
         print(enemy_data)
         stage_distance = enemy_data[stage_num - 1][0]
 
-        for i in range(1, 12):
+        for i in range(1, 15):
             enemy_type, level, num = enemy_data[stage_num - 1][i][0], enemy_data[stage_num - 1][i][1], enemy_data[stage_num - 1][i][2]
 
             for j in range(num):

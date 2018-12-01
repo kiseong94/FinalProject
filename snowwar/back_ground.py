@@ -1,4 +1,5 @@
 from pico2d import *
+import main_character
 
 A_DOWN, A_UP, S_DOWN, S_UP, W_DOWN, W_UP, D_DOWN, D_UP, R_DOWN, LEFT_BUTTON_DOWN, LEFT_BUTTON_UP = range(11)
 
@@ -18,9 +19,10 @@ mouse_event_table = {
 class MoveState:
     @staticmethod
     def do(background):
-        background.move_ground()
-        background.move_forest()
-        background.move_mountain()
+        if background.player.cur_state == main_character.MoveState:
+            background.move_ground()
+            background.move_forest()
+            background.move_mountain()
 
 class IdleState:
     @staticmethod
@@ -47,6 +49,7 @@ class Back_Ground:
         self.forest_x = 0
         self.ground_x = 0
         self.velocity = 0
+        self.player = None
         self.cur_state = IdleState
 
 
@@ -61,7 +64,8 @@ class Back_Ground:
         self.ground_image.draw(800 - self.ground_x, 230)
         self.ground_image.draw(1600 + 800 - self.ground_x, 230)
 
-
+    def set_player(self, player):
+        self.player = player
 
     def move_ground(self):
         self.ground_x = (self.ground_x + self.velocity) % 1600
