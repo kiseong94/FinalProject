@@ -7,6 +7,8 @@ import snow_wall
 import math
 import game_world
 import ally
+import game_framework
+import end_state
 
 SNOW, STONE_SNOW, ICICLE, BUCKET, A_DOWN, A_UP, S_DOWN, S_UP, W_DOWN, W_UP, D_DOWN, D_UP, R_DOWN, LEFT_BUTTON_DOWN, LEFT_BUTTON_UP, TIME_UP, DEAD = range(17)
 
@@ -261,6 +263,9 @@ class DeadState:
     def do(character):
         if character.frame < 127:
             character.frame += 1
+        else:
+            game_framework.push_state(end_state)
+
 
     @staticmethod
     def draw(character):

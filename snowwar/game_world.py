@@ -12,25 +12,22 @@ def remove_object(o, layer):
         del o
 
 def clear():
-    for o in objects[back_ground_layer]:
-        objects[back_ground_layer].remove(o)
-        del o
-    for o in objects[player_layer]:
-        objects[player_layer].remove(o)
-        del o
-    for o in objects[enemy_layer]:
-        objects[enemy_layer].remove(o)
-        del o
-    for o in objects[snow_layer]:
-        objects[snow_layer].remove(o)
-        del o
-    for o in objects[snow_wall_layer]:
-        objects[snow_wall_layer].remove(o)
-        del o
 
-
-
-
+    for i in range(len(objects[back_ground_layer])):
+        o = objects[back_ground_layer].pop()
+        del o
+    for i in range(len(objects[player_layer])):
+        o = objects[player_layer].pop()
+        del o
+    for i in range(len(objects[enemy_layer])):
+        o = objects[enemy_layer].pop()
+        del o
+    for i in range(len(objects[snow_layer])):
+        o = objects[snow_layer].pop()
+        del o
+    for i in range(len(objects[snow_wall_layer])):
+        o = objects[snow_wall_layer].pop()
+        del o
 
 
 def all_objects():

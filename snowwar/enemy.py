@@ -759,7 +759,7 @@ class EnemyType5(Enemy):
         self.hp = 1
         self.max_hp = 1
         self.armor = 0
-        self.velocity = 3
+        self.velocity = 4
         self.cur_state = MOVE
         self.x, self.y = 1800 + stage_state.base_x, 30 + 260
         self.range = 30
