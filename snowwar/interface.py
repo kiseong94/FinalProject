@@ -28,7 +28,7 @@ class UI:
         self.player_inform = load_font('font\\neodgm.ttf', 20)
         self.biggest_font = load_font('font\\neodgm.ttf', 120)
         self.x, self.y = 800, 100
-
+        self.ally_price = [150, 300, 700, 800]
         self.game_state = 0
         self.timer = 0
 
@@ -160,15 +160,17 @@ class UI:
 
 
     def hire_ally(self, type):
-        if type == 0:
-            game_world.add_object(ally.ReloadMan(), game_world.player_layer)
-        if type == 1:
-            game_world.add_object(ally.ThrowMan(), game_world.player_layer)
-        if type == 2:
-            game_world.add_object(ally.ShovelMan(), game_world.player_layer)
-        if type == 3:
-            game_world.add_object(ally.Storage(), game_world.player_layer)
-        main_state.Data.num_ally[type] += 1
+        if main_state.Data.cur_money >= self.ally_price[type]:
+            if type == 0:
+                game_world.add_object(ally.ReloadMan(), game_world.player_layer)
+            if type == 1:
+                game_world.add_object(ally.ThrowMan(), game_world.player_layer)
+            if type == 2:
+                game_world.add_object(ally.ShovelMan(), game_world.player_layer)
+            if type == 3:
+                game_world.add_object(ally.Storage(), game_world.player_layer)
+            main_state.Data.cur_money -= self.ally_price[type]
+            main_state.Data.num_ally[type] += 1
 
     def draw_stage_progress_bar(self):
         t = 550 * stage_state.base_x // stage_state.end_point // 2

@@ -115,7 +115,7 @@ class EnemyType1(Enemy):
         self.snow_stack = 0
         self.build_behavior_tree()
         self.target = None
-        self.money = 50 + level * 50
+        self.money = 20 + level * 30
         self.targeted = False
 
     def check_range(self):
@@ -284,7 +284,7 @@ class EnemyType2(Enemy):
         self.timer = 0
         self.build_behavior_tree()
         self.target = None
-        self.money = 70 + level*70
+        self.money = 40 + level*40
         self.targeted = False
 
     def move(self):
@@ -391,7 +391,7 @@ class EnemyType3(Enemy):
         self.wall_pos = random.randint(900, 1450)
         self.is_wall_built = False
         self.my_wall = None
-        self.money = 70 + level * 70
+        self.money = 60 + level * 50
         self.targeted = False
 
     def check_wall_build_position(self):
@@ -555,7 +555,7 @@ class EnemyType4(Enemy):
         self.build_behavior_tree()
         self.target = None
         self.cover = False
-        self.money = 50 + level * 50
+        self.money = 30 + level * 40
         self.targeted = False
 
     def find_cover(self):
@@ -767,7 +767,7 @@ class EnemyType5(Enemy):
         self.timer = 0
         self.build_behavior_tree()
         self.target = None
-        self.money = 100 + level*50
+        self.money = 50 + level*30
         self.targeted = False
         self.push_point = 1000 + random.randint(-100, 100)
         self.is_divided = False

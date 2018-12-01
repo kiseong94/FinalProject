@@ -14,8 +14,8 @@ class Data:
         self.ally_level = [1, 0, 0, 0, 0]
         self.num_ally = [0, 0, 0, 0]
 
-        self.total_money = 0
-        self.cur_money = 0
+        self.total_money = 5000
+        self.cur_money = 5000
 
 
     def get_player_inform(self,option):

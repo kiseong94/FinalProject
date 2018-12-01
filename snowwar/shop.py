@@ -29,6 +29,12 @@ class Shop:
         self.sheet1_button_pos = [(650, 500), (1250, 500), (650, 350), (1250, 350), (650, 200)]
         self.sheet1_image_pos = [(350, 500, '체 력'), (950, 500, '던지는 힘'), (350, 350, '장전 속도'), (950, 350, '눈벽 보수'), (350, 200, '눈벽 강화')]
 
+        self.sheet1_price = [[8, 300, 600, 900, 1200, 1500, 1800, 2100],
+                             [8, 300, 600, 900, 1200, 1500, 1800, 2100],
+                             [8, 400, 800, 1200, 1600, 2000, 2400, 2800],
+                             [4, 500, 1000, 1500, 2000],
+                             [4, 1000, 2000, 3000, 4000]]
+
         self.sheet2_select_image = load_image('image\\shop\\frame2_select_image.png')
         self.sheet2_button_pos = [(1200, 475), (1200, 250)]
         self.sheet2_image_pos = [[(400, 475, '눈덩이'), (400, 250, '돌을 넣은 눈덩이')],
@@ -38,6 +44,11 @@ class Shop:
                                       ('적을 최대 1번 관통', '데미지 +1', '15% 확률로 치명타 (데미지 X 2)', '적을 최대 2번 관통', '치명타 확률 30%'),
                                       ('적의 방어 1을 무시', '눈 벽을 관통', '데미지 +1', '데미지 +1', '적의 방어 1을 부숨'),
                                       ('넓은 범위의 공격', '재장전 시간 감소', '적을 뒤로 밈', '데미지 +1', '더 넓은 범위 공격을 함')]
+
+        self.sheet2_price = [[0, 600, 1200, 1800, 2400],
+                             [800, 800, 1500, 2200, 3000],
+                             [800, 600, 1300, 2000, 2800],
+                             [1000, 1000, 1200, 2000, 3000]]
 
         self.sheet3_select_image = load_image('image\\shop\\frame3_select_image.png')
         self.sheet3_button_pos = [(1200, 475), (1200, 250)]
@@ -51,18 +62,24 @@ class Shop:
 
         self.ability_box_pos = [(550, 425), (550, 200)]
 
+        self.sheet3_price = [0, 800, 1500, 2000]
+
 
     def draw(self):
         self.sheet_image.clip_draw(1200*self.sheet_state, 0, 1200, 700, 800, 450)
 
-        if self.sheet_state == Character:
+        self.big_font.draw(1200, 700,'%d'%main_state.Data.cur_money,(0,0,0))
 
+        if self.sheet_state == Character:
+            # 구매, 업그레이드 버튼
             for i in range(5):
                 x, y = self.sheet1_button_pos[i]
                 if i == self.mouse_on_button:
                     self.upgrade_button_image.clip_draw(150, 0, 150, 50, x, y)
                 else:
                     self.upgrade_button_image.clip_draw(0, 0, 150, 50, x, y)
+                if main_state.Data.main_inform[i] < self.sheet1_price[i][0]:
+                    self.big_font.draw(x, y + 50, '%4d' % self.sheet1_price[i][main_state.Data.main_inform[i]], (255, 255, 0))
 
             for i in range(5):
                 x, y, option_name = self.sheet1_image_pos[i]
@@ -84,6 +101,8 @@ class Shop:
                         self.buy_button_image.clip_draw(150, 0, 150, 50, x, y)
                     else:
                         self.buy_button_image.clip_draw(0, 0, 150, 50, x, y)
+                if main_state.Data.weapon_level[self.page_number * 2 + i] < 5:
+                    self.big_font.draw(x, y + 50, '%4d' % self.sheet2_price[self.page_number * 2 + i][main_state.Data.weapon_level[self.page_number * 2 + i]],(255, 255, 0))
 
             # 무기 이미지, 이름
             for i in range(2):
@@ -96,7 +115,10 @@ class Shop:
             for i in range(2):
                 for j in range(5):
                     start_x, start_y = self.ability_box_pos[i][0] + j*60, self.ability_box_pos[i][1]
-                    self.weapon_ability_image.clip_draw(j*60, i*60 + self.page_number*120, 60, 60, start_x, start_y)
+                    if j < main_state.Data.weapon_level[self.page_number * 2 + i]:
+                        self.weapon_ability_image.clip_draw(j*60, i*60 + self.page_number*120, 60, 60, start_x, start_y)
+                    else:
+                        self.weapon_ability_image.clip_draw(j * 60 + 300, i * 60 + self.page_number * 120, 60, 60, start_x, start_y)
                     #draw_rectangle(start_x - 30, start_y - 30, start_x + 30, start_y + 30)
 
             # 페이지 이동 버튼
@@ -121,6 +143,8 @@ class Shop:
                         self.buy_button_image.clip_draw(150, 0, 150, 50, x, y)
                     else:
                         self.buy_button_image.clip_draw(0, 0, 150, 50, x, y)
+                if main_state.Data.ally_level[self.page_number * 2 + i] < 1:
+                    self.big_font.draw(x, y + 50, '%4d' % self.sheet3_price[self.page_number * 2 + i],(255, 255, 0))
 
             # 용병 이미지, 이름
             for i in range(2):
@@ -162,17 +186,24 @@ class Shop:
                 for i in range(5):
                     x, y = self.sheet1_button_pos[i]
                     if x - 75 <= mouse_x <= x + 75 and y - 25 <= mouse_y <= y + 25:
-                        main_state.Data.main_inform[i] += 1
+                        if main_state.Data.main_inform[i] < self.sheet1_price[i][0] and main_state.Data.cur_money >= self.sheet1_price[i][main_state.Data.main_inform[i]]:
+                            main_state.Data.cur_money -= self.sheet1_price[i][main_state.Data.main_inform[i]]
+                            main_state.Data.main_inform[i] += 1
                         break
             elif self.sheet_state == Weapon:
                 for i in range(2):
                     x, y = self.sheet2_button_pos[i]
                     if x - 75 <= mouse_x <= x + 75 and y - 25 <= mouse_y <= y + 25:
                         if main_state.Data.available_weapon[self.page_number * 2 + i]:
-                            main_state.Data.weapon_level[self.page_number * 2 + i] += 1
+                            if main_state.Data.weapon_level[self.page_number * 2 + i] < 5 and main_state.Data.cur_money\
+                                    >= self.sheet2_price[self.page_number * 2 + i][main_state.Data.weapon_level[self.page_number * 2 + i]]:
+                                main_state.Data.cur_money -= self.sheet2_price[self.page_number * 2 + i][main_state.Data.weapon_level[self.page_number * 2 + i]]
+                                main_state.Data.weapon_level[self.page_number * 2 + i] += 1
                         else:
-                            main_state.Data.available_weapon[self.page_number * 2 + i] = True
-                            main_state.Data.weapon_level[self.page_number * 2 + i] += 1
+                            if main_state.Data.cur_money >= self.sheet2_price[self.page_number * 2 + i][main_state.Data.weapon_level[self.page_number * 2 + i]]:
+                                main_state.Data.cur_money -= self.sheet2_price[self.page_number * 2 + i][main_state.Data.weapon_level[self.page_number * 2 + i]]
+                                main_state.Data.available_weapon[self.page_number * 2 + i] = True
+                                main_state.Data.weapon_level[self.page_number * 2 + i] += 1
                         break
                     if self.page_number == 0:
                         x, y = self.page_right_button
@@ -191,6 +222,9 @@ class Shop:
                             pass
                         else:
                             main_state.Data.available_ally[self.page_number * 2 + i] = True
+                            if main_state.Data.ally_level[self.page_number * 2 + i] < 1 and main_state.Data.cur_money >= self.sheet3_price[self.page_number * 2 + i]:
+                                main_state.Data.cur_money -= self.sheet3_price[self.page_number * 2 + i]
+                                main_state.Data.ally_level[self.page_number * 2 + i] += 1
                         break
                     if self.page_number == 0:
                         x, y = self.page_right_button
