@@ -126,8 +126,11 @@ class ReloadMan(Ally):
         if self.snow_stack == 0:
             if self.cur_state == RELOAD:
                 if self.timer >= self.reload_time:
-                    self.snow_stack += 1
-                    ReloadMan.giving_snow_queue.insert(0, self)
+                    if main_state.Data.num_ally[STORAGE] != 0 and Storage.num_ammo[0] < main_state.Data.num_ally[STORAGE] * 40:
+                        Storage.num_ammo[0] += 1
+                    else:
+                        self.snow_stack += 1
+                        ReloadMan.giving_snow_queue.insert(0, self)
                     self.timer = 0
                     self.cur_state = IDLE
                     self.frame = 0
@@ -236,10 +239,7 @@ class ThrowMan(Ally):
 
     def reload(self):
         if self.snow_stack == 0:
-            if len(ReloadMan.giving_snow_queue) > 0:
-                giver = ReloadMan.giving_snow_queue.pop()
-                giver.snow_stack -= 1
-                self.snow_stack += 1
+            if self.get_snow():
                 return BehaviorTree.SUCCESS
             else:
                 if self.cur_state == RELOAD:
@@ -369,6 +369,22 @@ class ThrowMan(Ally):
         game_world.add_object(snow.SmallSnow(self.x, self.y + 10, vx, vy, self.snow_stack), game_world.snow_layer)
         self.target.targeted = False
         self.snow_stack = 0
+
+    def get_snow(self):
+        if main_state.Data.num_ally[STORAGE] != 0:
+            if Storage.num_ammo[0] > 0:
+                Storage.num_ammo[0] -= 1
+                self.snow_stack += 1
+                return True
+
+        elif len(ReloadMan.giving_snow_queue) > 0:
+            giver = ReloadMan.giving_snow_queue.pop()
+            giver.snow_stack -= 1
+            self.snow_stack += 1
+            return True
+
+        return False
+
 
 
 
@@ -525,6 +541,7 @@ class ShovelMan(Ally):
 
 class Storage(Ally):
     image = None
+    num_ammo = [0, 0, 0]
 
     def __init__(self):
         if Ally.hp_bar == None:
@@ -578,6 +595,7 @@ class Storage(Ally):
         if self.cur_state != DEAD1 and self.cur_state != DEAD2 and self.cur_state != DEAD3:
             self.bt.run()
             self.snow_collision_check()
+            self.get_snow()
             self.frame = (self.frame + 1) % 16
         else:
             if self.out_of_sight():
@@ -597,3 +615,9 @@ class Storage(Ally):
         if self.cur_state != DEAD1:
             self.draw_hp_gauge()
 
+    def get_snow(self):
+        if Storage.num_ammo[0] < main_state.Data.num_ally[STORAGE]*40:
+            while len(ReloadMan.giving_snow_queue) > 0:
+                giver = ReloadMan.giving_snow_queue.pop()
+                giver.snow_stack -= 1
+                Storage.num_ammo[0] += 1

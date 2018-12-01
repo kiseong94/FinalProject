@@ -13,7 +13,7 @@ import main_state
 class ObjectCreator:
     def __init__(self):
         self.time = 0
-        self.enemy_queue = [(0, 0, 5000)]
+        self.enemy_queue = [(0, 1, 50000)]
 
     def update(self):
         while stage_state.base_x > self.enemy_queue[0][2]:

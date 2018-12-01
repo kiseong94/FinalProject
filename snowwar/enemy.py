@@ -42,6 +42,9 @@ class Enemy:
             if snow.vx > 0:
                 if snow.collision_object(*self.get_hit_box()):
                     self.hit_by_snow(snow)
+                    if snow.type == 3 and main_state.Data.weapon_level[3] >= 3:
+                        self.x += 25
+
 
 
     def get_hit_box(self):

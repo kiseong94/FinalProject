@@ -40,9 +40,9 @@ class UI:
         self.image.draw(self.x, self.y)
 
         self.player_inform.draw(30, 160, '체 력 LV.%d' % main_state.Data.main_inform[0], (0, 0, 0))
-        self.player_inform.draw(30, 130, '장전 속도 LV.%d'% main_state.Data.main_inform[1], (0, 0, 0))
-        self.player_inform.draw(30, 100, '던지는 힘 LV.%d'% main_state.Data.main_inform[2], (0, 0, 0))
-        self.player_inform.draw(30, 70, '눈벽 보수 LV.%d'% main_state.Data.main_inform[3], (0, 0, 0))
+        self.player_inform.draw(30, 130, '장전 속도 LV.%d' % main_state.Data.main_inform[1], (0, 0, 0))
+        self.player_inform.draw(30, 100, '던지는 힘 LV.%d' % main_state.Data.main_inform[2], (0, 0, 0))
+        self.player_inform.draw(30, 70, '눈벽 보수 LV.%d' % main_state.Data.main_inform[3], (0, 0, 0))
         self.player_inform.draw(30, 40, '눈벽 레벨 LV.%d' % main_state.Data.main_inform[4], (0, 0, 0))
 
         for i in range(4):
@@ -78,6 +78,9 @@ class UI:
         elif stage_state.player.weapon_type == main_character.BUCKET:
             self.select_image.draw(300 + 450, 95)
 
+        if main_state.Data.num_ally[3] != 0:
+            self.font.draw(1500, 100, '%d' %ally.Storage.num_ammo[0], (0,0,0))
+
         if self.ally_inform_num != None:
             self.font.draw(self.mouse_x + 20, self.mouse_y, self.ally_button_pos[self.ally_inform_num][2], (0, 0, 0))
 
@@ -86,34 +89,7 @@ class UI:
         self.coin_image.draw(1280, 855)
         self.big_font.draw(1350, 850, '%6d' % main_state.Data.cur_money, (0, 0, 0))
 
-        if self.game_state == START:
-            self.start_image.draw(800, 450, 1600, 900)
-            if self.timer >= 100:
-                self.game_state = RUNNING
-            elif self.timer >= 50:
-                opacity = 1 - (self.timer - 50)/50
-                self.start_image.opacify(opacity)
-            else:
-                self.big_font.draw(650, 450, 'stage %d' %main_state.stage_num, (255, 255, 255))
-        elif self.game_state == END:
-            if self.timer >= 100:
-                game_framework.pop_state()
-                self.start_image.draw(800, 450, 1600, 900)
-            elif self.timer >= 50:
-                opacity = (self.timer - 50) / 50
-                self.start_image.opacify(opacity)
-                self.start_image.draw(800, 450, 1600, 900)
-            else:
-                self.biggest_font.draw(630, 450, '승리!', (0, 0, 0))
-        elif self.game_state == FAIL:
-            if self.timer >= 100:
-                self.start_image.draw(800, 450, 1600, 900)
-            elif self.timer >= 0:
-                opacity = self.timer / 100
-                self.start_image.opacify(opacity)
-                self.start_image.draw(800, 450, 1600, 900)
-
-
+        self.fading()
 
 
 
@@ -169,6 +145,7 @@ class UI:
                 game_world.add_object(ally.ShovelMan(), game_world.player_layer)
             if type == 3:
                 game_world.add_object(ally.Storage(), game_world.player_layer)
+
             main_state.Data.cur_money -= self.ally_price[type]
             main_state.Data.num_ally[type] += 1
 
@@ -180,4 +157,30 @@ class UI:
         self.progress_pointer.draw(800 - 550/2 + t*2, 870 - 20)
         self.font.draw(800 - 550/2 + t*2 - 10, 870 - 50, '%dm' % cur_distance, (0, 0, 0))
 
-
+    def fading(self):
+        if self.game_state == START:
+            self.start_image.draw(800, 450, 1600, 900)
+            if self.timer >= 100:
+                self.game_state = RUNNING
+            elif self.timer >= 50:
+                opacity = 1 - (self.timer - 50)/50
+                self.start_image.opacify(opacity)
+            else:
+                self.big_font.draw(650, 450, 'stage %d' %main_state.stage_num, (255, 255, 255))
+        elif self.game_state == END:
+            if self.timer >= 100:
+                game_framework.pop_state()
+                self.start_image.draw(800, 450, 1600, 900)
+            elif self.timer >= 50:
+                opacity = (self.timer - 50) / 50
+                self.start_image.opacify(opacity)
+                self.start_image.draw(800, 450, 1600, 900)
+            else:
+                self.biggest_font.draw(630, 450, '승리!', (0, 0, 0))
+        elif self.game_state == FAIL:
+            if self.timer >= 100:
+                self.start_image.draw(800, 450, 1600, 900)
+            elif self.timer >= 0:
+                opacity = self.timer / 100
+                self.start_image.opacify(opacity)
+                self.start_image.draw(800, 450, 1600, 900)

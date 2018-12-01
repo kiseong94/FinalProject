@@ -14,6 +14,7 @@ class Shop:
         self.upgrade_button_image = load_image('image\\shop\\upgrade_button.png')
         self.buy_button_image = load_image('image\\shop\\buy_button.png')
         self.weapon_ability_image = load_image('image\\shop\\weapon_ability.png')
+        self.page_button_image = load_image('image\\shop\\page_move_button.png')
         self.mouse_on_button = None
         self.page_number = 0
         self.inform_num = None
@@ -123,11 +124,9 @@ class Shop:
 
             # 페이지 이동 버튼
             if self.page_number == 0:
-                draw_rectangle(self.page_right_button[0] - 25, self.page_right_button[1] - 100,
-                               self.page_right_button[0] + 25, self.page_right_button[1] + 100)
+                self.page_button_image.draw(self.page_right_button[0],self.page_right_button[1])
             elif self.page_number == 1:
-                draw_rectangle(self.page_left_button[0] - 25, self.page_left_button[1] - 100,
-                               self.page_left_button[0] + 25, self.page_left_button[1] + 100)
+                self.page_button_image.composite_draw(0,'h',self.page_left_button[0],self.page_left_button[1])
 
         elif self.sheet_state == Ally:
             # 구매, 업그레이드 버튼
@@ -155,11 +154,9 @@ class Shop:
 
             # 페이지 이동 버튼
             if self.page_number == 0:
-                draw_rectangle(self.page_right_button[0] - 25, self.page_right_button[1] - 100,
-                               self.page_right_button[0] + 25, self.page_right_button[1] + 100)
+                self.page_button_image.draw(self.page_right_button[0],self.page_right_button[1])
             elif self.page_number == 1:
-                draw_rectangle(self.page_left_button[0] - 25, self.page_left_button[1] - 100,
-                               self.page_left_button[0] + 25, self.page_left_button[1] + 100)
+                self.page_button_image.composite_draw(0,'h',self.page_left_button[0],self.page_left_button[1])
 
 
 

@@ -93,7 +93,12 @@ class ReloadState:
     def do(character):
         character.frame = (character.frame + 1) % 16
         if character.weapon_type == BUCKET:
-            if character.timer == character.reload_time*2:
+            if character.bucket_fast_reload:
+                bucket_reload_time = character.reload_time * 2
+            else:
+                bucket_reload_time = character.reload_time * 3
+
+            if character.timer == bucket_reload_time:
                 character.num_ammo[character.weapon_type] += 1
                 character.add_event(TIME_UP)
             else:
@@ -322,6 +327,7 @@ class Character:
         self.throw_degree = 0
         self.snow_stack = 0
         self.max_snow_stack = main_state.Data.get_player_snow_inform(game_data.MAX_SNOW_STACK)
+        self.bucket_fast_reload = main_state.Data.get_player_bucket_inform(game_data.FAST_RELOAD)
         self.weapon_type = SNOW
         self.num_ammo = [0, 0, 30, 1]
         self.targeted = False
@@ -400,14 +406,27 @@ class Character:
 
     def get_snow(self):
         if self.snow_stack == 0 and self.num_ammo[SNOW] == 0:
-            if len(ally.ReloadMan.giving_snow_queue) > 0:
+            if main_state.Data.num_ally[ally.STORAGE] != 0:
+                if ally.Storage.num_ammo[0] > 0:
+                    ally.Storage.num_ammo[0] -= 1
+                    self.snow_stack += 1
+                    self.num_ammo[SNOW] += 1
+
+            elif len(ally.ReloadMan.giving_snow_queue) > 0:
+                giver = ally.ReloadMan.giving_snow_queue.pop()
+                giver.snow_stack -= 1
                 self.snow_stack += 1
                 self.num_ammo[SNOW] += 1
-                giver = ally.ReloadMan.giving_snow_queue.pop()
-                giver.snow_stack = 0
 
     def draw_reloading_gauge(self):
-        t = 50 * self.timer // self.reload_time//2
+        if self.weapon_type == BUCKET:
+            if self.bucket_fast_reload:
+                t = 50 * self.timer // self.reload_time // 4
+            else:
+                t = 50 * self.timer // self.reload_time // 6
+
+        else:
+            t = 50 * self.timer // self.reload_time//2
 
 
         self.reloading_gauge.clip_draw(0, 0, 4, 10, self.x - stage_state.base_x - 27, self.y + 20)

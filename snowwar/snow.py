@@ -28,6 +28,7 @@ class Snow:
 
     def collision_ground(self):
         if self.y < 260:
+            self.y = 260
             self.vx, self.vy = 0, 0
             self.cur_state = HIT
             self.frame = 0
@@ -103,7 +104,11 @@ class BigSnow(Snow):
         if self.cur_state == FLY:
             self.image.draw(self.x - stage_state.base_x, self.y, 10 + (self.size - 1)*6, 10 + (self.size - 1)*6)
         elif self.cur_state == HIT:
-            self.destroy_image.clip_draw((self.frame//3)*80, 0, 80, 80, self.x-stage_state.base_x, self.y, 80 + (self.size - 1)*6, 80 + (self.size - 1)*6)
+            if self.wide_splash_range:
+                self.destroy_image.clip_draw((self.frame // 3) * 80, 0, 80, 80, self.x - stage_state.base_x, self.y,
+                                             100 + (self.size - 1) * 6, 100 + (self.size - 1) * 6)
+            else:
+                self.destroy_image.clip_draw((self.frame//3)*80, 0, 80, 80, self.x-stage_state.base_x, self.y, 80 + (self.size - 1)*6, 80 + (self.size - 1)*6)
 
     def collision_object(self, left, top, right, bottom):
         if self.cur_state == FLY:
@@ -138,7 +143,10 @@ class BigSnow(Snow):
                 self.frame = self.frame + 1
 
     def get_hit_box(self):
-        return self.x - 20, self.y + 10, self.x + 40, self.y - 40
+        if self.wide_splash_range:
+            return self.x - 30, self.y + 30, self.x + 60, self.y - 40
+        else:
+            return self.x - 20, self.y + 10, self.x + 40, self.y - 40
 
 class StoneSnow(Snow):
     image = None
@@ -236,13 +244,19 @@ class SpreadSnow(Snow):
         if SpreadSnow.destroy_image == None:
             SpreadSnow.destroy_image = load_image('image\\snows\\spread_snow.png')
         self.x, self.y = x, y
+        self.damage = main_state.Data.get_player_bucket_inform(game_data.DAMAGE)
+        self.armor_piercing_point = 0
         self.vx = 1
         self.cur_state = HIT
         self.frame = 0
         self.type = 3
+        self.wide_splash = main_state.Data.get_player_bucket_inform(game_data.SPLASH_RANGE)
 
     def draw(self):
-        self.destroy_image.clip_draw((self.frame//3)*120, 0, 120, 60, self.x-stage_state.base_x, self.y)
+        if self.wide_splash:
+            self.destroy_image.clip_draw((self.frame // 3) * 120, 0, 120, 60, self.x - stage_state.base_x + 15, self.y + 5, 150, 70)
+        else:
+            self.destroy_image.clip_draw((self.frame//3)*120, 0, 120, 60, self.x-stage_state.base_x, self.y)
         #draw_rectangle(*self.get_hit_box())
 
     def collision_object(self, left, top, right, bottom):
@@ -256,12 +270,22 @@ class SpreadSnow(Snow):
         else:
             self.frame = self.frame + 1
 
-
-
     def get_hit_box(self):
-        if 0 == self.frame:
-            return self.x - 60, self.y + 30, self.x - 20, self.y - 30
-        elif 10 == self.frame:
-            return self.x - 20, self.y + 30, self.x + 20, self.y - 30
-        elif 20 == self.frame:
-            return self.x + 20, self.y + 30, self.x + 60, self.y - 30
+        if self.wide_splash:
+            if 0 == self.frame:
+                return self.x - 50, self.y + 30, self.x - 10, self.y - 30
+            elif 10 == self.frame:
+                return self.x - 10, self.y + 30, self.x + 30, self.y - 30
+            elif 20 == self.frame:
+                return self.x + 30, self.y + 30, self.x + 70, self.y - 30
+            else:
+                return 0, 0, 0, 0
+        else:
+            if 0 == self.frame:
+                return self.x - 60, self.y + 30, self.x - 20, self.y - 30
+            elif 10 == self.frame:
+                return self.x - 20, self.y + 30, self.x + 20, self.y - 30
+            elif 20 == self.frame:
+                return self.x + 20, self.y + 30, self.x + 60, self.y - 30
+            else:
+                return 0, 0, 0, 0

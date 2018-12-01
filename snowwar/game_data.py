@@ -1,6 +1,7 @@
 
 SNOW, STONE_SNOW, ICICLE, BUCKET, HP, THROW_POWER, RELOAD_SPEED, SHOVEL_POWER, WALL_LEVEL, MAX_SNOW_STACK,\
-SPLASH_DAMAGE, SPLASH_RANGE, PIERCING_NUM, DAMAGE, CRITICAL_CHANCE, PIERCING_ARMOR, PIERCING_WALL, DESTROY_ARMOR = range(18)
+SPLASH_DAMAGE, SPLASH_RANGE, PIERCING_NUM, DAMAGE, CRITICAL_CHANCE, PIERCING_ARMOR, PIERCING_WALL, DESTROY_ARMOR,\
+FAST_RELOAD, KNOW_BACK = range(20)
 
 
 class Data:
@@ -14,8 +15,8 @@ class Data:
         self.ally_level = [1, 0, 0, 0, 0]
         self.num_ally = [0, 0, 0, 0]
 
-        self.total_money = 5000
-        self.cur_money = 5000
+        self.total_money = 0
+        self.cur_money = 10000
 
 
     def get_player_inform(self,option):
@@ -90,4 +91,23 @@ class Data:
 
 
     def get_player_bucket_inform(self, option):
-        pass
+        if option == FAST_RELOAD:
+            if self.weapon_level[BUCKET] >= 2:
+                return True
+            else:
+                return False
+        elif option == KNOW_BACK:
+            if self.weapon_level[BUCKET] >= 3:
+                return True
+            else:
+                return False
+        elif option == DAMAGE:
+            if self.weapon_level[BUCKET] >= 4:
+                return 2
+            else:
+                return 1
+        elif option == SPLASH_RANGE:
+            if self.weapon_level[BUCKET] >= 5:
+                return True
+            else:
+                return False
