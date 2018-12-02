@@ -210,6 +210,7 @@ class StoneSnow(Snow):
                     self.x = left
                 else:
                     self.x = right
+                self.piercing_num -= 1
                 if self.piercing_num == 0:
                     self.cur_state = HIT
                 self.snow_hit.play()

@@ -62,8 +62,6 @@ class ObjectCreator:
                         if distance <= self.enemy_queue[k][2]:
                             self.enemy_queue.insert(k, (enemy_type, level, distance))
                             break
-        print(self.enemy_queue)
-
         return stage_distance
 
     def clear(self):

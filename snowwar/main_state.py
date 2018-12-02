@@ -37,8 +37,7 @@ def enter():
     small_font = load_font('font\\neodgm.ttf', 40)
     Data = game_data.Data()
     Shop = shop.Shop()
-    if Data.stage_num == 1:
-        game_framework.push_state(stage_state)
+
 
 def exit():
     pass

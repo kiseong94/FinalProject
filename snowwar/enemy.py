@@ -78,7 +78,9 @@ class Enemy:
             return self.x - 10, self.y + 20, self.x + 10, self.y - 25
 
     def hit_by_snow(self, snow):
-        self.hit_sound.play()
+        if not isinstance(self, EnemyType5):
+            self.hit_sound.play()
+
         if snow.type == 1:
             if snow.critical_chance >= random.randint(0, 100):
                 damage = snow.damage * 2

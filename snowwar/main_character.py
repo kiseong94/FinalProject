@@ -373,8 +373,16 @@ class Character:
         self.cur_state.draw(self)
 
     def throw(self):
-        bias_x = (self.aim_base_x - self.aim_draw_x) / (self.aim_base_x - self.aim_draw_x + self.aim_base_y - self.aim_draw_y)
-        bias_y = (self.aim_base_y - self.aim_draw_y) / (self.aim_base_x - self.aim_draw_x + self.aim_base_y - self.aim_draw_y)
+        if self.aim_base_x - self.aim_draw_x + self.aim_base_y - self.aim_draw_y == 0:
+            bias_x = (self.aim_base_x - self.aim_draw_x) / (self.aim_base_x - self.aim_draw_x + self.aim_base_y - self.aim_draw_y) + 1
+        else:
+            bias_x = (self.aim_base_x - self.aim_draw_x) / (
+                        self.aim_base_x - self.aim_draw_x + self.aim_base_y - self.aim_draw_y)
+        if self.aim_base_x - self.aim_draw_x + self.aim_base_y - self.aim_draw_y == 0:
+            bias_y = (self.aim_base_y - self.aim_draw_y) / (
+                        self.aim_base_x - self.aim_draw_x + self.aim_base_y - self.aim_draw_y) + 1
+        else:
+            bias_y = (self.aim_base_y - self.aim_draw_y) / (self.aim_base_x - self.aim_draw_x + self.aim_base_y - self.aim_draw_y)
         if self.weapon_type == SNOW:
             if self.snow_stack < 3:
                 game_world.add_object(snow.SmallSnow(self.x, self.y + 15,

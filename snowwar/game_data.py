@@ -16,7 +16,7 @@ class Data:
         self.num_ally = [0, 0, 0, 0]
         self.stage_num = 1
         self.total_money = 0
-        self.cur_money = 0
+        self.cur_money = 10000
 
 
     def get_player_inform(self,option):

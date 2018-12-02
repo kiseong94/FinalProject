@@ -12,6 +12,7 @@ import main_state
 import object_creator
 import interface
 import pause_state
+import ally
 
 
 name = "StageState"
@@ -48,6 +49,8 @@ def enter():
 def exit():
     global player, background, ui
     game_world.clear()
+    ally.ReloadMan.giving_snow_queue.clear()
+    ally.Storage.num_ammo[0] = 0
 
 
 
