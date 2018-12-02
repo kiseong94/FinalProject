@@ -3,7 +3,7 @@ import start_state
 import game_framework
 import game_data
 import shop
-import math
+import main_state
 
 from pico2d import *
 
@@ -12,7 +12,6 @@ SHOP_BUTTON, START_BUTTON = range(2)
 name = "MainState"
 Data = None
 Shop = None
-stage_num = 4
 IsShopOpened = False
 map = None
 stage = None
@@ -22,19 +21,24 @@ arrow_image = None
 font = None
 small_font = None
 button_on = None
+bgm = None
 
 def enter():
     global Shop
-    global Data, map, stage, shop_button_image, font,small_font, arrow_image,stage_button_image
+    global Data, map, stage, shop_button_image, font,small_font, arrow_image,stage_button_image,click_sound,bgm
     map = load_image('image\\ui\\map.png')
     stage = load_image('image\\ui\\stage.png')
     shop_button_image = load_image('image\\ui\\shop_button.png')
     stage_button_image = load_image('image\\ui\\stage_button.png')
     arrow_image = load_image('image\\ui\\arrow.png')
+    bgm = load_music('sound\\main_bgm.mp3')
+    click_sound = load_wav('sound\\button.wav')
     font = load_font('font\\neodgm.ttf',60)
     small_font = load_font('font\\neodgm.ttf', 40)
     Data = game_data.Data()
     Shop = shop.Shop()
+    if Data.stage_num == 1:
+        game_framework.push_state(stage_state)
 
 def exit():
     pass
@@ -44,11 +48,12 @@ def pause():
 
 
 def resume():
-    pass
+    global bgm
+    bgm.play()
 
 
 def handle_events():
-    global IsShopOpened, button_on
+    global IsShopOpened, button_on,click_sound
     global Shop
     events = get_events()
     for event in events:
@@ -56,12 +61,15 @@ def handle_events():
             game_framework.quit()
         elif event.type == SDL_MOUSEBUTTONDOWN and event.button == SDL_BUTTON_LEFT:
             if button_on == SHOP_BUTTON:
+                click_sound.play()
                 if IsShopOpened:
                     IsShopOpened = False
                 else:
                     IsShopOpened = True
             elif button_on == START_BUTTON:
+                click_sound.play()
                 game_framework.push_state(stage_state)
+                bgm.stop()
                 IsShopOpened = False
 
         elif event.type == SDL_MOUSEMOTION:
@@ -92,20 +100,20 @@ def draw():
         for j in range(6):
             x, y = 200 + 240*j, 750 - 180*i
 
-            if stage_num > (i*6 + j +1):
+            if main_state.Data.stage_num > (i*6 + j +1):
                 stage.clip_draw(50, 0, 50, 50, 200 + 240 * j, 750 - 180 * i, 120, 120)
                 small_font.draw(x - 50, y, 'clear', (255, 255, 255))
             else:
 
                 stage.clip_draw(0, 0, 50, 50, 200 + 240*j, 750 - 180*i, 120, 120)
-                if (i*6 + j +1)/10<1:
+                if (i*6 + j +1)/10 < 1:
                     font.draw(x - 40, y, '%2d' % (i * 6 + j + 1), (255, 255, 255))
                 else:
-                    font.draw(x - 30, y, '%2d'% (i*6 + j +1), (255, 255, 255))
-                if stage_num == (i * 6 + j + 1):
-                    arrow_image.draw(x, y + 80 , 60, 100)
+                    font.draw(x - 30, y, '%2d'% (i*6 + j + 1), (255, 255, 255))
+                if main_state.Data.stage_num == (i * 6 + j + 1):
+                    arrow_image.draw(x, y + 80, 60, 100)
     if button_on == SHOP_BUTTON:
-        shop_button_image.clip_draw(150,0,150,150,70,70,200,200)
+        shop_button_image.clip_draw(150, 0, 150, 150, 70, 70, 200, 200)
     else:
         shop_button_image.clip_draw(0, 0, 150, 150, 70, 70, 200, 200)
 

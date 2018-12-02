@@ -14,6 +14,29 @@ LEFT, RIGHT = range(2)
 class Enemy:
     hp_gauge = None
     hp_bar = None
+    armor_image = None
+    hit_sound = None
+    throw_sound = None
+    reload_sound = None
+    make_wall_sound = None
+    melee_attack_sound = None
+
+    def load_sound(self):
+        if Enemy.hit_sound == None:
+            Enemy.hit_sound = load_wav('sound\\hit.ogg')
+        if Enemy.throw_sound == None:
+            Enemy.throw_sound = load_wav('sound\\throw.ogg')
+        if Enemy.reload_sound == None:
+            Enemy.reload_sound = load_wav('sound\\reload.ogg')
+            Enemy.reload_sound.set_volume(20)
+        if Enemy.make_wall_sound == None:
+            Enemy.make_wall_sound = load_wav('sound\\makewall.ogg')
+            Enemy.make_wall_sound.set_volume(30)
+        if Enemy.melee_attack_sound == None:
+            Enemy.melee_attack_sound = load_wav('sound\\melee_hit.ogg')
+            Enemy.melee_attack_sound.set_volume(20)
+
+
 
     def change_state(self, state):
         self.cur_state = state
@@ -21,6 +44,7 @@ class Enemy:
         self.frame = 0
 
     def throw_snow(self):
+        self.throw_sound.play()
         distance = self.x - self.target.x + random.randint(-150, 100)
         vx = random.randint(18, 22)
         t = distance/vx
@@ -54,7 +78,7 @@ class Enemy:
             return self.x - 10, self.y + 20, self.x + 10, self.y - 25
 
     def hit_by_snow(self, snow):
-
+        self.hit_sound.play()
         if snow.type == 1:
             if snow.critical_chance >= random.randint(0, 100):
                 damage = snow.damage * 2
@@ -89,6 +113,9 @@ class Enemy:
         if self.hp > 0:
             self.hp_gauge.draw(self.x - stage_state.base_x - 15 + t, self.y - 50, t * 2, 5)
 
+        if self.armor > 0:
+            self.armor_image.draw(self.x - stage_state.base_x - 10, self.y - 60)
+
 ####################################################################################################################################
 ####################################################################################################################################
 
@@ -102,23 +129,26 @@ class EnemyType1(Enemy):
             Enemy.hp_bar = load_image('image\\ui\\hp_bar.png')
         if Enemy.hp_gauge == None:
             Enemy.hp_gauge = load_image('image\\ui\\hp_gauge.png')
-        self.hp = level
-        self.max_hp = level
+        if Enemy.armor_image == None:
+            Enemy.armor_image = load_image('image\\ui\\armor.png')
+        self.load_sound()
+        self.hp = 1 + level//3
+        self.max_hp = 1 + level//3
         self.armor = 0
         self.velocity = -2
         self.cur_state = MOVE
         self.x, self.y = position, 30 + 260
-        self.frame = 0
+        self.frame = random.randint(0,15)
         self.reload_time = 80
         self.aim_time = 30
-        self.range = 1000 + (level * 100)
+        self.range = 800 + (level * 100)
         self.timer = 0
         self.target_position = random.randint(800 + level*100, 1200 + level * 100)
         self.is_target_position_set = True
         self.snow_stack = 0
         self.build_behavior_tree()
         self.target = None
-        self.money = 20 + level * 30
+        self.money = 50 + level * 30
         self.targeted = False
 
     def check_range(self):
@@ -133,6 +163,7 @@ class EnemyType1(Enemy):
         else:
             if self.cur_state != RELOAD:
                 self.change_state(RELOAD)
+                self.reload_sound.play()
             else:
                 if self.timer >= self.reload_time:
                     self.snow_stack = 1
@@ -276,18 +307,21 @@ class EnemyType2(Enemy):
             Enemy.hp_bar = load_image('image\\ui\\hp_bar.png')
         if Enemy.hp_gauge == None:
             Enemy.hp_gauge = load_image('image\\ui\\hp_gauge.png')
-        self.hp = 1 + level
-        self.max_hp = 1 + level
+        if Enemy.armor_image == None:
+            Enemy.armor_image = load_image('image\\ui\\armor.png')
+        self.load_sound()
+        self.hp = level
+        self.max_hp = level
         self.armor = 0
         self.velocity = -2
         self.cur_state = MOVE
         self.x, self.y = 1800 + stage_state.base_x, 30 + 260
         self.range = 60
-        self.frame = 0
+        self.frame = random.randint(0,15)
         self.timer = 0
         self.build_behavior_tree()
         self.target = None
-        self.money = 40 + level*40
+        self.money = 80 + level*40
         self.targeted = False
 
     def move(self):
@@ -317,6 +351,7 @@ class EnemyType2(Enemy):
             if self.timer >= 16:
                 if not self.target.cur_state == DEAD1:
                     self.target.hit_by_melee(1)
+                    self.melee_attack_sound.play()
                 self.timer = 0
                 return BehaviorTree.SUCCESS
             else:
@@ -377,6 +412,9 @@ class EnemyType3(Enemy):
             Enemy.hp_bar = load_image('image\\ui\\hp_bar.png')
         if Enemy.hp_gauge == None:
             Enemy.hp_gauge = load_image('image\\ui\\hp_gauge.png')
+        if Enemy.armor_image == None:
+            Enemy.armor_image = load_image('image\\ui\\armor.png')
+        self.load_sound()
         self.hp = 1 + level
         self.max_hp = 1 + level
         self.armor = 1
@@ -384,7 +422,7 @@ class EnemyType3(Enemy):
         self.cur_state = MOVE
         self.x, self.y = 1800 + stage_state.base_x, 30 + 260
         self.range = 60
-        self.frame = 0
+        self.frame = random.randint(0,15)
         self.timer = 0
         self.build_behavior_tree()
         self.target = None
@@ -394,7 +432,7 @@ class EnemyType3(Enemy):
         self.wall_pos = random.randint(900, 1450)
         self.is_wall_built = False
         self.my_wall = None
-        self.money = 60 + level * 50
+        self.money = 100 + level * 50
         self.targeted = False
 
     def check_wall_build_position(self):
@@ -421,6 +459,7 @@ class EnemyType3(Enemy):
             if self.timer >= self.shoveling_time:
                 self.timer = 0
                 self.create_and_strengthen_wall()
+                self.make_wall_sound.play()
                 if self.my_wall.hp >= self.my_wall.max_hp:
                     return BehaviorTree.FAIL
             else:
@@ -455,6 +494,7 @@ class EnemyType3(Enemy):
             if self.timer >= 16:
                 if not self.target.cur_state == DEAD1:
                     self.target.hit_by_melee(1)
+                    self.melee_attack_sound.play()
                 self.timer = 0
                 return BehaviorTree.SUCCESS
             else:
@@ -540,6 +580,9 @@ class EnemyType4(Enemy):
             Enemy.hp_bar = load_image('image\\ui\\hp_bar.png')
         if Enemy.hp_gauge == None:
             Enemy.hp_gauge = load_image('image\\ui\\hp_gauge.png')
+        if Enemy.armor_image == None:
+            Enemy.armor_image = load_image('image\\ui\\armor.png')
+        self.load_sound()
         self.hp = level
         self.max_hp = level
         self.armor = 0
@@ -547,7 +590,7 @@ class EnemyType4(Enemy):
         self.dir = LEFT
         self.cur_state = MOVE
         self.x, self.y = 1800 + stage_state.base_x, 30 + 260
-        self.frame = 0
+        self.frame = random.randint(0,15)
         self.reload_time = 80
         self.aim_time = 30
         self.range = 1200 + (level * 50)
@@ -558,7 +601,7 @@ class EnemyType4(Enemy):
         self.build_behavior_tree()
         self.target = None
         self.cover = False
-        self.money = 30 + level * 40
+        self.money = 50 + level * 40
         self.targeted = False
 
     def find_cover(self):
@@ -574,6 +617,7 @@ class EnemyType4(Enemy):
             if self.x >= self.target_position:
                 self.dir = LEFT
                 self.x -= self.velocity
+
                 if self.x < self.target_position:
                     self.cover = True
                     return BehaviorTree.SUCCESS
@@ -602,6 +646,7 @@ class EnemyType4(Enemy):
         else:
             if self.cur_state != RELOAD:
                 self.change_state(RELOAD)
+                self.reload_sound.play()
             else:
                 if self.timer >= self.reload_time:
                     self.snow_stack = 1
@@ -759,6 +804,9 @@ class EnemyType5(Enemy):
             Enemy.hp_bar = load_image('image\\ui\\hp_bar.png')
         if Enemy.hp_gauge == None:
             Enemy.hp_gauge = load_image('image\\ui\\hp_gauge.png')
+        if Enemy.armor_image == None:
+            Enemy.armor_image = load_image('image\\ui\\armor.png')
+        self.load_sound()
         self.hp = 1
         self.max_hp = 1
         self.armor = 0
@@ -766,11 +814,11 @@ class EnemyType5(Enemy):
         self.cur_state = MOVE
         self.x, self.y = 1800 + stage_state.base_x, 30 + 260
         self.range = 30
-        self.frame = 0
+        self.frame = random.randint(0,15)
         self.timer = 0
         self.build_behavior_tree()
         self.target = None
-        self.money = 50 + level*30
+        self.money = 90 + level*30
         self.targeted = False
         self.push_point = 1000 + random.randint(-100, 100)
         self.is_divided = False

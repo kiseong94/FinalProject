@@ -14,16 +14,16 @@ class Data:
         self.weapon_level = [1, 0, 0, 0, 0]
         self.ally_level = [1, 0, 0, 0, 0]
         self.num_ally = [0, 0, 0, 0]
-
+        self.stage_num = 1
         self.total_money = 0
-        self.cur_money = 10000
+        self.cur_money = 0
 
 
     def get_player_inform(self,option):
         if option == HP:
             return 5 + self.main_inform[0]*3
         elif option == THROW_POWER:
-            return 280 + self.main_inform[1] * 10
+            return 240 + self.main_inform[1] * 12
         elif option == RELOAD_SPEED:
             return 50 - self.main_inform[2] * 5
         elif option == SHOVEL_POWER:

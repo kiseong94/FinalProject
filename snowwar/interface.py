@@ -16,6 +16,7 @@ class UI:
         self.weapon_image = load_image('image\\ui\\weapon.png')
         self.weapon_locked_image = load_image('image\\ui\\weapon_locked.png')
         self.select_image = load_image('image\\ui\\select.png')
+        self.snow_image = load_image('image\\ui\\snow.png')
         self.progress_pointer = load_image('image\\ui\\progress_pointer.png')
         self.stage_progress_bar = load_image('image\\ui\\stage_progress_bar.png')
         self.stage_progress_gauge = load_image('image\\ui\\stage_progress_gauge.png')
@@ -27,8 +28,14 @@ class UI:
         self.big_font = load_font('font\\neodgm.ttf', 60)
         self.player_inform = load_font('font\\neodgm.ttf', 20)
         self.biggest_font = load_font('font\\neodgm.ttf', 120)
+        self.start_sound = load_wav('sound\\stage_start.ogg')
+        self.fail_sound = load_music('sound\\stage_fail.mp3')
+        self.victory_sound = load_wav('sound\\victory.ogg')
+        self.victory_sound.set_volume(25)
+
+        self.bgm = load_music('sound\\stage_bgm.mp3')
         self.x, self.y = 800, 100
-        self.ally_price = [150, 300, 700, 800]
+        self.ally_price = [250, 500, 800, 800]
         self.game_state = 0
         self.timer = 0
 
@@ -62,6 +69,7 @@ class UI:
             x, y, = self.ally_button_pos[i][0], self.ally_button_pos[i][1]
             if main_state.Data.available_ally[i]:
                 self.ally_button_image.clip_draw(i*70, 0, 70, 70, x, y)
+                self.font.draw(x-20, y-50, '%d' %self.ally_price[i], (255,255,0))
             else:
                 self.ally_button_locked_image.draw(x, y)
 
@@ -79,7 +87,9 @@ class UI:
             self.select_image.draw(300 + 450, 95)
 
         if main_state.Data.num_ally[3] != 0:
-            self.font.draw(1500, 100, '%d' %ally.Storage.num_ammo[0], (0,0,0))
+            self.font.draw(1450, 150, '저장소', (0, 0, 0))
+            self.snow_image.draw(1440, 100, 30, 30)
+            self.font.draw(1500, 100, '%3d개' %ally.Storage.num_ammo[0], (0, 0, 0))
 
         if self.ally_inform_num != None:
             self.font.draw(self.mouse_x + 20, self.mouse_y, self.ally_button_pos[self.ally_inform_num][2], (0, 0, 0))
@@ -95,21 +105,29 @@ class UI:
 
     def update(self):
         self.timer += 1
+
+        if self.game_state == RUNNING and self.timer == 200:
+            self.bgm.set_volume(50)
+            self.bgm.repeat_play()
         if self.game_state == RUNNING and stage_state.base_x >= stage_state.end_point:
             self.game_end()
 
     def game_start(self):
         self.timer = 0
         self.game_state = START
+        self.start_sound.play()
 
     def game_end(self):
         self.timer = 0
-        main_state.stage_num += 1
+        main_state.Data.stage_num += 1
         self.game_state = END
+        self.victory_sound.play()
 
     def game_fail(self):
         self.timer = 0
         self.game_state = FAIL
+        self.fail_sound.set_volume(80)
+        self.fail_sound.play()
 
 
     def handle_event(self, event):
@@ -150,7 +168,9 @@ class UI:
             main_state.Data.num_ally[type] += 1
 
     def draw_stage_progress_bar(self):
-        t = 550 * stage_state.base_x // stage_state.end_point // 2
+        gauge_bar_pos = clamp(0, stage_state.base_x, stage_state.end_point)
+
+        t = 550 * gauge_bar_pos // stage_state.end_point // 2
         cur_distance = stage_state.base_x//stage_state.PIXEL_PER_METER
         self.stage_progress_bar.draw(800, 870)
         self.stage_progress_gauge.draw(800 - 550/2 + t, 870-2, t * 2, 6)
@@ -166,7 +186,7 @@ class UI:
                 opacity = 1 - (self.timer - 50)/50
                 self.start_image.opacify(opacity)
             else:
-                self.big_font.draw(650, 450, 'stage %d' %main_state.stage_num, (255, 255, 255))
+                self.big_font.draw(650, 450, 'stage %d' %main_state.Data.stage_num, (255, 255, 255))
         elif self.game_state == END:
             if self.timer >= 100:
                 game_framework.pop_state()

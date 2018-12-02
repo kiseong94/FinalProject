@@ -13,8 +13,27 @@ LEFT, RIGHT = range(2)
 class Ally:
     hp_bar = None
     hp_gauge = None
+    hit_sound = None
+    throw_sound = None
+    reload_sound = None
+    make_wall_sound = None
+    melee_attack_sound = None
+
+    def load_sound(self):
+        if Ally.hit_sound == None:
+            Ally.hit_sound = load_wav('sound\\hit.ogg')
+        if Ally.throw_sound == None:
+            Ally.throw_sound = load_wav('sound\\throw.ogg')
+        if Ally.reload_sound == None:
+            Ally.reload_sound = load_wav('sound\\reload.ogg')
+            Ally.reload_sound.set_volume(20)
+        if Ally.make_wall_sound == None:
+            Ally.make_wall_sound = load_wav('sound\\makewall.ogg')
+            Ally.make_wall_sound.set_volume(30)
+
 
     def hit_by_snow(self, snow):
+        self.hit_sound.play()
         if self.hp > 0:
             self.hp -= snow.damage
 
@@ -23,6 +42,7 @@ class Ally:
 
 
     def hit_by_melee(self, damage):
+        self.hit_sound.play()
         if self.hp > 0:
             self.hp -= damage
 
@@ -86,6 +106,7 @@ class ReloadMan(Ally):
             Ally.hp_gauge = load_image('image\\ui\\hp_gauge.png')
         if ReloadMan.image == None:
             ReloadMan.image = load_image('image\\ally\\reloadman.png')
+        self.load_sound()
         self.hp = 2
         self.max_hp = 2
         self.velocity = 2
@@ -137,6 +158,7 @@ class ReloadMan(Ally):
                 else:
                     self.timer += 1
             else:
+                self.reload_sound.play()
                 self.timer = 0
                 self.cur_state = RELOAD
             return BehaviorTree.SUCCESS
@@ -206,6 +228,7 @@ class ThrowMan(Ally):
             Ally.hp_gauge = load_image('image\\ui\\hp_gauge.png')
         if ThrowMan.image == None:
             ThrowMan.image = load_image('image\\ally\\throwman.png')
+        self.load_sound()
         self.hp = 3
         self.max_hp = 3
         self.velocity = 2
@@ -249,6 +272,7 @@ class ThrowMan(Ally):
                     else:
                         self.timer += 1
                 else:
+                    self.reload_sound.play()
                     self.timer = 0
                     self.cur_state = RELOAD
                     self.frame = 0
@@ -275,6 +299,7 @@ class ThrowMan(Ally):
                 self.timer = 0
                 return BehaviorTree.SUCCESS
             elif self.timer == 12:
+                self.throw_sound.play()
                 self.throw_snow()
                 self.timer += 1
             else:
@@ -397,6 +422,7 @@ class ShovelMan(Ally):
             Ally.hp_gauge = load_image('image\\ui\\hp_gauge.png')
         if ShovelMan.image == None:
             ShovelMan.image = load_image('image\\ally\\shovelman.png')
+        self.load_sound()
         self.hp = 6
         self.max_hp = 6
         self.velocity = 3
@@ -479,6 +505,7 @@ class ShovelMan(Ally):
                     self.timer = 0
                 else:
                     if self.shoveling_time <= self.timer:
+                        self.make_wall_sound.play()
                         self.target_wall.strengthen_wall(self.shovel_power)
                         self.timer = 0
                     else:
@@ -550,6 +577,7 @@ class Storage(Ally):
             Ally.hp_gauge = load_image('image\\ui\\hp_gauge.png')
         if Storage.image == None:
             Storage.image = load_image('image\\ally\\storage_image.png')
+        self.load_sound()
         self.hp = 10
         self.max_hp = 10
         self.velocity = 2

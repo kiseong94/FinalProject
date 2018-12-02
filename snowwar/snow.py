@@ -9,6 +9,13 @@ FLY, HIT, DESTROY = range(3)
 pi = 3.14
 
 class Snow:
+    snow_hit = None
+
+
+    def load_sound(self):
+        if Snow.snow_hit == None:
+            Snow.snow_hit = load_wav('sound\\snow_hit2.wav')
+
     def draw(self):
         pass
 
@@ -32,6 +39,7 @@ class Snow:
             self.vx, self.vy = 0, 0
             self.cur_state = HIT
             self.frame = 0
+            self.snow_hit.play()
 
     def out_of_sight(self):
         if stage_state.base_x > self.x or self.x > stage_state.base_x + 1600:
@@ -39,7 +47,15 @@ class Snow:
 
     def collision_object(self, left, top, right, bottom):
         if self.cur_state == FLY:
-            if self.y < top and self.prev_x < left < self.x and self.vx > 0:
+            if bottom <= self.y <= top and left <= self.x <= right:
+                if self.vx > 0:
+                    self.x = left
+                else:
+                    self.x = right
+                self.cur_state = HIT
+                self.frame = 0
+                return True
+            elif self.y < top and self.prev_x < left < self.x and self.vx > 0:
                 self.x = left
                 self.cur_state = HIT
                 self.frame = 0
@@ -61,6 +77,7 @@ class SmallSnow(Snow):
             SmallSnow.image = load_image('image\\snows\\snow.png')
         if SmallSnow.destroy_image == None:
             SmallSnow.destroy_image = load_image('image\\snows\\snow_destroy.png')
+        self.load_sound()
         self.damage = size
         self.armor_piercing_point = 0
         self.x, self.y = x, y
@@ -87,6 +104,7 @@ class BigSnow(Snow):
             BigSnow.image = load_image('image\\snows\\big_snow.png')
         if BigSnow.destroy_image == None:
             BigSnow.destroy_image = load_image('image\\snows\\big_snow_destroy.png')
+        self.load_sound()
         self.damage = size
         self.armor_piercing_point = 0
         self.x, self.y = x, y
@@ -112,14 +130,25 @@ class BigSnow(Snow):
 
     def collision_object(self, left, top, right, bottom):
         if self.cur_state == FLY:
-            if self.y < top and self.prev_x < left < self.x and self.vx > 0:
+            if bottom <= self.y <= top and left <= self.x <= right:
+                if self.vx > 0:
+                    self.x = left
+                else:
+                    self.x = right
+                self.cur_state = HIT
+                self.snow_hit.play()
+                self.frame = 0
+                return True
+            elif self.y < top and self.prev_x < left < self.x and self.vx > 0:
                 self.x = left
                 self.cur_state = HIT
+                self.snow_hit.play()
                 self.frame = 0
                 return True
             elif self.y < top and self.x < right < self.prev_x and self.vx < 0:
                 self.x = right
                 self.cur_state = HIT
+                self.snow_hit.play()
                 self.frame = 0
                 return True
         elif self.cur_state == HIT and self.frame == 15:
@@ -156,6 +185,7 @@ class StoneSnow(Snow):
             StoneSnow.image = load_image('image\\snows\\stone_snow.png')
         if StoneSnow.destroy_image == None:
             StoneSnow.destroy_image = load_image('image\\snows\\snow_destroy.png')
+        self.load_sound()
         self.damage = main_state.Data.get_player_stone_snow_inform(game_data.DAMAGE)
         self.critical_chance = main_state.Data.get_player_stone_snow_inform(game_data.CRITICAL_CHANCE)
         self.piercing_num = main_state.Data.get_player_stone_snow_inform(game_data.PIERCING_NUM)
@@ -175,11 +205,22 @@ class StoneSnow(Snow):
 
     def collision_object(self, left, top, right, bottom):
         if self.cur_state == FLY:
-            if self.y < top and self.prev_x < left < self.x and self.vx > 0:
+            if bottom <= self.y <= top and left <= self.x <= right:
+                if self.vx > 0:
+                    self.x = left
+                else:
+                    self.x = right
+                if self.piercing_num == 0:
+                    self.cur_state = HIT
+                self.snow_hit.play()
+                self.frame = 0
+                return True
+            elif self.y < top and self.prev_x < left < self.x and self.vx > 0:
                 self.x = left
                 self.piercing_num -= 1
                 if self.piercing_num == 0:
                     self.cur_state = HIT
+                self.snow_hit.play()
                 self.frame = 0
                 return True
             elif self.y < top and self.x < right < self.prev_x and self.vx < 0:
@@ -187,6 +228,7 @@ class StoneSnow(Snow):
                 self.piercing_num -= 1
                 if self.piercing_num == 0:
                     self.cur_state = HIT
+                self.snow_hit.play()
                 self.frame = 0
                 return True
 
@@ -198,6 +240,7 @@ class Icicle(Snow):
             Icicle.image = load_image('image\\snows\\icicle.png')
         if Icicle.destroy_image == None:
             Icicle.destroy_image = load_image('image\\snows\\snow_destroy.png')
+        self.load_sound()
         self.damage = main_state.Data.get_player_icicle_inform(game_data.DAMAGE)
         self.armor_piercing_point = main_state.Data.get_player_icicle_inform(game_data.PIERCING_ARMOR)
         self.destroy_armor = main_state.Data.get_player_icicle_inform(game_data.DESTROY_ARMOR)
@@ -231,9 +274,11 @@ class Icicle(Snow):
     def collision_object(self, left, top, right, bottom):
         if self.cur_state == FLY:
             if self.y < top and self.prev_x < left < self.x and self.vx > 0:
+                self.snow_hit.play()
                 self.delete()
                 return True
             elif self.y < top and self.x < right < self.prev_x and self.vx < 0:
+                self.snow_hit.play()
                 self.delete()
                 return True
 
@@ -243,6 +288,7 @@ class SpreadSnow(Snow):
     def __init__(self, x, y):
         if SpreadSnow.destroy_image == None:
             SpreadSnow.destroy_image = load_image('image\\snows\\spread_snow.png')
+        self.load_sound()
         self.x, self.y = x, y
         self.damage = main_state.Data.get_player_bucket_inform(game_data.DAMAGE)
         self.armor_piercing_point = 0

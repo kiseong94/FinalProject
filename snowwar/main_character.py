@@ -67,6 +67,10 @@ class MoveState:
         stage_state.base_x += character.velocity
         character.x += character.velocity
 
+        if character.frame == 0:
+            character.make_wall_sound.play()
+
+
 
     @staticmethod
     def draw(character):
@@ -114,6 +118,9 @@ class ReloadState:
                 character.add_event(TIME_UP)
             else:
                 character.timer += 1
+
+            if character.frame%14==0:
+                character.reload_sound.play()
 
 
     @staticmethod
@@ -170,6 +177,8 @@ class MakeWallState:
 
             character.frame = 0
         else:
+            if character.frame == 0:
+                character.make_wall_sound.play()
             character.frame += 1
 
     @staticmethod
@@ -227,6 +236,7 @@ class ThrowState:
     @staticmethod
     def enter(character):
         character.frame = 0
+        character.throw_sound.play()
         if character.weapon_type == BUCKET:
             character.timer = 16
         else:
@@ -235,6 +245,7 @@ class ThrowState:
     @staticmethod
     def exit(character):
         character.throw()
+
 
 
 
@@ -310,6 +321,10 @@ class Character:
         self.reloading_gauge = load_image('image\\main_character\\reloading_gauge.png')
         self.hp_gauge = load_image('image\\main_character\\hp_gauge.png')
         self.font = load_font('font\\neodgm.ttf')
+        self.throw_sound = load_wav('sound\\throw.ogg')
+        self.reload_sound = load_wav('sound\\reload.ogg')
+        self.make_wall_sound = load_wav('sound\\makewall.ogg')
+        self.make_wall_sound.set_volume(30)
         self.x, self.y = 300, 30 + 260
         self.cur_state = IdleState
         self.frame = 0

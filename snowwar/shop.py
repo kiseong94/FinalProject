@@ -9,12 +9,18 @@ from pico2d import *
 class Shop:
     def __init__(self):
         self.font = load_font('font\\neodgm.ttf')
+        self.small_font = load_font('font\\neodgm.ttf', 15)
         self.big_font = load_font('font\\neodgm.ttf', 30)
+        self.biggest_font = load_font('font\\neodgm.ttf', 50)
         self.sheet_image = load_image('image\\shop\\frame.png')
+        self.complete_image = load_image('image\\shop\\complete.png')
         self.upgrade_button_image = load_image('image\\shop\\upgrade_button.png')
         self.buy_button_image = load_image('image\\shop\\buy_button.png')
         self.weapon_ability_image = load_image('image\\shop\\weapon_ability.png')
         self.page_button_image = load_image('image\\shop\\page_move_button.png')
+        self.coin_image = load_image('image\\shop\\coin.png')
+        self.click_sound = load_wav('sound\\button.wav')
+        self.purchase_sound = load_wav('sound\\purchase.wav')
         self.mouse_on_button = None
         self.page_number = 0
         self.inform_num = None
@@ -45,6 +51,8 @@ class Shop:
                                       ('적을 최대 1번 관통', '데미지 +1', '15% 확률로 치명타 (데미지 X 2)', '적을 최대 2번 관통', '치명타 확률 30%'),
                                       ('적의 방어 1을 무시', '눈 벽을 관통', '데미지 +1', '데미지 +1', '적의 방어 1을 부숨'),
                                       ('넓은 범위의 공격', '재장전 시간 감소', '적을 뒤로 밈', '데미지 +1', '더 넓은 범위 공격을 함')]
+        self.sheet2_explain = ['기본적인 무기. 눈 뭉치기를 중첩하면 더 크고 강력해집니다.(3스택 이상은 범위 공격)',
+                               '돌을 넣은 눈덩이. 맞으면 아픕니다', '날카로운 고드름. 적의 방어구를 뚫습니다', '눈을 가득 담은 양동이. 넓은 범위 공격을 합니다']
 
         self.sheet2_price = [[0, 600, 1200, 1800, 2400],
                              [800, 800, 1500, 2200, 3000],
@@ -56,6 +64,10 @@ class Shop:
         self.sheet3_image_pos = [[(400, 475, '눈 뭉치기 용병', '눈을 뭉쳐 줍니다'), (400, 250, '눈 던지기 용병', '눈을 던져 적을 공격합니다')],
                                  [(400, 475, '눈벽 보수 용병', '눈벽을 보수해줍니다'), (400, 250, '이동식 저장소', '눈을 저장합니다')]]
 
+        self.sheet3_explain = ['눈을 대신 뭉쳐주는 노예. 눈덩이를 한 개만 소지할 수 있습니다.',
+                               '눈을 던져 적을 공격하는 공격수입니다',
+                               '눈 벽을 보수 해줍니다', '눈덩이을 저장해줍니다. (저장소 하나 당 눈덩이 40개)']
+
         self.sheet3_ability_inform = [('특성1', '특성2', '특성3', '특성4', '특성5'),
                                       ('특성1', '특성2', '특성3', '특성4', '특성5'),
                                       ('특성1', '특성2', '특성3', '특성4', '특성5'),
@@ -63,24 +75,29 @@ class Shop:
 
         self.ability_box_pos = [(550, 425), (550, 200)]
 
-        self.sheet3_price = [0, 800, 1500, 2000]
+        self.sheet3_price = [0, 1000, 1500, 2000]
 
 
     def draw(self):
         self.sheet_image.clip_draw(1200*self.sheet_state, 0, 1200, 700, 800, 450)
 
-        self.big_font.draw(1200, 700,'%d'%main_state.Data.cur_money,(0,0,0))
+        self.biggest_font.draw(1200, 650,'%6d'%main_state.Data.cur_money, (0, 0, 0))
+        self.coin_image.draw(1050, 650, 40,40)
 
         if self.sheet_state == Character:
             # 구매, 업그레이드 버튼
             for i in range(5):
                 x, y = self.sheet1_button_pos[i]
-                if i == self.mouse_on_button:
-                    self.upgrade_button_image.clip_draw(150, 0, 150, 50, x, y)
-                else:
-                    self.upgrade_button_image.clip_draw(0, 0, 150, 50, x, y)
                 if main_state.Data.main_inform[i] < self.sheet1_price[i][0]:
+                    if i == self.mouse_on_button:
+                        self.upgrade_button_image.clip_draw(150, 0, 150, 50, x, y)
+                    else:
+                        self.upgrade_button_image.clip_draw(0, 0, 150, 50, x, y)
+
                     self.big_font.draw(x, y + 50, '%4d' % self.sheet1_price[i][main_state.Data.main_inform[i]], (255, 255, 0))
+                    self.coin_image.draw(x - 50, y + 50, 30,30)
+                else:
+                    self.complete_image.draw(x, y)
 
             for i in range(5):
                 x, y, option_name = self.sheet1_image_pos[i]
@@ -92,25 +109,30 @@ class Shop:
             # 구매, 업그레이드 버튼
             for i in range(2):
                 x, y = self.sheet2_button_pos[i]
-                if main_state.Data.available_weapon[self.page_number * 2 + i]:
-                    if i == self.mouse_on_button:
-                        self.upgrade_button_image.clip_draw(150, 0, 150, 50, x, y)
-                    else:
-                        self.upgrade_button_image.clip_draw(0, 0, 150, 50, x, y)
-                else:
-                    if i == self.mouse_on_button:
-                        self.buy_button_image.clip_draw(150, 0, 150, 50, x, y)
-                    else:
-                        self.buy_button_image.clip_draw(0, 0, 150, 50, x, y)
                 if main_state.Data.weapon_level[self.page_number * 2 + i] < 5:
+                    if main_state.Data.available_weapon[self.page_number * 2 + i]:
+                        if i == self.mouse_on_button:
+                            self.upgrade_button_image.clip_draw(150, 0, 150, 50, x, y)
+                        else:
+                            self.upgrade_button_image.clip_draw(0, 0, 150, 50, x, y)
+                    else:
+                        if i == self.mouse_on_button:
+                            self.buy_button_image.clip_draw(150, 0, 150, 50, x, y)
+                        else:
+                            self.buy_button_image.clip_draw(0, 0, 150, 50, x, y)
+
                     self.big_font.draw(x, y + 50, '%4d' % self.sheet2_price[self.page_number * 2 + i][main_state.Data.weapon_level[self.page_number * 2 + i]],(255, 255, 0))
+                    self.coin_image.draw(x - 50, y + 50, 30, 30)
+                else:
+                    self.complete_image.draw(x, y)
 
             # 무기 이미지, 이름
             for i in range(2):
                 x, y, option_name = self.sheet2_image_pos[self.page_number][i]
                 # option_name = option_name + ' %d'
                 self.sheet2_select_image.clip_draw(150 * (self.page_number * 2 + i), 0, 150, 150, x, y)
-                self.font.draw(x + 100, y + 50, option_name + ' LV.%d' % main_state.Data.weapon_level[self.page_number * 2 + i], (0, 0, 0))
+                self.font.draw(x + 100, y + 50, option_name + ' LV.%d' % main_state.Data.weapon_level[self.page_number * 2 + i], (150, 0, 0))
+                self.small_font.draw(x + 100, y + 10, self.sheet2_explain[self.page_number * 2 + i],(0,0,0))
 
             # 레벨에 따른 특성 정보
             for i in range(2):
@@ -132,25 +154,30 @@ class Shop:
             # 구매, 업그레이드 버튼
             for i in range(2):
                 x, y = self.sheet3_button_pos[i]
-                if main_state.Data.available_ally[self.page_number * 2 + i]:
-                    if i == self.mouse_on_button:
-                        self.upgrade_button_image.clip_draw(150, 0, 150, 50, x, y)
-                    else:
-                        self.upgrade_button_image.clip_draw(0, 0, 150, 50, x, y)
-                else:
-                    if i == self.mouse_on_button:
-                        self.buy_button_image.clip_draw(150, 0, 150, 50, x, y)
-                    else:
-                        self.buy_button_image.clip_draw(0, 0, 150, 50, x, y)
                 if main_state.Data.ally_level[self.page_number * 2 + i] < 1:
+                    if main_state.Data.available_ally[self.page_number * 2 + i]:
+                        if i == self.mouse_on_button:
+                            self.upgrade_button_image.clip_draw(150, 0, 150, 50, x, y)
+                        else:
+                            self.upgrade_button_image.clip_draw(0, 0, 150, 50, x, y)
+                    else:
+                        if i == self.mouse_on_button:
+                            self.buy_button_image.clip_draw(150, 0, 150, 50, x, y)
+                        else:
+                            self.buy_button_image.clip_draw(0, 0, 150, 50, x, y)
+
                     self.big_font.draw(x, y + 50, '%4d' % self.sheet3_price[self.page_number * 2 + i],(255, 255, 0))
+                    self.coin_image.draw(x - 50, y + 50, 30, 30)
+                else:
+                    self.complete_image.draw(x, y)
 
             # 용병 이미지, 이름
             for i in range(2):
                 x, y, option_name, inform = self.sheet3_image_pos[self.page_number][i]
                 # option_name = option_name + ' %d'
                 self.sheet3_select_image.clip_draw(150 * (self.page_number * 2 + i), 0, 150, 150, x, y)
-                self.font.draw(x + 100, y + 50, option_name, (0, 0, 0))
+                self.font.draw(x + 100, y + 50, option_name, (0, 0, 150))
+                self.small_font.draw(x + 100, y + 10, self.sheet3_explain[self.page_number * 2 + i], (0, 0, 0))
 
             # 페이지 이동 버튼
             if self.page_number == 0:
@@ -178,6 +205,7 @@ class Shop:
                 x, y = self.sheet_select_button_pos[i]
                 if x - 70 <= mouse_x <= x + 70 and y - 30 <= mouse_y <= y + 30:
                     self.sheet_state = i
+                    self.click_sound.play()
 
             if self.sheet_state == Character:
                 for i in range(5):
@@ -186,6 +214,7 @@ class Shop:
                         if main_state.Data.main_inform[i] < self.sheet1_price[i][0] and main_state.Data.cur_money >= self.sheet1_price[i][main_state.Data.main_inform[i]]:
                             main_state.Data.cur_money -= self.sheet1_price[i][main_state.Data.main_inform[i]]
                             main_state.Data.main_inform[i] += 1
+                            self.purchase_sound.play()
                         break
             elif self.sheet_state == Weapon:
                 for i in range(2):
@@ -196,20 +225,24 @@ class Shop:
                                     >= self.sheet2_price[self.page_number * 2 + i][main_state.Data.weapon_level[self.page_number * 2 + i]]:
                                 main_state.Data.cur_money -= self.sheet2_price[self.page_number * 2 + i][main_state.Data.weapon_level[self.page_number * 2 + i]]
                                 main_state.Data.weapon_level[self.page_number * 2 + i] += 1
+                                self.purchase_sound.play()
                         else:
                             if main_state.Data.cur_money >= self.sheet2_price[self.page_number * 2 + i][main_state.Data.weapon_level[self.page_number * 2 + i]]:
                                 main_state.Data.cur_money -= self.sheet2_price[self.page_number * 2 + i][main_state.Data.weapon_level[self.page_number * 2 + i]]
                                 main_state.Data.available_weapon[self.page_number * 2 + i] = True
                                 main_state.Data.weapon_level[self.page_number * 2 + i] += 1
+                                self.purchase_sound.play()
                         break
                     if self.page_number == 0:
                         x, y = self.page_right_button
                         if x - 25 <= mouse_x <= x + 25 and y - 100 <= mouse_y <= y + 100:
                             self.page_number += 1
+                            self.click_sound.play()
                     elif self.page_number == 1:
                         x, y = self.page_left_button
                         if x - 25 <= mouse_x <= x + 25 and y - 100 <= mouse_y <= y + 100:
                             self.page_number -= 1
+                            self.click_sound.play()
 
             elif self.sheet_state == Ally:
                 for i in range(2):
@@ -222,15 +255,18 @@ class Shop:
                             if main_state.Data.ally_level[self.page_number * 2 + i] < 1 and main_state.Data.cur_money >= self.sheet3_price[self.page_number * 2 + i]:
                                 main_state.Data.cur_money -= self.sheet3_price[self.page_number * 2 + i]
                                 main_state.Data.ally_level[self.page_number * 2 + i] += 1
+                                self.purchase_sound.play()
                         break
                     if self.page_number == 0:
                         x, y = self.page_right_button
                         if x - 25 <= mouse_x <= x + 25 and y - 100 <= mouse_y <= y + 100:
                             self.page_number += 1
+                            self.click_sound.play()
                     elif self.page_number == 1:
                         x, y = self.page_left_button
                         if x - 25 <= mouse_x <= x + 25 and y - 100 <= mouse_y <= y + 100:
                             self.page_number -= 1
+                            self.click_sound.play()
 
 
 

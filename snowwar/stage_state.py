@@ -41,7 +41,7 @@ def enter():
     ui = interface.UI()
     obj_creator = object_creator.ObjectCreator()
     obj_creator.create_ally()
-    end_point = obj_creator.stage_start(main_state.stage_num) * PIXEL_PER_METER
+    end_point = obj_creator.stage_start(main_state.Data.stage_num) * PIXEL_PER_METER
     ui.game_start()
 
 
